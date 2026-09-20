@@ -112,7 +112,7 @@
       "additionalProperties": false,
       "required": ["local_datetime", "timezone_id", "fold", "utc_offset_seconds", "utc_datetime", "jd_ut", "jd_tt", "delta_t_seconds", "tzdb_provider", "tzdb_version", "resolution_status"],
       "properties": {
-        "local_datetime": { "type": "string", "format": "date-time" },
+        "local_datetime": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?$" },
         "timezone_id": { "type": "string" },
         "fold": { "type": ["integer", "null"], "enum": [0, 1, null] },
         "utc_offset_seconds": { "type": "integer" },
