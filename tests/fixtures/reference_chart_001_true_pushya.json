@@ -1,0 +1,28 @@
+{
+  "fixture_id": "reference-chart-001-true-pushya",
+  "note": "Anonymous canonical regression fixture. Numerical values were generated with pyswisseph 2.10.03; source fallback is recorded at runtime, while the assertions allow small ephemeris-source numerical tolerance.",
+  "input": {
+    "local_datetime": "1997-06-07T20:28:36",
+    "timezone_id": "Asia/Tehran",
+    "latitude_deg": 36.15,
+    "longitude_deg": 51.6166666667
+  },
+  "expected": {
+    "utc_datetime": "1997-06-07T15:58:36+00:00",
+    "utc_offset_seconds": 16200,
+    "ayanamsha_deg": 22.68264984822582,
+    "ascendant_sidereal_longitude_deg": 237.41339805282163,
+    "ascendant_sign_index": 7,
+    "placements": {
+      "sun": {"sidereal_longitude_deg": 54.24970958069625, "sign_index": 1, "house": 7},
+      "moon": {"sidereal_longitude_deg": 82.77337484459395, "sign_index": 2, "house": 8},
+      "mars": {"sidereal_longitude_deg": 152.59182149321572, "sign_index": 5, "house": 11},
+      "mercury": {"sidereal_longitude_deg": 35.06623548830817, "sign_index": 1, "house": 7},
+      "jupiter": {"sidereal_longitude_deg": 299.2497590918123, "sign_index": 9, "house": 3},
+      "venus": {"sidereal_longitude_deg": 71.58235105089206, "sign_index": 2, "house": 8},
+      "saturn": {"sidereal_longitude_deg": 355.22770858805205, "sign_index": 11, "house": 5},
+      "rahu": {"sidereal_longitude_deg": 152.14468394929304, "sign_index": 5, "house": 11},
+      "ketu": {"sidereal_longitude_deg": 332.14468394929304, "sign_index": 11, "house": 5}
+    }
+  }
+}
