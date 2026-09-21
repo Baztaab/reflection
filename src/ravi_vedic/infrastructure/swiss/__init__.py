@@ -1,3 +1,3 @@
-from .adapter import SwissEphemerisAdapter
+from .adapter import EphemerisSourceError, SwissEphemerisAdapter
 
-__all__ = ["SwissEphemerisAdapter"]
+__all__ = ["EphemerisSourceError", "SwissEphemerisAdapter"]

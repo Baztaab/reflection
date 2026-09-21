@@ -5,6 +5,7 @@ import pytest
 
 from ravi_vedic import BirthInput, calculate_d1
 from ravi_vedic.domain.models import Graha
+from ravi_vedic.infrastructure.swiss import EphemerisSourceError, SwissEphemerisAdapter
 
 FIXTURE = Path(__file__).parents[1] / "fixtures" / "reference_chart_001_true_pushya.json"
 
@@ -12,7 +13,7 @@ FIXTURE = Path(__file__).parents[1] / "fixtures" / "reference_chart_001_true_pus
 def test_reference_chart_001_matches_golden_structure() -> None:
     fixture = json.loads(FIXTURE.read_text())
     birth = BirthInput.from_iso(**fixture["input"])
-    result = calculate_d1(birth)
+    result = calculate_d1(birth, astronomy=SwissEphemerisAdapter(allow_moshier_fallback=True))
 
     expected = fixture["expected"]
     assert result.canon_id == "ravi-vedic-mvp-v1"
@@ -36,9 +37,23 @@ def test_reference_chart_001_matches_golden_structure() -> None:
 
 def test_ketu_is_exactly_opposite_true_rahu() -> None:
     fixture = json.loads(FIXTURE.read_text())
-    result = calculate_d1(BirthInput.from_iso(**fixture["input"]))
+    result = calculate_d1(
+        BirthInput.from_iso(**fixture["input"]),
+        astronomy=SwissEphemerisAdapter(allow_moshier_fallback=True),
+    )
     rahu = result.astronomy.bodies[Graha.RAHU]
     ketu = result.astronomy.bodies[Graha.KETU]
     assert (ketu.sidereal_longitude_deg - rahu.sidereal_longitude_deg) % 360.0 == pytest.approx(180.0, abs=1e-12)
     assert ketu.longitude_speed_deg_per_day == rahu.longitude_speed_deg_per_day
     assert ketu.source_method == "derived:exact-opposition-from-true-rahu"
+
+
+def test_canonical_profile_rejects_silent_moshier_when_files_are_absent() -> None:
+    fixture = json.loads(FIXTURE.read_text())
+    birth = BirthInput.from_iso(**fixture["input"])
+    try:
+        result = calculate_d1(birth)
+    except EphemerisSourceError:
+        return
+    assert "swisseph-files" in result.astronomy.provenance.actual_sources
+    assert result.astronomy.provenance.source_profile == "canonical-strict-swiss-files"

@@ -115,6 +115,7 @@ class AstronomyProvenance:
     requested_flags: int
     sidereal_mode: str
     ayanamsha_policy_id: str
+    source_profile: str
     actual_sources: tuple[str, ...]
     warnings: tuple[str, ...]
 

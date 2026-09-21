@@ -36,11 +36,21 @@ def _source_from_flags(flags: int) -> str:
     return "unknown"
 
 
+class EphemerisSourceError(RuntimeError):
+    pass
+
+
 class SwissEphemerisAdapter:
     """The only module in RAVI VEDIC allowed to know Swiss Ephemeris details."""
 
-    def __init__(self, ephemeris_path: str | Path | None = None) -> None:
+    def __init__(
+        self,
+        ephemeris_path: str | Path | None = None,
+        *,
+        allow_moshier_fallback: bool = False,
+    ) -> None:
         self._ephemeris_path = str(ephemeris_path) if ephemeris_path else None
+        self._allow_moshier_fallback = allow_moshier_fallback
         self._requested_flags = swe.FLG_SWIEPH | swe.FLG_SPEED
 
     @contextmanager
@@ -87,6 +97,10 @@ class SwissEphemerisAdapter:
                 source = _source_from_flags(sidereal_retflags)
                 actual_sources.add(source)
                 if source != "swisseph-files":
+                    if not self._allow_moshier_fallback:
+                        raise EphemerisSourceError(
+                            f"canonical profile requires Swiss .se1 files; actual source={source}"
+                        )
                     warning = f"EPHEMERIS_SOURCE_FALLBACK:{source}"
                     if warning not in warnings:
                         warnings.append(warning)
@@ -109,6 +123,10 @@ class SwissEphemerisAdapter:
             rahu_tropical_source = _source_from_flags(rahu_tropical_retflags)
             actual_sources.add(rahu_tropical_source)
             if rahu_tropical_source != "swisseph-files":
+                if not self._allow_moshier_fallback:
+                    raise EphemerisSourceError(
+                        f"canonical profile requires Swiss .se1 files; actual source={rahu_tropical_source}"
+                    )
                 warning = f"EPHEMERIS_SOURCE_FALLBACK:{rahu_tropical_source}"
                 if warning not in warnings:
                     warnings.append(warning)
@@ -173,6 +191,10 @@ class SwissEphemerisAdapter:
                 requested_flags=self._requested_flags,
                 sidereal_mode="SIDM_TRUE_PUSHYA",
                 ayanamsha_policy_id=canon.ayanamsha_policy_id,
+                source_profile=(
+                    "development-allow-moshier" if self._allow_moshier_fallback
+                    else "canonical-strict-swiss-files"
+                ),
                 actual_sources=tuple(sorted(actual_sources)),
                 warnings=tuple(warnings),
             ),
