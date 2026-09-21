@@ -33,6 +33,7 @@ def _snapshot(asc: float, body_lon: float) -> AstronomicalSnapshot:
             requested_flags=0,
             sidereal_mode="test",
             ayanamsha_policy_id=RAVI_VEDIC_MVP_V1.ayanamsha_policy_id,
+            source_profile="test",
             actual_sources=("test",),
             warnings=(),
         ),
