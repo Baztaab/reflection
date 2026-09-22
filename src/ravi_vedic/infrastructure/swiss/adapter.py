@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from importlib import metadata
 from pathlib import Path
 from threading import RLock
@@ -98,7 +98,7 @@ class SwissEphemerisAdapter:
     def julian_time(self, utc_datetime: datetime) -> JulianTime:
         if (
             utc_datetime.tzinfo is None
-            or utc_datetime.utcoffset() != timezone.utc.utcoffset(utc_datetime)
+            or utc_datetime.utcoffset() != UTC.utcoffset(utc_datetime)
         ):
             raise ValueError("utc_datetime must be timezone-aware UTC")
         seconds = utc_datetime.second + utc_datetime.microsecond / 1_000_000.0

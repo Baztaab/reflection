@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from ravi_vedic.astronomy.port import AstronomyPort
-from ravi_vedic.domain.canon import CalculationCanon, RAVI_VEDIC_MVP_V1
+from ravi_vedic.domain.canon import RAVI_VEDIC_MVP_V1, CalculationCanon
 from ravi_vedic.domain.d1 import build_d1
 from ravi_vedic.domain.models import BirthInput, CoreResult
 from ravi_vedic.domain.varga import build_varga
@@ -35,4 +35,3 @@ def calculate_core(
         d9=d9,
         d10=d10,
     )
-

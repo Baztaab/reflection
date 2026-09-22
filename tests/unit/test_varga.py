@@ -35,7 +35,10 @@ def _snapshot(asc: float, body_lon: float) -> AstronomicalSnapshot:
         provenance=AstronomyProvenance(
             implementation="test",
             implementation_version="1",
+            library_version="1",
             ephemeris_path=None,
+            ephemeris_manifest_sha256=None,
+            ephemeris_file_count=0,
             requested_flags=0,
             sidereal_mode="test",
             ayanamsha_policy_id=RAVI_VEDIC_MVP_V1.ayanamsha_policy_id,
@@ -48,9 +51,9 @@ def _snapshot(asc: float, body_lon: float) -> AstronomicalSnapshot:
 
 def test_navamsa_segment_zero_start_signs_follow_modality() -> None:
     policy = get_varga_policy("varga.parasari-navamsa-v1")
-    assert project_longitude(0.0, policy).target_sign_index == 0      # Aries movable -> Aries
-    assert project_longitude(30.0, policy).target_sign_index == 9     # Taurus fixed -> Capricorn
-    assert project_longitude(60.0, policy).target_sign_index == 6     # Gemini dual -> Libra
+    assert project_longitude(0.0, policy).target_sign_index == 0  # Aries movable -> Aries
+    assert project_longitude(30.0, policy).target_sign_index == 9  # Taurus fixed -> Capricorn
+    assert project_longitude(60.0, policy).target_sign_index == 6  # Gemini dual -> Libra
 
 
 def test_dashamsa_segment_zero_start_signs_follow_odd_even_rule() -> None:

@@ -5,7 +5,6 @@ from types import MappingProxyType
 from ravi_vedic.domain.varga.base import VargaPolicy
 from ravi_vedic.domain.varga.policies import ParasariDashamsaV1, ParasariNavamsaV1
 
-
 _POLICIES = MappingProxyType(
     {
         "varga.parasari-navamsa-v1": ParasariNavamsaV1(),

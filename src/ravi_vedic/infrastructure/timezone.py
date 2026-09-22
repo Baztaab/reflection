@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from importlib import metadata, resources
 from zoneinfo import ZoneInfo
 
@@ -52,7 +52,7 @@ def _valid_candidates(local: datetime, zone: ZoneInfo) -> list[_Candidate]:
     out: list[_Candidate] = []
     for fold in (0, 1):
         aware = local.replace(tzinfo=zone, fold=fold)
-        utc = aware.astimezone(timezone.utc)
+        utc = aware.astimezone(UTC)
         round_trip = utc.astimezone(zone)
         if round_trip.replace(tzinfo=None) == local and round_trip.fold == fold:
             out.append(_Candidate(fold=fold, aware=aware, utc=utc))

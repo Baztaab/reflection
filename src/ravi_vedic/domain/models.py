@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
 from types import MappingProxyType
-from typing import Mapping
 
 
 class Graha(StrEnum):
@@ -54,7 +54,7 @@ class BirthInput:
         latitude_deg: float,
         longitude_deg: float,
         **kwargs: object,
-    ) -> "BirthInput":
+    ) -> BirthInput:
         return cls(
             local_datetime=datetime.fromisoformat(local_datetime),
             timezone_id=timezone_id,
@@ -138,7 +138,7 @@ class AstronomicalSnapshot:
         bodies: Mapping[Graha, BodyPosition],
         ascendant: AscendantPosition,
         provenance: AstronomyProvenance,
-    ) -> "AstronomicalSnapshot":
+    ) -> AstronomicalSnapshot:
         return cls(
             ayanamsha_deg=ayanamsha_deg,
             bodies=MappingProxyType(dict(bodies)),
@@ -177,7 +177,7 @@ class D1Chart:
         placements: Mapping[Graha, D1Placement],
         house_policy_id: str,
         mapping_policy_id: str,
-    ) -> "D1Chart":
+    ) -> D1Chart:
         return cls(
             ascendant_sidereal_longitude_deg=ascendant_sidereal_longitude_deg,
             ascendant_sign_index=ascendant_sign_index,
@@ -223,7 +223,7 @@ class VargaChart:
         ascendant: VargaProjection,
         placements: Mapping[Graha, VargaPlacement],
         mapping_policy_id: str,
-    ) -> "VargaChart":
+    ) -> VargaChart:
         return cls(
             varga=varga,
             factor=factor,
