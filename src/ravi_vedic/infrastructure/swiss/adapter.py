@@ -7,6 +7,7 @@ from pathlib import Path
 import swisseph as swe
 
 from ravi_vedic.domain.canon import CalculationCanon
+from ravi_vedic.domain.geometry import normalize_longitude
 from ravi_vedic.domain.models import (
     AscendantPosition,
     AstronomicalSnapshot,
@@ -32,10 +33,6 @@ _BODY_IDS = {
     Graha.VENUS: swe.VENUS,
     Graha.SATURN: swe.SATURN,
 }
-
-
-def _normalize(value: float) -> float:
-    return value % 360.0
 
 
 def _source_from_flags(flags: int) -> str:
@@ -156,8 +153,8 @@ class SwissEphemerisAdapter:
                         warnings.append(warning)
                 bodies[body] = BodyPosition(
                     body=body,
-                    tropical_longitude_deg=_normalize(tropical[0]),
-                    sidereal_longitude_deg=_normalize(sidereal[0]),
+                    tropical_longitude_deg=normalize_longitude(tropical[0]),
+                    sidereal_longitude_deg=normalize_longitude(sidereal[0]),
                     latitude_deg=sidereal[1],
                     distance_au=sidereal[2],
                     longitude_speed_deg_per_day=sidereal[3],
@@ -185,13 +182,13 @@ class SwissEphemerisAdapter:
                     swe.TRUE_NODE,
                     sidereal_flags,
                 )
-                rahu_sidereal_lon = _normalize(rahu_sidereal[0])
+                rahu_sidereal_lon = normalize_longitude(rahu_sidereal[0])
                 rahu_lat = rahu_sidereal[1]
                 rahu_distance = rahu_sidereal[2]
                 rahu_speed = rahu_sidereal[3]
                 rahu_method = "swiss-true-node:direct-sidereal"
             except swe.Error:
-                rahu_sidereal_lon = _normalize(rahu_tropical[0] - ayanamsha)
+                rahu_sidereal_lon = normalize_longitude(rahu_tropical[0] - ayanamsha)
                 rahu_lat = rahu_tropical[1]
                 rahu_distance = rahu_tropical[2]
                 rahu_speed = rahu_tropical[3]
@@ -200,7 +197,7 @@ class SwissEphemerisAdapter:
 
             rahu = BodyPosition(
                 body=Graha.RAHU,
-                tropical_longitude_deg=_normalize(rahu_tropical[0]),
+                tropical_longitude_deg=normalize_longitude(rahu_tropical[0]),
                 sidereal_longitude_deg=rahu_sidereal_lon,
                 latitude_deg=rahu_lat,
                 distance_au=rahu_distance,
@@ -213,8 +210,8 @@ class SwissEphemerisAdapter:
             bodies[Graha.RAHU] = rahu
             bodies[Graha.KETU] = BodyPosition(
                 body=Graha.KETU,
-                tropical_longitude_deg=_normalize(rahu.tropical_longitude_deg + 180.0),
-                sidereal_longitude_deg=_normalize(rahu.sidereal_longitude_deg + 180.0),
+                tropical_longitude_deg=normalize_longitude(rahu.tropical_longitude_deg + 180.0),
+                sidereal_longitude_deg=normalize_longitude(rahu.sidereal_longitude_deg + 180.0),
                 latitude_deg=0.0,
                 distance_au=rahu.distance_au,
                 longitude_speed_deg_per_day=rahu.longitude_speed_deg_per_day,
@@ -238,8 +235,8 @@ class SwissEphemerisAdapter:
             )[1][0]
 
             ascendant = AscendantPosition(
-                tropical_longitude_deg=_normalize(tropical_asc),
-                sidereal_longitude_deg=_normalize(sidereal_asc),
+                tropical_longitude_deg=normalize_longitude(tropical_asc),
+                sidereal_longitude_deg=normalize_longitude(sidereal_asc),
                 source_method="swiss-houses-ex:whole-sign-ascendant",
             )
 

@@ -56,7 +56,7 @@ class FakeAstronomy:
                 ephemeris_file_count=0,
                 requested_flags=0,
                 sidereal_mode="test-only",
-                ayanamsha_policy_id=canon.ayanamsha_policy_id,
+                ayanamsha_policy_id=canon.astronomy.ayanamsha_policy_id,
                 source_profile="test-only",
                 actual_sources=("fake",),
                 warnings=(),
