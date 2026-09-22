@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Baztaab/reflection/schemas/ravi_vedic_core_v1.schema.json",
+  "title": "RAVI VEDIC executable core v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "canon_id", "input", "time_context", "provenance", "astronomy", "charts"],
+  "properties": {
+    "schema_version": {"const": "ravi-vedic-core-v1"},
+    "canon_id": {"const": "ravi-vedic-mvp-v1"},
+    "input": {"$ref": "#/$defs/birthInput"},
+    "time_context": {"$ref": "#/$defs/timeContext"},
+    "provenance": {"$ref": "#/$defs/provenance"},
+    "astronomy": {"$ref": "#/$defs/astronomy"},
+    "charts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["D1", "D9", "D10"],
+      "properties": {
+        "D1": {"$ref": "#/$defs/d1Chart"},
+        "D9": {"$ref": "#/$defs/vargaChart"},
+        "D10": {"$ref": "#/$defs/vargaChart"}
+      }
+    }
+  },
+  "$defs": {
+    "bodyName": {
+      "enum": ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn", "Rahu", "Ketu"]
+    },
+    "signName": {
+      "enum": ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"]
+    },
+    "longitude": {"type": "number", "minimum": 0, "exclusiveMaximum": 360},
+    "degreeInSign": {"type": "number", "minimum": 0, "exclusiveMaximum": 30},
+    "house": {"type": "integer", "minimum": 1, "maximum": 12},
+    "birthInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["local_datetime", "timezone_id", "latitude_deg", "longitude_deg", "elevation_m", "calendar", "time_uncertainty_seconds", "fold", "source_note"],
+      "properties": {
+        "local_datetime": {"type": "string"},
+        "timezone_id": {"type": "string", "minLength": 1},
+        "latitude_deg": {"type": "number", "minimum": -90, "maximum": 90},
+        "longitude_deg": {"type": "number", "minimum": -180, "exclusiveMaximum": 180},
+        "elevation_m": {"type": ["number", "null"]},
+        "calendar": {"const": "gregorian"},
+        "time_uncertainty_seconds": {"type": "integer", "minimum": 0},
+        "fold": {"type": ["integer", "null"], "enum": [0, 1, null]},
+        "source_note": {"type": ["string", "null"]}
+      }
+    },
+    "timeContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["local_datetime", "timezone_id", "fold", "utc_offset_seconds", "utc_datetime", "jd_ut", "jd_tt", "delta_t_seconds", "tzdb_provider", "tzdb_version", "resolution_status"],
+      "properties": {
+        "local_datetime": {"type": "string"},
+        "timezone_id": {"type": "string"},
+        "fold": {"type": "integer", "enum": [0, 1]},
+        "utc_offset_seconds": {"type": "integer"},
+        "utc_datetime": {"type": "string"},
+        "jd_ut": {"type": "number"},
+        "jd_tt": {"type": "number"},
+        "delta_t_seconds": {"type": "number"},
+        "tzdb_provider": {"const": "python-tzdata"},
+        "tzdb_version": {"type": "string", "minLength": 1},
+        "resolution_status": {"enum": ["exact", "ambiguous_resolved"]}
+      }
+    },
+    "astronomyProvenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["implementation", "implementation_version", "library_version", "ephemeris_path", "ephemeris_manifest_sha256", "ephemeris_file_count", "requested_flags", "sidereal_mode", "ayanamsha_policy_id", "source_profile", "actual_sources", "warnings"],
+      "properties": {
+        "implementation": {"const": "pyswisseph"},
+        "implementation_version": {"type": "string"},
+        "library_version": {"type": "string"},
+        "ephemeris_path": {"type": ["string", "null"]},
+        "ephemeris_manifest_sha256": {"type": ["string", "null"]},
+        "ephemeris_file_count": {"type": "integer", "minimum": 0},
+        "requested_flags": {"type": "integer"},
+        "sidereal_mode": {"const": "SIDM_TRUE_PUSHYA"},
+        "ayanamsha_policy_id": {"const": "ayanamsha.true-pushya.swiss-v1"},
+        "source_profile": {"enum": ["canonical-strict-swiss-files", "development-allow-moshier"]},
+        "actual_sources": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "warnings": {"type": "array", "items": {"type": "string"}}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"source_profile": {"const": "canonical-strict-swiss-files"}}},
+          "then": {
+            "properties": {
+              "ephemeris_path": {"type": "string", "minLength": 1},
+              "ephemeris_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+              "ephemeris_file_count": {"type": "integer", "minimum": 1}
+            }
+          }
+        }
+      ]
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deterministic_input_hash", "astronomy"],
+      "properties": {
+        "deterministic_input_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "astronomy": {"$ref": "#/$defs/astronomyProvenance"}
+      }
+    },
+    "astronomyBody": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["body", "tropical_longitude_deg", "sidereal_longitude_deg", "latitude_deg", "distance_au", "longitude_speed_deg_per_day", "retrograde", "source_method"],
+      "properties": {
+        "body": {"$ref": "#/$defs/bodyName"},
+        "tropical_longitude_deg": {"$ref": "#/$defs/longitude"},
+        "sidereal_longitude_deg": {"$ref": "#/$defs/longitude"},
+        "latitude_deg": {"type": "number"},
+        "distance_au": {"type": "number"},
+        "longitude_speed_deg_per_day": {"type": "number"},
+        "retrograde": {"type": "boolean"},
+        "source_method": {"type": "string"}
+      }
+    },
+    "astronomy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ayanamsha_deg", "ascendant", "bodies"],
+      "properties": {
+        "ayanamsha_deg": {"type": "number"},
+        "ascendant": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tropical_longitude_deg", "sidereal_longitude_deg", "source_method"],
+          "properties": {
+            "tropical_longitude_deg": {"$ref": "#/$defs/longitude"},
+            "sidereal_longitude_deg": {"$ref": "#/$defs/longitude"},
+            "source_method": {"type": "string"}
+          }
+        },
+        "bodies": {
+          "type": "array",
+          "minItems": 9,
+          "maxItems": 9,
+          "items": {"$ref": "#/$defs/astronomyBody"}
+        }
+      }
+    },
+    "d1Placement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["body", "sidereal_longitude_deg", "sign_index", "sign", "degree_in_sign", "house", "retrograde", "mapping_policy_id"],
+      "properties": {
+        "body": {"$ref": "#/$defs/bodyName"},
+        "sidereal_longitude_deg": {"$ref": "#/$defs/longitude"},
+        "sign_index": {"type": "integer", "minimum": 0, "maximum": 11},
+        "sign": {"$ref": "#/$defs/signName"},
+        "degree_in_sign": {"$ref": "#/$defs/degreeInSign"},
+        "house": {"$ref": "#/$defs/house"},
+        "retrograde": {"type": "boolean"},
+        "mapping_policy_id": {"const": "varga.rasi-v1"}
+      }
+    },
+    "d1Chart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["varga", "mapping_policy_id", "house_policy_id", "ascendant", "grahas"],
+      "properties": {
+        "varga": {"const": "D1"},
+        "mapping_policy_id": {"const": "varga.rasi-v1"},
+        "house_policy_id": {"const": "houses.whole-sign-v1"},
+        "ascendant": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sidereal_longitude_deg", "sign_index", "sign", "degree_in_sign"],
+          "properties": {
+            "sidereal_longitude_deg": {"$ref": "#/$defs/longitude"},
+            "sign_index": {"type": "integer", "minimum": 0, "maximum": 11},
+            "sign": {"$ref": "#/$defs/signName"},
+            "degree_in_sign": {"$ref": "#/$defs/degreeInSign"}
+          }
+        },
+        "grahas": {
+          "type": "array",
+          "minItems": 9,
+          "maxItems": 9,
+          "items": {"$ref": "#/$defs/d1Placement"}
+        }
+      }
+    },
+    "vargaProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_longitude_deg", "segment_index", "target_sign_index", "target_sign", "longitude_within_target_sign_deg", "projected_longitude_deg", "mapping_policy_id"],
+      "properties": {
+        "source_longitude_deg": {"$ref": "#/$defs/longitude"},
+        "segment_index": {"type": "integer", "minimum": 0},
+        "target_sign_index": {"type": "integer", "minimum": 0, "maximum": 11},
+        "target_sign": {"$ref": "#/$defs/signName"},
+        "longitude_within_target_sign_deg": {"$ref": "#/$defs/degreeInSign"},
+        "projected_longitude_deg": {"$ref": "#/$defs/longitude"},
+        "mapping_policy_id": {"type": "string"}
+      }
+    },
+    "vargaGraha": {
+      "allOf": [
+        {"$ref": "#/$defs/vargaProjection"},
+        {
+          "type": "object",
+          "required": ["body", "house", "retrograde"],
+          "properties": {
+            "body": {"$ref": "#/$defs/bodyName"},
+            "house": {"$ref": "#/$defs/house"},
+            "retrograde": {"type": "boolean"}
+          }
+        }
+      ]
+    },
+    "vargaChart": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["varga", "factor", "mapping_policy_id", "ascendant", "grahas"],
+      "properties": {
+        "varga": {"enum": ["D9", "D10"]},
+        "factor": {"enum": [9, 10]},
+        "mapping_policy_id": {"enum": ["varga.parasari-navamsa-v1", "varga.parasari-dashamsa-v1"]},
+        "ascendant": {"$ref": "#/$defs/vargaProjection"},
+        "grahas": {
+          "type": "array",
+          "minItems": 9,
+          "maxItems": 9,
+          "items": {"$ref": "#/$defs/vargaGraha"}
+        }
+      }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from math import floor
+from decimal import Decimal, localcontext
 
 from ravi_vedic.domain.geometry import degree_in_sign, normalize_longitude, sign_index
 from ravi_vedic.domain.models import VargaProjection
@@ -15,10 +15,14 @@ def project_longitude(source_longitude_deg: float, policy: VargaPolicy) -> Varga
     source_sign = sign_index(source_longitude)
     source_degree = degree_in_sign(source_longitude)
 
-    scaled = source_degree * policy.factor / 30.0
-    segment_index = min(floor(scaled), policy.factor - 1)
-    fraction_within_segment = scaled - segment_index
-    longitude_within_target = fraction_within_segment * 30.0
+    # Decimal(str(float)) preserves the caller-visible numeric value while avoiding
+    # binary floating-point drift exactly at Varga segment boundaries.
+    with localcontext() as context:
+        context.prec = 34
+        scaled = Decimal(str(source_degree)) * Decimal(policy.factor) / Decimal(30)
+        segment_index = min(int(scaled), policy.factor - 1)
+        fraction_within_segment = scaled - Decimal(segment_index)
+        longitude_within_target = float(fraction_within_segment * Decimal(30))
 
     target_sign = policy.target_sign(source_sign, segment_index)
     projected_longitude = target_sign * 30.0 + longitude_within_target
