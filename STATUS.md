@@ -5,10 +5,10 @@ Current milestone: **M2.6 — Engine Foundation IN PROGRESS**
 Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon + M2.6.5 shared angular/boundary kernel**.
 Next phase: **M2.6.6 generic chart frame and chart collection — NOT STARTED**.
 
-Current verified `main`: `8cf1c22baebd27a5663362f06d9d090335d02fee`
-(M2.6.5 merged).
+M2.6.5 verified calculation baseline: `8cf1c22baebd27a5663362f06d9d090335d02fee`.
+Later documentation-only cleanup commits do not redefine this calculation baseline.
 
-Latest merged-main verification:
+Latest verification of that calculation baseline:
 - quality run `35792895282` — success; Ruff passed; pytest **122 passed, 1 skipped**;
   exact full-payload parity **5/5**;
 - canonical Swiss run `35792895252` — success; pinned dataset manifest verified;
