@@ -1,14 +1,15 @@
 # Schemas
 
-RAVI VEDIC deliberately separates the schema that is executable **now** from the
-larger target schema for the full MVP.
+RAVI VEDIC keeps **only executable machine schemas** in this directory.
 
-- `ravi_vedic_core_v1.schema.json` is the current executable contract. CI validates
-  real engine output against it. It contains BirthInput, TimeContext, provenance,
-  astronomy, D1, D9 and D10.
-- `ravi_vedic_mvp_v1.schema.json` remains the target/full-MVP draft. It includes
-  structural Jyotish, timing, evidence and sensitivity sections that are not yet
-  executable and MUST NOT be populated with placeholders merely to satisfy schema.
+Current contract:
 
-A section moves from the target schema into an executable schema only when the
-corresponding engine layer and its contract tests exist.
+- `ravi_vedic_core_v1.schema.json` — validated in CI against real engine output. It
+  currently contains BirthInput, TimeContext, provenance, astronomy, D1, D9 and D10.
+
+Future structural Jyotish, timing, evidence and sensitivity shapes belong in the
+specification until the corresponding engine layer exists and has contract tests.
+
+When a new layer becomes executable, evolve the executable schema deliberately. Do not
+maintain a speculative full-future JSON Schema and do not emit placeholders for
+unfinished layers.
