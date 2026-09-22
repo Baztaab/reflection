@@ -1,12 +1,15 @@
 # Project status
 
-Current milestone: **M2.5 — Foundation Hardening COMPLETE**
+Current milestone: **M2.6 — Engine Foundation PLANNED / NOT STARTED**
+
+Baseline on `main`: `3ddc06106fd578a091675102a3d970583d8d6236`
+Baseline quality gate: Ruff passed; pytest **33 passed**.
 
 Canonical specification: `docs/spec/RAVI_VEDIC_MVP_v1.md`
-Architecture decisions: `docs/adr/0001-canonical-policy-pipeline.md`, `docs/adr/0002-ephemeris-source-strictness.md`, `docs/adr/0003-executable-schema-and-runtime-reproducibility.md`
-Implementation branch: `feat/m2.5-foundation-hardening` (ready to merge)
+Active roadmap: `docs/roadmap/M2_6_ENGINE_FOUNDATION.md`
+Executable schema: `schemas/ravi_vedic_core_v1.schema.json`
 
-## Stable calculation core
+## What is trusted today
 
 ```text
 BirthInput
@@ -17,41 +20,38 @@ BirthInput
  -> D9
  -> D10
  -> CoreResult
- -> executable Core JSON projection
+ -> Core JSON projection
 ```
 
-## Hardening completed on branch
+The D1/D9/D10 calculation outputs are regression-tested and must remain unchanged during
+M2.6 unless a separately reviewed calculation-policy decision explicitly changes them.
 
-- M1 and M2 are merged into `main`; stacked-branch debt is closed.
-- Public entry point is `calculate_core()`; misleading `calculate_d1()` alias is removed.
-- `pyswisseph==2.10.3.2` and `tzdata==2026.4` are exact-pinned runtime dependencies.
-- Canonical timezone resolution reads the pinned Python tzdata package, never unversioned host zoneinfo.
-- Canonical Swiss-file execution requires an explicit ephemeris directory.
-- The `.se1` dataset receives a deterministic SHA-256 content manifest in provenance.
-- Strict file-source gating applies to ephemeris-backed Sun-Saturn; True Node is recorded as an analytical Swiss point.
-- Exact Varga boundaries use decimal arithmetic to avoid binary-float ownership drift.
-- CoreResult has a deterministic JSON projection and executable JSON Schema.
-- The future full-MVP schema is explicitly non-executable until its layers exist.
-- D9/D10 conformance covers all 228 source-sign × segment mapping cells and every internal segment boundary.
-- High-latitude Whole Sign Ascendant behavior has a contract test.
-- CI installs pinned dev tooling and runs Ruff + pytest.
+## Why M3 is blocked
 
-## Validation
+The current core is numerically useful but still has foundation debt that should not be
+copied into Nakshatra/lordship/dispositor work:
 
-GitHub Actions on Python 3.11 is green at commit `66caada5c9709c4325111cdb3130f44a79b8cb18`:
+- application code still constructs concrete Swiss infrastructure implicitly;
+- Swiss process-global session handling is not yet isolated to the target standard;
+- Canon immutability is shallow for caller-supplied mappings;
+- D1 and Varga boundary logic do not yet share one angular primitive;
+- CoreResult/pipeline still hard-code D9 and D10 slots;
+- whole-calculation fingerprinting is incomplete;
+- strict Swiss-file canonical execution is not yet exercised end-to-end in CI;
+- current schema validation does not encode every semantic invariant.
 
-- Ruff: all checks passed;
-- pytest: **33 passed**;
-- exhaustive D9/D10 mapping and boundary conformance included.
+These are M2.6 tasks, not M3 tasks.
 
-M2.5 is approved for merge.
+## Repository contract after cleanup
 
-## Deliberately not started
+- `schemas/ravi_vedic_core_v1.schema.json` is the only executable machine schema.
+- Future M3/MVP structures live in the specification until implemented.
+- No placeholder output is allowed for unfinished layers.
+- No new Jyotish technique may be added during M2.6.
 
-Nakshatra, lordship, dignity, friendship, dispositor, conjunction/drishti, Moon Lagna, Arudha, Evidence Graph, Vimshottari date conversion (D06), Yoga families, sensitivity engine.
+## Next action
 
-## Next dependency after M2.5
+Execute M2.6 in the exact dependency order documented in
+`docs/roadmap/M2_6_ENGINE_FOUNDATION.md`.
 
-Begin **M3 Structural Jyotish** with Nakshatra/Pada, then sign lordship and dispositor structure. Dignity/friendship follows only after those structural dependencies are stable.
-
-Do not start D06 before the timing slice.
+Only after all M2.6 acceptance gates pass may M3 begin with Nakshatra/Pada.

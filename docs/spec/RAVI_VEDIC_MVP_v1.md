@@ -1,8 +1,8 @@
 # RAVI VEDIC MVP v1 — Canonical Calculation and Evidence Specification
 
-Status: **Draft 0.1 — implementation-driving**  
+Status: **Draft 0.2 — implementation-driving design target**  
 Canonical ID: `ravi-vedic-mvp-v1`  
-Last updated: 2026-09-20  
+Last updated: 2026-09-22  
 Scope: deterministic natal calculation and low-noise evidence production
 
 ## 1. Purpose
@@ -62,24 +62,28 @@ The following are outside MVP v1:
 
 ## 5. Layer boundary
 
-The required pipeline is:
+The **currently executable** core pipeline is:
 
 ```text
 BirthInput
   -> TimeContext
   -> AstronomyAdapter
-  -> CelestialSnapshot
-  -> SiderealProjection
-  -> VedicDerivation
-  -> NatalEvidenceGraph
-  -> JSON projection
+  -> AstronomicalSnapshot
+  -> D1 / Varga derivation
+  -> CoreResult
+  -> executable JSON projection
 ```
+
+Later structural Jyotish and Evidence Graph layers extend this pipeline only when they
+become executable. They MUST NOT be represented by placeholder data in the current core.
 
 Rules:
 
-- Swiss-specific constants and calls MUST NOT escape `AstronomyAdapter`.
-- Analysis MUST NOT know about Julian day, Delta-T or Swiss global state.
-- Markdown is documentation or projection, never the source of calculation truth.
+- Swiss-specific constants and calls MUST NOT escape the Swiss infrastructure boundary.
+- Analysis MUST NOT know about Julian day, Delta-T or Swiss process-global state.
+- Canonical sidereal longitudes produced by the astronomy boundary are a single source of
+  truth; downstream code MUST NOT independently subtract ayanamsha a second time.
+- Markdown is documentation, never the source of calculation truth.
 - Full recomputation is the canonical v1 execution strategy.
 - Hidden current time and process-global mutable calculation policy are forbidden.
 
@@ -143,7 +147,10 @@ One chart calculation MUST run inside one explicit `EphemerisSession` containing
 - time context;
 - observer coordinates where required.
 
-The adapter MUST restore any unavoidable Swiss process-global state when the session closes. v1 gives no thread-safety guarantee and MUST execute sessions sequentially.
+The Swiss infrastructure MUST own and reset every process-global state it changes. It
+MUST serialize engine sessions and MUST reject unsafe nested sessions before mutating
+Swiss state. It MUST NOT claim to restore external state that Swiss does not expose for
+inspection. v1 remains sequential from the engine's perspective.
 
 ### 7.2 Bodies
 
@@ -181,7 +188,10 @@ The result MUST record the ayanamsha value at `jd_ut`. A library default MUST ne
 
 ### 7.4 Ascendant and houses
 
-The adapter calculates the exact tropical Ascendant for the resolved time and location. The projection layer applies the canonical sidereal policy and retains the exact sidereal longitude.
+The astronomy boundary records both the exact tropical Ascendant and the canonical
+sidereal Ascendant under the explicitly selected True Pushya mode. The downstream D1
+layer consumes that canonical sidereal Ascendant directly; it MUST NOT perform an
+independent second ayanamsha projection.
 
 Whole Sign assignment is then:
 
@@ -629,9 +639,14 @@ warnings: []
 
 ## 21. Canonical output shape
 
-The normative machine schema is `schemas/ravi_vedic_mvp_v1.schema.json`.
+The only **currently executable** machine schema is
+`schemas/ravi_vedic_core_v1.schema.json`.
 
-Top-level sections are:
+The larger shape below is the design target for completed MVP v1. A section becomes
+machine-contract material only after its engine layer and contract tests exist. No
+speculative full-future JSON Schema is maintained.
+
+Target top-level sections are:
 
 ```yaml
 schema_version:

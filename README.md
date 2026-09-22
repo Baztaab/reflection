@@ -1,10 +1,10 @@
 # reflection
 
-`reflection` is the deterministic calculation and evidence engine behind RAVI VEDIC.
+`reflection` is the deterministic calculation engine behind RAVI VEDIC.
 
 The project is optimized for auditable Jyotish research rather than feature count.
-Astronomy, Vedic policy, derived structure, evidence and interpretation are separate
-layers.
+Astronomy, Jyotish policy, derived structure, evidence and interpretation are kept as
+separate concerns.
 
 ## Current executable core
 
@@ -19,21 +19,30 @@ BirthInput
  -> D9
  -> D10
  -> CoreResult
+ -> Core JSON projection
 ```
 
-Canonical choices include True Pushya, True Rahu with derived opposite Ketu, Whole Sign
-houses, Parashari Navamsha and Parashari Dashamsha.
+Canonical choices currently implemented include True Pushya, True Rahu with derived
+opposite Ketu, Whole Sign houses, Parashari Navamsha and Parashari Dashamsha.
 
-## Contracts
+## Current machine contract
+
+There is exactly one executable JSON contract:
+
+- [Executable Core Schema](schemas/ravi_vedic_core_v1.schema.json)
+
+Future structures are specified in prose until their engine layer exists. The repository
+does not keep a speculative "full future schema" beside the executable contract.
+
+## Project documents
 
 - [MVP calculation specification](docs/spec/RAVI_VEDIC_MVP_v1.md)
-- [Executable Core Schema](schemas/ravi_vedic_core_v1.schema.json)
-- [Future full-MVP Schema](schemas/ravi_vedic_mvp_v1.schema.json)
+- [M2.6 Engine Foundation roadmap](docs/roadmap/M2_6_ENGINE_FOUNDATION.md)
 - [Schema lifecycle notes](schemas/README.md)
 - [Architecture decisions](docs/adr/)
 
-The full-MVP schema is intentionally ahead of implementation; it is not used to force
-placeholder output. CI validates current engine output against the executable Core Schema.
+M3 Structural Jyotish is intentionally blocked until M2.6 Engine Foundation passes its
+acceptance gates.
 
 ## Development
 
@@ -43,4 +52,5 @@ ruff check src tests
 pytest
 ```
 
-Before changing calculation code, read `AGENTS.md` and `STATUS.md`.
+Before changing calculation code, read `AGENTS.md`, `STATUS.md`, and the active
+milestone roadmap.
