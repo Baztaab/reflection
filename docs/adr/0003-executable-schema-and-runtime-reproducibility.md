@@ -24,8 +24,9 @@ actual ephemeris data files strongly enough.
    for MVP v1.
 6. The public application entry point is `calculate_core()`. The misleading
    compatibility alias `calculate_d1()` is removed before any public release.
-7. Varga boundary classification uses decimal arithmetic over the caller-visible float
-   value so half-open segment ownership remains stable at exact boundaries.
+7. Varga boundary classification uses decimal arithmetic plus a documented 1e-12°
+   snap window around internal rational boundaries. This absorbs float arithmetic noise
+   far below astronomical precision while preserving ordinary near-boundary distinctions.
 
 ## Consequences
 

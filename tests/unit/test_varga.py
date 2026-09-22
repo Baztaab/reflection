@@ -1,4 +1,3 @@
-from math import nextafter
 from types import MappingProxyType
 
 import pytest
@@ -66,7 +65,7 @@ def test_dashamsa_segment_zero_start_signs_follow_odd_even_rule() -> None:
 def test_navamsa_boundaries_are_half_open() -> None:
     policy = get_varga_policy("varga.parasari-navamsa-v1")
     boundary = 30.0 / 9.0
-    before = project_longitude(nextafter(boundary, 0.0), policy)
+    before = project_longitude(boundary - 1e-10, policy)
     at = project_longitude(boundary, policy)
     assert before.segment_index == 0
     assert at.segment_index == 1
@@ -75,7 +74,7 @@ def test_navamsa_boundaries_are_half_open() -> None:
 
 def test_dashamsa_boundaries_are_half_open() -> None:
     policy = get_varga_policy("varga.parasari-dashamsa-v1")
-    before = project_longitude(nextafter(3.0, 0.0), policy)
+    before = project_longitude(3.0 - 1e-10, policy)
     at = project_longitude(3.0, policy)
     assert before.segment_index == 0
     assert at.segment_index == 1
