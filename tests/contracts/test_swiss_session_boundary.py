@@ -1,5 +1,8 @@
 import ast
+from datetime import UTC, datetime
 from pathlib import Path
+
+import pytest
 
 ROOT = Path(__file__).parents[2]
 SWISS_PACKAGE = ROOT / "src/ravi_vedic/infrastructure/swiss"
@@ -22,19 +25,6 @@ def _is_swe_call(node):
     )
 
 
-def _is_session_open_context(item):
-    expression = item.context_expr
-    return (
-        isinstance(expression, ast.Call)
-        and isinstance(expression.func, ast.Attribute)
-        and expression.func.attr == "open"
-        and isinstance(expression.func.value, ast.Attribute)
-        and expression.func.value.attr == "_session"
-        and isinstance(expression.func.value.value, ast.Name)
-        and expression.func.value.value.id == "self"
-    )
-
-
 def test_only_swiss_session_module_mutates_process_global_state():
     violations = []
     for path in SWISS_PACKAGE.rglob("*.py"):
@@ -46,29 +36,32 @@ def test_only_swiss_session_module_mutates_process_global_state():
     assert not violations, "\n".join(violations)
 
 
-def test_adapter_native_calls_are_inside_swiss_session_boundary():
+def test_native_calls_live_on_active_session_handle_not_configured_adapter():
     tree = ast.parse(ADAPTER.read_text())
-    adapter = next(
-        node
+    classes = {
+        node.name: node
         for node in tree.body
-        if isinstance(node, ast.ClassDef) and node.name == "SwissEphemerisAdapter"
-    )
-    violations = []
+        if isinstance(node, ast.ClassDef)
+    }
+    adapter = classes["SwissEphemerisAdapter"]
+    active_session = classes["_SwissAstronomySession"]
 
-    for method in (node for node in adapter.body if isinstance(node, ast.FunctionDef)):
-        all_swe_calls = [node for node in ast.walk(method) if _is_swe_call(node)]
-        protected = set()
-        for node in ast.walk(method):
-            if isinstance(node, ast.With) and any(
-                _is_session_open_context(item) for item in node.items
-            ):
-                protected.update(
-                    id(child) for child in ast.walk(node) if _is_swe_call(child)
-                )
-        violations.extend(
-            f"{method.name}:{call.lineno}: swe.{call.func.attr}"
-            for call in all_swe_calls
-            if id(call) not in protected
-        )
+    adapter_calls = [node for node in ast.walk(adapter) if _is_swe_call(node)]
+    active_calls = [node for node in ast.walk(active_session) if _is_swe_call(node)]
 
-    assert not violations, "\n".join(violations)
+    assert not adapter_calls
+    assert active_calls
+
+
+def test_swiss_adapter_session_handle_expires_after_context_exit():
+    from ravi_vedic.infrastructure.swiss import SwissEphemerisAdapter
+
+    adapter = SwissEphemerisAdapter(allow_moshier_fallback=True)
+    moment = datetime(2000, 1, 1, 12, tzinfo=UTC)
+
+    with adapter.open_session() as session:
+        julian = session.julian_time(moment)
+        assert julian.jd_ut > 0
+
+    with pytest.raises(RuntimeError, match="no longer active"):
+        session.julian_time(moment)

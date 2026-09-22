@@ -15,17 +15,19 @@ def calculate_core(
     astronomy: AstronomyPort,
     time_context_provider: TimeContextPort,
 ) -> CoreResult:
-    """Low-level orchestration; never constructs runtime infrastructure.
+    """Low-level orchestration with one astronomy session per chart calculation.
 
     Normal callers use a configured RaviEngine. Integrators must supply both ports.
     """
-    time_context = time_context_provider.build(birth, astronomy)
-    snapshot = astronomy.snapshot(
-        time_context=time_context,
-        latitude_deg=birth.latitude_deg,
-        longitude_deg=birth.longitude_deg,
-        canon=canon,
-    )
+    with astronomy.open_session() as astronomy_session:
+        time_context = time_context_provider.build(birth, astronomy_session)
+        snapshot = astronomy_session.snapshot(
+            time_context=time_context,
+            latitude_deg=birth.latitude_deg,
+            longitude_deg=birth.longitude_deg,
+            canon=canon,
+        )
+
     d1 = build_d1(snapshot, canon)
     d9 = build_varga(snapshot, canon, "D9")
     d10 = build_varga(snapshot, canon, "D10")

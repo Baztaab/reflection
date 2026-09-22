@@ -1,3 +1,3 @@
-from .port import AstronomyPort
+from .port import AstronomyPort, AstronomySessionPort
 
-__all__ = ["AstronomyPort"]
+__all__ = ["AstronomyPort", "AstronomySessionPort"]

@@ -1,9 +1,11 @@
+from contextlib import contextmanager
 from dataclasses import FrozenInstanceError, replace
 from datetime import UTC
 
 import pytest
 
-from ravi_vedic import RAVI_VEDIC_MVP_V1, BirthInput, RaviEngine, calculate_core
+from ravi_vedic import RAVI_VEDIC_MVP_V1, BirthInput, RaviEngine
+from ravi_vedic.application.pipeline import calculate_core
 from ravi_vedic.domain.canon import ChartPolicies
 from ravi_vedic.domain.models import (
     AscendantPosition,
@@ -22,6 +24,12 @@ class FakeAstronomy:
 
     def __init__(self):
         self.calls = []
+        self.session_entries = 0
+
+    @contextmanager
+    def open_session(self):
+        self.session_entries += 1
+        yield self
 
     def __bool__(self):
         return False
@@ -101,6 +109,7 @@ def test_pipeline_uses_supplied_ports_and_canonical_sidereal_values(birth):
     astronomy, time = FakeAstronomy(), FakeTime()
     engine = RaviEngine(astronomy=astronomy, time_context_provider=time)
     result = engine.calculate(birth)
+    assert astronomy.session_entries == 1
     assert time.calls == [(birth, astronomy)]
     assert astronomy.calls == [(result.time_context, 35.0, 51.0, engine.canon)]
     assert result.birth_input is birth

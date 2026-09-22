@@ -1,7 +1,6 @@
 """RAVI VEDIC canonical calculation kernel."""
 
 from .application.engine import RaviEngine
-from .application.pipeline import calculate_core
 from .bootstrap import create_engine
 from .domain.canon import RAVI_VEDIC_MVP_V1
 from .domain.models import BirthInput, CoreResult
@@ -14,6 +13,5 @@ __all__ = [
     "RaviEngine",
     "RuntimeConfig",
     "SourceProfile",
-    "calculate_core",
     "create_engine",
 ]

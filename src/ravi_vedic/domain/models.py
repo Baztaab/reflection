@@ -122,6 +122,10 @@ class AstronomyProvenance:
     actual_sources: tuple[str, ...]
     warnings: tuple[str, ...]
 
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "actual_sources", tuple(self.actual_sources))
+        object.__setattr__(self, "warnings", tuple(self.warnings))
+
 
 @dataclass(frozen=True, slots=True)
 class AstronomicalSnapshot:
@@ -129,6 +133,13 @@ class AstronomicalSnapshot:
     bodies: Mapping[Graha, BodyPosition]
     ascendant: AscendantPosition
     provenance: AstronomyProvenance
+
+    def __post_init__(self) -> None:
+        detached = dict(self.bodies)
+        for body, position in detached.items():
+            if position.body != body:
+                raise ValueError("astronomy body mapping key must match BodyPosition.body")
+        object.__setattr__(self, "bodies", MappingProxyType(detached))
 
     @classmethod
     def freeze(
@@ -166,6 +177,15 @@ class D1Chart:
     placements: Mapping[Graha, D1Placement]
     house_policy_id: str
     mapping_policy_id: str
+
+    def __post_init__(self) -> None:
+        detached = dict(self.placements)
+        for body, placement in detached.items():
+            if placement.body != body:
+                raise ValueError("D1 placement mapping key must match D1Placement.body")
+            if placement.mapping_policy_id != self.mapping_policy_id:
+                raise ValueError("D1 placement policy must match chart mapping_policy_id")
+        object.__setattr__(self, "placements", MappingProxyType(detached))
 
     @classmethod
     def freeze(
@@ -214,6 +234,17 @@ class VargaChart:
     placements: Mapping[Graha, VargaPlacement]
     mapping_policy_id: str
 
+    def __post_init__(self) -> None:
+        if self.ascendant.mapping_policy_id != self.mapping_policy_id:
+            raise ValueError("Varga ascendant policy must match chart mapping_policy_id")
+        detached = dict(self.placements)
+        for body, placement in detached.items():
+            if placement.body != body:
+                raise ValueError("Varga placement mapping key must match VargaPlacement.body")
+            if placement.projection.mapping_policy_id != self.mapping_policy_id:
+                raise ValueError("Varga placement policy must match chart mapping_policy_id")
+        object.__setattr__(self, "placements", MappingProxyType(detached))
+
     @classmethod
     def freeze(
         cls,
@@ -242,4 +273,9 @@ class CoreResult:
     d1: D1Chart
     d9: VargaChart
     d10: VargaChart
-    policy_manifest_sha256: str | None = None
+    policy_manifest_sha256: str
+
+    def __post_init__(self) -> None:
+        value = self.policy_manifest_sha256
+        if len(value) != 64 or any(char not in "0123456789abcdef" for char in value):
+            raise ValueError("policy_manifest_sha256 must be a lowercase SHA-256 hex digest")

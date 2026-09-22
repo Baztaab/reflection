@@ -65,3 +65,11 @@ print("backend-free engine passed")
     )
     assert result.returncode == 0, result.stderr
     assert "backend-free engine passed" in result.stdout
+
+
+def test_package_root_exposes_engine_not_low_level_pipeline():
+    import ravi_vedic
+
+    assert callable(ravi_vedic.create_engine)
+    assert ravi_vedic.RaviEngine is not None
+    assert not hasattr(ravi_vedic, "calculate_core")

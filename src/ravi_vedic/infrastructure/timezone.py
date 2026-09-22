@@ -5,7 +5,7 @@ from datetime import UTC, datetime
 from importlib import metadata, resources
 from zoneinfo import ZoneInfo
 
-from ravi_vedic.astronomy.port import AstronomyPort
+from ravi_vedic.astronomy.port import AstronomySessionPort
 from ravi_vedic.domain.models import BirthInput, TimeContext
 
 PINNED_TZDATA_VERSION = "2026.4"
@@ -64,7 +64,7 @@ class PinnedTimezoneProvider:
         _tzdb_identity()
         _load_pinned_zone("Etc/UTC")
 
-    def build(self, birth: BirthInput, astronomy: AstronomyPort) -> TimeContext:
+    def build(self, birth: BirthInput, astronomy: AstronomySessionPort) -> TimeContext:
         return build_time_context(birth, astronomy)
 
 
@@ -79,7 +79,7 @@ def _valid_candidates(local: datetime, zone: ZoneInfo) -> list[_Candidate]:
     return out
 
 
-def build_time_context(birth: BirthInput, astronomy: AstronomyPort) -> TimeContext:
+def build_time_context(birth: BirthInput, astronomy: AstronomySessionPort) -> TimeContext:
     provider, version = _tzdb_identity()
     zone = _load_pinned_zone(birth.timezone_id)
 
