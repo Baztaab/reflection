@@ -42,10 +42,14 @@ not a truthful contract because Swiss does not expose all prior state for recons
 7. On every exit, including exceptions, call `swe.close()` to release native resources.
    Do **not** claim that this restores an unknown pre-session sidereal/path configuration.
    Safety comes from deterministic reapplication on the next entry.
-8. Every direct native Swiss function used by `SwissEphemerisAdapter`, including
-   `utc_to_jd`, must execute inside `SwissSession.open()`.
-9. Static contract tests make direct Swiss global-state mutators outside `session.py`
-   fail CI.
+8. A configured `SwissEphemerisAdapter` opens one scoped astronomy session per chart
+   calculation. That active handle performs both `utc_to_jd` and snapshot production
+   while one `SwissSession.open()` lifecycle remains active; the configured adapter
+   itself performs no native calculation calls.
+9. Active astronomy-session handles expire when their context exits and reject later use;
+   they are also bound to the thread that opened them.
+10. Static contract tests make direct Swiss global-state mutators outside `session.py`
+   fail CI and keep native calculation calls off the configured adapter object.
 
 ## Consequences
 
@@ -55,6 +59,8 @@ not a truthful contract because Swiss does not expose all prior state for recons
   the user's environment is preserved outside the brief native path-setup call.
 - Failed calculations still close native resources and the next session starts from
   explicitly applied RAVI state.
+- Julian conversion and position/Ascendant calculation cannot be separated by an
+  intervening RAVI Swiss session; they share one calculation-scoped native lifecycle.
 - A rejected nested session cannot reset or change the active outer session.
 - The adapter becomes a consumer of a lifecycle boundary rather than an owner of global
   state mechanics.

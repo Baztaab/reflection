@@ -138,6 +138,28 @@ Evidence: ADR-0007 and `docs/research/M2_6_4_CANON_REVIEW.md`.
 
 Evidence: ADR-0008 and `docs/research/M2_6_5_ANGLE_KERNEL_REVIEW.md`.
 
+## Post-M2.6.5 architecture audit hardening
+
+The cleanup audit found and replaced three structural leaks rather than masking them:
+
+- one configured astronomy provider now opens **one scoped astronomy session per chart
+  calculation**; Julian-time conversion and the astronomical snapshot execute on that same
+  active handle, so the Swiss lifecycle is atomic at calculation scope rather than split
+  across two independent native sessions;
+- immutable domain containers now detach mutable mappings/sequences and enforce lineage
+  invariants in their constructors; correctness no longer depends on callers remembering a
+  special `.freeze()` factory path;
+- `create_engine(...)` / `RaviEngine.calculate(...)` are the package-level calculation
+  API. `calculate_core` remains an explicit low-level module integration function and is
+  intentionally not re-exported from the package root.
+
+Verification on `718c8dc0cfb236b68fcb9af21265d147cc0fcecd`:
+- quality run `35798255525` — success; Ruff passed; pytest **128 passed, 1 skipped**;
+  exact full-payload parity **5/5**;
+- canonical Swiss run `35798255522` — success.
+
+These corrections do not implement M2.6.6 and do not change serialized D1/D9/D10 output.
+
 ## Why M3 is still blocked
 
 The current core is numerically useful but still has foundation debt that should not be

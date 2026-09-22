@@ -76,10 +76,12 @@ engine = create_engine(RuntimeConfig(source_profile=SourceProfile.DEVELOPMENT))
 The development profile permits Moshier fallback; it is not a promise of a fixed Moshier
 dataset. The actual numerical source remains visible in result provenance.
 
-Migration: the pre-release `calculate_core(birth, astronomy=...)` signature now also
-requires `time_context_provider`. Normal callers should use the engine above. Tests and
-trusted integrations may construct `RaviEngine(astronomy=..., time_context_provider=...)`
-with fake ports. The serialized Core v1 schema is unchanged.
+The supported package-level calculation entry points are `create_engine(...)` and
+`RaviEngine.calculate(...)`. Tests and trusted integrations may construct
+`RaviEngine(astronomy=..., time_context_provider=...)` with fake ports. The low-level
+`ravi_vedic.application.pipeline.calculate_core` function remains available only as an
+explicit integration seam and is intentionally not re-exported from the package root.
+The serialized Core v1 schema is unchanged.
 
 ## Current machine contract
 

@@ -25,9 +25,11 @@ and the precise patterns adopted. This is independent implementation, not source
    actual source and birth-date coverage remain per-calculation checks.
 3. `RaviEngine.calculate(birth)` is the normal public calculation API. The application
    engine/pipeline know only `AstronomyPort`, `TimeContextPort` and domain types.
-4. `calculate_core()` remains a low-level integration function, now requiring both ports.
-   The pre-release Python call signature changes intentionally; the serialized Core v1
-   contract and all numerical policies remain unchanged. No deprecated implicit facade.
+4. `calculate_core()` remains a low-level integration function, requiring both ports,
+   but it is not part of the package-root public API. Normal callers use
+   `create_engine(...)` / `RaviEngine.calculate(...)`; trusted integrations that
+   deliberately need the low-level seam import it from `ravi_vedic.application.pipeline`.
+   The serialized Core v1 contract and all numerical policies remain unchanged.
 5. The engine copies the current flat string-to-string Varga policy map into an owned
    immutable mapping and validates supported policy IDs. Caller mutation cannot change
    subsequent calculations. This small boundary snapshot does not redesign the Canon;

@@ -25,6 +25,9 @@ Non-negotiable rules:
 - Never create placeholder timing/evidence/sensitivity fields to satisfy a future design.
 - Runtime data that can change canonical numbers must be versioned or content-identified.
 - Foundation refactors must preserve trusted D1/D9/D10 results unless a reviewed policy decision says otherwise.
+- One configured astronomy session must span Julian-time conversion and snapshot production for one chart calculation.
+- Domain immutability must be enforced by constructors; do not introduce alternate "safe" factory paths that callers must remember.
+- The package-level calculation API is `create_engine(...)` / `RaviEngine.calculate(...)`; do not re-export the low-level pipeline facade from the package root.
 - Prefer small, dependency-ordered changes over speculative infrastructure.
 
 When finishing a meaningful implementation step, update `STATUS.md` with what is now

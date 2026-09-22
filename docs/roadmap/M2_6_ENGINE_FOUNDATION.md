@@ -157,7 +157,8 @@ Exit gate:
 
 - nested-session test fails safely;
 - sequential different-session tests show no sidereal/path leakage;
-- all Swiss calls used by the engine occur inside the session boundary;
+- one astronomy session spans Julian conversion and snapshot production for a chart;
+- all Swiss calls used by the engine occur inside that session boundary;
 - D1/D9/D10 golden outputs unchanged.
 
 ## M2.6.3 — Canonical Swiss-file integration lane
