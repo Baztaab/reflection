@@ -1,0 +1,21 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ravi-vedic"
+version = "0.1.0"
+description = "Canonical calculation kernel for RAVI VEDIC"
+requires-python = ">=3.11"
+dependencies = ["pyswisseph>=2.10.3.2,<3"]
+
+[project.optional-dependencies]
+test = ["pytest>=8,<9"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ravi_vedic"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q"
