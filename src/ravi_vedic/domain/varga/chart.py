@@ -9,7 +9,7 @@ from ravi_vedic.domain.varga.registry import get_varga_policy
 
 def build_varga(snapshot: AstronomicalSnapshot, canon: CalculationCanon, varga: str) -> VargaChart:
     try:
-        policy_id = canon.varga_policy_ids[varga]
+        policy_id = canon.charts.varga_policy_ids[varga]
     except KeyError as exc:
         raise ValueError(f"varga not enabled in canon: {varga}") from exc
 

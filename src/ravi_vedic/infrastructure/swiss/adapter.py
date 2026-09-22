@@ -123,10 +123,10 @@ class SwissEphemerisAdapter:
         longitude_deg: float,
         canon: CalculationCanon,
     ) -> AstronomicalSnapshot:
-        if canon.ayanamsha_policy_id != "ayanamsha.true-pushya.swiss-v1":
-            raise ValueError(f"unsupported ayanamsha policy: {canon.ayanamsha_policy_id}")
-        if canon.node_policy_id != "nodes.true-rahu-opposite-ketu-v1":
-            raise ValueError(f"unsupported node policy: {canon.node_policy_id}")
+        if canon.astronomy.ayanamsha_policy_id != "ayanamsha.true-pushya.swiss-v1":
+            raise ValueError(f"unsupported ayanamsha policy: {canon.astronomy.ayanamsha_policy_id}")
+        if canon.astronomy.node_policy_id != "nodes.true-rahu-opposite-ketu-v1":
+            raise ValueError(f"unsupported node policy: {canon.astronomy.node_policy_id}")
 
         warnings: list[str] = []
         actual_sources: set[str] = set()
@@ -259,7 +259,7 @@ class SwissEphemerisAdapter:
                 ephemeris_file_count=identity.file_count if identity is not None else 0,
                 requested_flags=requested_flags,
                 sidereal_mode="SIDM_TRUE_PUSHYA",
-                ayanamsha_policy_id=canon.ayanamsha_policy_id,
+                ayanamsha_policy_id=canon.astronomy.ayanamsha_policy_id,
                 source_profile=(
                     "development-allow-moshier"
                     if self._allow_moshier_fallback

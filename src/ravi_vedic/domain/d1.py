@@ -13,7 +13,7 @@ from ravi_vedic.domain.models import AstronomicalSnapshot, D1Chart, D1Placement
 def build_d1(snapshot: AstronomicalSnapshot, canon: CalculationCanon) -> D1Chart:
     asc_lon = normalize_longitude(snapshot.ascendant.sidereal_longitude_deg)
     asc_sign = sign_index(asc_lon)
-    mapping_policy_id = canon.varga_policy_ids["D1"]
+    mapping_policy_id = canon.charts.varga_policy_ids["D1"]
 
     placements: dict = {}
     for body, position in snapshot.bodies.items():
@@ -34,6 +34,6 @@ def build_d1(snapshot: AstronomicalSnapshot, canon: CalculationCanon) -> D1Chart
         ascendant_sign_index=asc_sign,
         ascendant_degree_in_sign=degree_in_sign(asc_lon),
         placements=placements,
-        house_policy_id=canon.house_policy_id,
+        house_policy_id=canon.charts.house_policy_id,
         mapping_policy_id=mapping_policy_id,
     )
