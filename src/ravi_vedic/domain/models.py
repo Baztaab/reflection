@@ -186,8 +186,55 @@ class D1Chart:
 
 
 @dataclass(frozen=True, slots=True)
+class VargaProjection:
+    source_longitude_deg: float
+    segment_index: int
+    target_sign_index: int
+    longitude_within_target_sign_deg: float
+    projected_longitude_deg: float
+    mapping_policy_id: str
+
+
+@dataclass(frozen=True, slots=True)
+class VargaPlacement:
+    body: Graha
+    projection: VargaProjection
+    house: int
+    retrograde: bool
+
+
+@dataclass(frozen=True, slots=True)
+class VargaChart:
+    varga: str
+    factor: int
+    ascendant: VargaProjection
+    placements: Mapping[Graha, VargaPlacement]
+    mapping_policy_id: str
+
+    @classmethod
+    def freeze(
+        cls,
+        *,
+        varga: str,
+        factor: int,
+        ascendant: VargaProjection,
+        placements: Mapping[Graha, VargaPlacement],
+        mapping_policy_id: str,
+    ) -> "VargaChart":
+        return cls(
+            varga=varga,
+            factor=factor,
+            ascendant=ascendant,
+            placements=MappingProxyType(dict(placements)),
+            mapping_policy_id=mapping_policy_id,
+        )
+
+
+@dataclass(frozen=True, slots=True)
 class CoreResult:
     canon_id: str
     time_context: TimeContext
     astronomy: AstronomicalSnapshot
     d1: D1Chart
+    d9: VargaChart
+    d10: VargaChart

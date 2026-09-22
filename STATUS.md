@@ -1,35 +1,55 @@
 # Project status
 
-Current milestone: **M1 — executable canonical D1**
+Current milestone: **M2 — generic Varga kernel + D9/D10**
 
 Canonical specification: `docs/spec/RAVI_VEDIC_MVP_v1.md`
 Architecture decisions: `docs/adr/0001-canonical-policy-pipeline.md`, `docs/adr/0002-ephemeris-source-strictness.md`
-Implementation branch: `feat/m1-canonical-d1`
+Implementation branch: `feat/m2-varga-kernel`
 
-## Implemented on branch
+## Implemented before M2
 
 ```text
-BirthInput -> TimeContext -> SwissEphemerisAdapter -> AstronomicalSnapshot -> D1 -> CoreResult
+BirthInput -> TimeContext -> SwissEphemerisAdapter -> AstronomicalSnapshot -> D1
 ```
 
-Acceptance state:
+M1 invariants remain unchanged: explicit True Pushya, True Rahu + opposite Ketu, exact sidereal Ascendant, Whole Sign D1, explicit ephemeris source profile and provenance.
 
-- True Pushya is selected explicitly;
-- True Rahu is used and Ketu is derived exactly 180 degrees opposite;
-- exact sidereal Ascendant is retained;
-- Whole Sign houses are derived without cuspal assignment;
-- canonical astronomy requires actual Swiss `.se1` output and rejects silent source downgrade;
-- Moshier fallback exists only as an explicit development/test profile and remains visible in provenance;
-- Swiss version, requested flags, actual ephemeris source, ayanamsha policy, and normalization warnings are preserved;
-- anonymous golden fixture `reference-chart-001-true-pushya` is present;
-- DST gap/fold behavior is covered;
-- D1 boundary and Whole Sign invariants are covered;
-- local test run: **9 passed** on 2026-09-22.
+## M2 implementation
+
+```text
+canonical sidereal longitude
+        -> VargaPolicy
+        -> project_longitude()
+        -> VargaProjection
+        -> VargaChart
+             ├─ D9 ParasariNavamsaV1
+             └─ D10 ParasariDashamsaV1
+```
+
+Design constraints:
+
+- projector contains no D9/D10 method branches;
+- D9 and D10 are explicit versioned policy objects selected through a registry;
+- Varga calculation is pure Python and has no astronomy dependency;
+- Ascendant is projected by the same policy as Grahas;
+- Varga houses are Whole Sign relative to the projected Varga Ascendant;
+- segment ownership remains half-open at exact boundaries;
+- projected Varga longitude is explicitly a mathematical projection, not an observed celestial longitude.
+
+## Validation target
+
+- modality starts for D9;
+- odd/even starts for D10;
+- exact and immediately-before segment boundaries;
+- Varga longitude fractional projection;
+- Varga house assignment;
+- golden D9/D10 regression for reference chart 001;
+- GitHub Actions pytest workflow.
 
 ## Deliberately not started
 
-D9/D10 implementation, lordship, dignity, friendship, dispositor, drishti, Moon Lagna, Arudha, Evidence Graph, Vimshottari date conversion (D06), Yoga families, sensitivity engine.
+Nakshatra, lordship, dignity, friendship, dispositor, drishti, Moon Lagna, Arudha, Evidence Graph, Vimshottari date conversion (D06), Yoga families, sensitivity engine.
 
-## Next dependency
+## Next dependency after M2
 
-Implement the generic Varga projection contract, then D9 and D10 as explicit versioned policies. Do not start D06 before the timing slice.
+Begin Structural Jyotish with Nakshatra/Pada as the first pure derivation layer, then lordship and dispositor structure. Do not start D06 before the timing slice.
