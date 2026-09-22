@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from ravi_vedic.astronomy.port import AstronomyPort
-from ravi_vedic.domain.canon import CalculationCanon, RAVI_VEDIC_MVP_V1
+from ravi_vedic.domain.canon import RAVI_VEDIC_MVP_V1, CalculationCanon
 from ravi_vedic.domain.d1 import build_d1
 from ravi_vedic.domain.models import BirthInput, CoreResult
 from ravi_vedic.domain.varga import build_varga
@@ -28,19 +28,10 @@ def calculate_core(
     d10 = build_varga(snapshot, canon, "D10")
     return CoreResult(
         canon_id=canon.canon_id,
+        birth_input=birth,
         time_context=time_context,
         astronomy=snapshot,
         d1=d1,
         d9=d9,
         d10=d10,
     )
-
-
-def calculate_d1(
-    birth: BirthInput,
-    *,
-    canon: CalculationCanon = RAVI_VEDIC_MVP_V1,
-    astronomy: AstronomyPort | None = None,
-) -> CoreResult:
-    """Compatibility entry point from M1; returns the complete canonical core result."""
-    return calculate_core(birth, canon=canon, astronomy=astronomy)

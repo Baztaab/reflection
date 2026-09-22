@@ -3,8 +3,11 @@ from types import MappingProxyType
 from ravi_vedic.domain.canon import RAVI_VEDIC_MVP_V1
 from ravi_vedic.domain.d1 import build_d1, sign_index, whole_sign_house
 from ravi_vedic.domain.models import (
-    AscendantPosition, AstronomicalSnapshot, AstronomyProvenance,
-    BodyPosition, Graha,
+    AscendantPosition,
+    AstronomicalSnapshot,
+    AstronomyProvenance,
+    BodyPosition,
+    Graha,
 )
 
 
@@ -29,7 +32,10 @@ def _snapshot(asc: float, body_lon: float) -> AstronomicalSnapshot:
         provenance=AstronomyProvenance(
             implementation="test",
             implementation_version="1",
+            library_version="1",
             ephemeris_path=None,
+            ephemeris_manifest_sha256=None,
+            ephemeris_file_count=0,
             requested_flags=0,
             sidereal_mode="test",
             ayanamsha_policy_id=RAVI_VEDIC_MVP_V1.ayanamsha_policy_id,

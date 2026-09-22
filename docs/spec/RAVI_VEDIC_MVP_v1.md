@@ -198,6 +198,8 @@ Cuspal house assignment is forbidden in canonical v1. No longitude information i
 - Houses use one-based indexes: `1..12`.
 - Exact boundary ownership is half-open: `[start, end)`.
 - `0°00′00″` belongs to the new sign, Nakshatra, Pada or Varga segment.
+- For a rational Varga boundary that is not exactly representable as an IEEE-754 float, the nearest representable float is the canonical boundary representative. That exact value belongs to the new segment; its immediate predecessor and successor remain on their respective mathematical sides.
+- Tolerance bands or epsilon-based snapping around Varga boundaries are forbidden.
 - Internal calculations use full available precision.
 - Display rounding MUST occur only in a projection and MUST NOT affect classification.
 - Circular separation is `min(abs(a-b), 360-abs(a-b))`.
