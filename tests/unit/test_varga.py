@@ -1,5 +1,3 @@
-from types import MappingProxyType
-
 import pytest
 
 from ravi_vedic.domain.canon import RAVI_VEDIC_MVP_V1
@@ -29,7 +27,7 @@ def _body(body: Graha, lon: float) -> BodyPosition:
 def _snapshot(asc: float, body_lon: float) -> AstronomicalSnapshot:
     return AstronomicalSnapshot(
         ayanamsha_deg=0.0,
-        bodies=MappingProxyType({Graha.SUN: _body(Graha.SUN, body_lon)}),
+        bodies={Graha.SUN: _body(Graha.SUN, body_lon)},
         ascendant=AscendantPosition(asc, asc, "test"),
         provenance=AstronomyProvenance(
             implementation="test",

@@ -39,7 +39,7 @@ class FakeAstronomy:
 
     def snapshot(self, *, time_context, latitude_deg, longitude_deg, canon):
         self.calls.append((time_context, latitude_deg, longitude_deg, canon))
-        return AstronomicalSnapshot.freeze(
+        return AstronomicalSnapshot(
             ayanamsha_deg=22.0,
             bodies={
                 body: BodyPosition(

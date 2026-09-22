@@ -22,7 +22,7 @@ def build_d1(snapshot: AstronomicalSnapshot, canon: CalculationCanon) -> D1Chart
             mapping_policy_id=mapping_policy_id,
         )
 
-    return D1Chart.freeze(
+    return D1Chart(
         ascendant_sidereal_longitude_deg=ascendant.degrees,
         ascendant_sign_index=ascendant.sign_index,
         ascendant_degree_in_sign=ascendant.degree_in_sign,

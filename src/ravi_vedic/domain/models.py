@@ -141,22 +141,6 @@ class AstronomicalSnapshot:
                 raise ValueError("astronomy body mapping key must match BodyPosition.body")
         object.__setattr__(self, "bodies", MappingProxyType(detached))
 
-    @classmethod
-    def freeze(
-        cls,
-        *,
-        ayanamsha_deg: float,
-        bodies: Mapping[Graha, BodyPosition],
-        ascendant: AscendantPosition,
-        provenance: AstronomyProvenance,
-    ) -> AstronomicalSnapshot:
-        return cls(
-            ayanamsha_deg=ayanamsha_deg,
-            bodies=MappingProxyType(dict(bodies)),
-            ascendant=ascendant,
-            provenance=provenance,
-        )
-
 
 @dataclass(frozen=True, slots=True)
 class D1Placement:
@@ -186,26 +170,6 @@ class D1Chart:
             if placement.mapping_policy_id != self.mapping_policy_id:
                 raise ValueError("D1 placement policy must match chart mapping_policy_id")
         object.__setattr__(self, "placements", MappingProxyType(detached))
-
-    @classmethod
-    def freeze(
-        cls,
-        *,
-        ascendant_sidereal_longitude_deg: float,
-        ascendant_sign_index: int,
-        ascendant_degree_in_sign: float,
-        placements: Mapping[Graha, D1Placement],
-        house_policy_id: str,
-        mapping_policy_id: str,
-    ) -> D1Chart:
-        return cls(
-            ascendant_sidereal_longitude_deg=ascendant_sidereal_longitude_deg,
-            ascendant_sign_index=ascendant_sign_index,
-            ascendant_degree_in_sign=ascendant_degree_in_sign,
-            placements=MappingProxyType(dict(placements)),
-            house_policy_id=house_policy_id,
-            mapping_policy_id=mapping_policy_id,
-        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -244,24 +208,6 @@ class VargaChart:
             if placement.projection.mapping_policy_id != self.mapping_policy_id:
                 raise ValueError("Varga placement policy must match chart mapping_policy_id")
         object.__setattr__(self, "placements", MappingProxyType(detached))
-
-    @classmethod
-    def freeze(
-        cls,
-        *,
-        varga: str,
-        factor: int,
-        ascendant: VargaProjection,
-        placements: Mapping[Graha, VargaPlacement],
-        mapping_policy_id: str,
-    ) -> VargaChart:
-        return cls(
-            varga=varga,
-            factor=factor,
-            ascendant=ascendant,
-            placements=MappingProxyType(dict(placements)),
-            mapping_policy_id=mapping_policy_id,
-        )
 
 
 @dataclass(frozen=True, slots=True)

@@ -233,7 +233,7 @@ class _SwissAstronomySession:
         )
 
         identity = self.data_identity
-        return AstronomicalSnapshot.freeze(
+        return AstronomicalSnapshot(
             ayanamsha_deg=ayanamsha,
             bodies=bodies,
             ascendant=ascendant,

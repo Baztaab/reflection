@@ -32,7 +32,7 @@ def build_varga(snapshot: AstronomicalSnapshot, canon: CalculationCanon, varga: 
             retrograde=position.retrograde,
         )
 
-    return VargaChart.freeze(
+    return VargaChart(
         varga=varga,
         factor=policy.factor,
         ascendant=ascendant,
