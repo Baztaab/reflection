@@ -3,7 +3,10 @@ from __future__ import annotations
 from types import MappingProxyType
 
 from ravi_vedic.domain.varga.base import VargaPolicy
-from ravi_vedic.domain.varga.policies import ParasariDashamsaV1, ParasariNavamsaV1
+from ravi_vedic.domain.varga.policies import (
+    ParasariDashamsaV1,
+    ParasariNavamsaV1,
+)
 
 _POLICIES = MappingProxyType(
     {
