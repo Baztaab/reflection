@@ -37,3 +37,21 @@ def test_dst_fold_resolves_to_distinct_offsets() -> None:
     assert first.resolution_status == second.resolution_status == "ambiguous_resolved"
     assert first.utc_offset_seconds != second.utc_offset_seconds
     assert first.utc_datetime != second.utc_datetime
+
+
+def test_timezone_source_is_pinned_python_tzdata() -> None:
+    context = build_time_context(_birth("2024-01-15T12:00:00"), _AstronomyStub())
+    assert context.tzdb_provider == "python-tzdata"
+    assert context.tzdb_version == "2026.4"
+
+
+def test_tehran_1997_historical_offset_comes_from_pinned_tzdata() -> None:
+    birth = BirthInput.from_iso(
+        local_datetime="1997-06-07T20:28:36",
+        timezone_id="Asia/Tehran",
+        latitude_deg=36.15,
+        longitude_deg=51.6166666667,
+    )
+    context = build_time_context(birth, _AstronomyStub())
+    assert context.utc_offset_seconds == 16200
+    assert context.utc_datetime.isoformat() == "1997-06-07T15:58:36+00:00"

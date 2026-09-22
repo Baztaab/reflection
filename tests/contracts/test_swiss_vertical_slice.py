@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from ravi_vedic import BirthInput, calculate_core, calculate_d1
+from ravi_vedic import BirthInput, calculate_core
 from ravi_vedic.domain.models import Graha
 from ravi_vedic.infrastructure.swiss import EphemerisSourceError, SwissEphemerisAdapter
 
@@ -37,7 +37,7 @@ def _assert_varga(actual, expected) -> None:
 def test_reference_chart_001_matches_golden_structure() -> None:
     fixture = json.loads(FIXTURE.read_text())
     birth = BirthInput.from_iso(**fixture["input"])
-    result = calculate_d1(birth, astronomy=SwissEphemerisAdapter(allow_moshier_fallback=True))
+    result = calculate_core(birth, astronomy=SwissEphemerisAdapter(allow_moshier_fallback=True))
 
     expected = fixture["expected"]
     assert result.canon_id == "ravi-vedic-mvp-v1"
@@ -64,7 +64,7 @@ def test_reference_chart_001_matches_golden_structure() -> None:
 
 def test_ketu_is_exactly_opposite_true_rahu() -> None:
     fixture = json.loads(FIXTURE.read_text())
-    result = calculate_d1(
+    result = calculate_core(
         BirthInput.from_iso(**fixture["input"]),
         astronomy=SwissEphemerisAdapter(allow_moshier_fallback=True),
     )
@@ -75,15 +75,9 @@ def test_ketu_is_exactly_opposite_true_rahu() -> None:
     assert ketu.source_method == "derived:exact-opposition-from-true-rahu"
 
 
-def test_canonical_profile_rejects_silent_moshier_when_files_are_absent() -> None:
-    fixture = json.loads(FIXTURE.read_text())
-    birth = BirthInput.from_iso(**fixture["input"])
-    try:
-        result = calculate_d1(birth)
-    except EphemerisSourceError:
-        return
-    assert "swisseph-files" in result.astronomy.provenance.actual_sources
-    assert result.astronomy.provenance.source_profile == "canonical-strict-swiss-files"
+def test_canonical_profile_requires_explicit_ephemeris_path() -> None:
+    with pytest.raises(EphemerisSourceError, match="explicit ephemeris_path"):
+        SwissEphemerisAdapter()
 
 
 def test_calculate_core_exposes_default_vargas() -> None:
@@ -96,3 +90,18 @@ def test_calculate_core_exposes_default_vargas() -> None:
     assert result.d9.mapping_policy_id == "varga.parasari-navamsa-v1"
     assert result.d10.varga == "D10"
     assert result.d10.mapping_policy_id == "varga.parasari-dashamsa-v1"
+
+
+def test_whole_sign_ascendant_survives_high_latitude() -> None:
+    birth = BirthInput.from_iso(
+        local_datetime="2026-01-15T12:00:00",
+        timezone_id="Etc/UTC",
+        latitude_deg=80.0,
+        longitude_deg=20.0,
+    )
+    result = calculate_core(
+        birth,
+        astronomy=SwissEphemerisAdapter(allow_moshier_fallback=True),
+    )
+    assert 0.0 <= result.d1.ascendant_sidereal_longitude_deg < 360.0
+    assert result.astronomy.ascendant.source_method == "swiss-houses-ex:whole-sign-ascendant"

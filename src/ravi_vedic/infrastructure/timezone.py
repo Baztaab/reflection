@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from importlib import metadata
-from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+from importlib import metadata, resources
+from zoneinfo import ZoneInfo
 
 from ravi_vedic.astronomy.port import AstronomyPort
 from ravi_vedic.domain.models import BirthInput, TimeContext
@@ -22,11 +22,30 @@ class _Candidate:
     utc: datetime
 
 
+def _load_pinned_zone(timezone_id: str) -> ZoneInfo:
+    parts = timezone_id.split("/")
+    if not parts or any(part in {"", ".", ".."} for part in parts):
+        raise TimeResolutionError("UNKNOWN_TIMEZONE", timezone_id)
+
+    resource = resources.files("tzdata.zoneinfo")
+    for part in parts:
+        resource = resource.joinpath(part)
+
+    if not resource.is_file():
+        raise TimeResolutionError("UNKNOWN_TIMEZONE", timezone_id)
+
+    with resource.open("rb") as handle:
+        return ZoneInfo.from_file(handle, key=timezone_id)
+
+
 def _tzdb_identity() -> tuple[str, str]:
     try:
         return "python-tzdata", metadata.version("tzdata")
-    except metadata.PackageNotFoundError:
-        return "system-zoneinfo", "unknown"
+    except metadata.PackageNotFoundError as exc:
+        raise TimeResolutionError(
+            "TZDATA_UNAVAILABLE",
+            "canonical timezone resolution requires the pinned tzdata package",
+        ) from exc
 
 
 def _valid_candidates(local: datetime, zone: ZoneInfo) -> list[_Candidate]:
@@ -41,10 +60,8 @@ def _valid_candidates(local: datetime, zone: ZoneInfo) -> list[_Candidate]:
 
 
 def build_time_context(birth: BirthInput, astronomy: AstronomyPort) -> TimeContext:
-    try:
-        zone = ZoneInfo(birth.timezone_id)
-    except ZoneInfoNotFoundError as exc:
-        raise TimeResolutionError("UNKNOWN_TIMEZONE", birth.timezone_id) from exc
+    zone = _load_pinned_zone(birth.timezone_id)
+    provider, version = _tzdb_identity()
 
     candidates = _valid_candidates(birth.local_datetime, zone)
     if not candidates:
@@ -64,11 +81,13 @@ def build_time_context(birth: BirthInput, astronomy: AstronomyPort) -> TimeConte
     else:
         chosen = candidates[0]
         if birth.fold not in (None, chosen.fold):
-            raise TimeResolutionError("INVALID_FOLD", f"fold={birth.fold} is not valid for this local time")
+            raise TimeResolutionError(
+                "INVALID_FOLD",
+                f"fold={birth.fold} is not valid for this local time",
+            )
         resolution_status = "exact"
 
     julian = astronomy.julian_time(chosen.utc)
-    provider, version = _tzdb_identity()
     offset = chosen.aware.utcoffset()
     assert offset is not None
 

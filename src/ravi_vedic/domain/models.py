@@ -111,7 +111,10 @@ class AscendantPosition:
 class AstronomyProvenance:
     implementation: str
     implementation_version: str
+    library_version: str
     ephemeris_path: str | None
+    ephemeris_manifest_sha256: str | None
+    ephemeris_file_count: int
     requested_flags: int
     sidereal_mode: str
     ayanamsha_policy_id: str
@@ -233,6 +236,7 @@ class VargaChart:
 @dataclass(frozen=True, slots=True)
 class CoreResult:
     canon_id: str
+    birth_input: BirthInput
     time_context: TimeContext
     astronomy: AstronomicalSnapshot
     d1: D1Chart
