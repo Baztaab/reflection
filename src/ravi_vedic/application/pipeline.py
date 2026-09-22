@@ -37,4 +37,5 @@ def calculate_core(
         d1=d1,
         d9=d9,
         d10=d10,
+        policy_manifest_sha256=canon.policy_manifest_sha256,
     )

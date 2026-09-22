@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
-from types import MappingProxyType
+from dataclasses import dataclass
 
 from ravi_vedic.application.pipeline import calculate_core
 from ravi_vedic.application.ports import TimeContextPort
@@ -25,22 +24,24 @@ class RaviEngine:
     def __post_init__(self) -> None:
         if self.astronomy is None or self.time_context_provider is None:
             raise TypeError("RaviEngine requires astronomy and time_context_provider ports")
-        # Only today's flat policy map is captured here. Hierarchical Canon and
-        # its policy fingerprint are intentionally deferred to M2.6.4.
-        snapshot = replace(
-            self.canon,
-            varga_policy_ids=MappingProxyType(dict(self.canon.varga_policy_ids)),
-        )
-        for name in (
-            "zodiac_policy_id",
-            "ayanamsha_policy_id",
-            "node_policy_id",
-            "house_policy_id",
-        ):
-            if getattr(snapshot, name) != getattr(RAVI_VEDIC_MVP_V1, name):
-                raise ValueError(f"unsupported {name}: {getattr(snapshot, name)}")
-        if snapshot.varga_policy_ids != RAVI_VEDIC_MVP_V1.varga_policy_ids:
+        snapshot = self.canon.snapshot()
+        if snapshot.canon_id != RAVI_VEDIC_MVP_V1.canon_id:
+            raise ValueError(f"unsupported canon_id: {snapshot.canon_id}")
+
+        for name in ("zodiac_policy_id", "ayanamsha_policy_id", "node_policy_id"):
+            actual = getattr(snapshot.astronomy, name)
+            expected = getattr(RAVI_VEDIC_MVP_V1.astronomy, name)
+            if actual != expected:
+                raise ValueError(f"unsupported astronomy.{name}: {actual}")
+
+        if snapshot.charts.house_policy_id != RAVI_VEDIC_MVP_V1.charts.house_policy_id:
+            raise ValueError(
+                f"unsupported charts.house_policy_id: {snapshot.charts.house_policy_id}"
+            )
+        if snapshot.charts.varga_policy_ids != RAVI_VEDIC_MVP_V1.charts.varga_policy_ids:
             raise ValueError("this engine requires the implemented D1/D9/D10 policies")
+        if snapshot.policy_manifest_sha256 != RAVI_VEDIC_MVP_V1.policy_manifest_sha256:
+            raise ValueError("unsupported policy manifest")
         object.__setattr__(self, "canon", snapshot)
 
     def calculate(self, birth: BirthInput) -> CoreResult:

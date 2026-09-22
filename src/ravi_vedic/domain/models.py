@@ -242,3 +242,4 @@ class CoreResult:
     d1: D1Chart
     d9: VargaChart
     d10: VargaChart
+    policy_manifest_sha256: str | None = None

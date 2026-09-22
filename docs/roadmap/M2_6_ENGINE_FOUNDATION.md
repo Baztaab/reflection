@@ -1,6 +1,6 @@
 # M2.6 — Engine Foundation Roadmap
 
-Status: In progress; M2.6.0–3 implemented and CI verified; M2.6.4 next
+Status: In progress; M2.6.0–4 implemented and CI verified; M2.6.5 next
 Date: 2026-09-22
 Goal: make the existing D1/D9/D10 core safe to extend before M3 Structural Jyotish.
 
@@ -187,6 +187,11 @@ Exit gate:
 - the canonical lane fails if data is missing or changed.
 
 ## M2.6.4 — Deep-frozen hierarchical Canon
+
+Implemented and CI-verified. Quality run `35760275149`: Ruff passed,
+**98 tests passed, 1 skipped**, and exact full-payload parity remained **5/5**.
+Canonical Swiss run `35760275320` also passed. See ADR-0007 and the
+[pinned source review](../research/M2_6_4_CANON_REVIEW.md).
 
 Purpose: make "same canon" mean the same immutable calculation policy.
 

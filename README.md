@@ -96,6 +96,7 @@ does not keep a speculative "full future schema" beside the executable contract.
 - [Pinned Kerykeion / Immanuel review](docs/research/M2_6_1_REFERENCE_REVIEW.md)
 - [SwissSession source review](docs/research/M2_6_2_SWISS_SESSION_REVIEW.md)
 - [Canonical Swiss dataset review](docs/research/M2_6_3_CANONICAL_SWISS_DATA.md)
+- [Hierarchical Canon review](docs/research/M2_6_4_CANON_REVIEW.md)
 - [Frozen M2.6 baseline](docs/roadmap/M2_6_0_BASELINE.md)
 
 M3 Structural Jyotish is intentionally blocked until M2.6 Engine Foundation passes its
