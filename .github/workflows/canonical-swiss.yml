@@ -1,0 +1,27 @@
+name: canonical-swiss
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  canonical-swiss:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: python -m pip install --disable-pip-version-check -e ".[dev]"
+      - name: Fetch and verify pinned official Swiss files
+        run: python scripts/fetch_canonical_ephemeris.py "$RUNNER_TEMP/ravi-swiss-ephe"
+      - name: Run strict canonical Swiss-file integration
+        env:
+          RAVI_CANONICAL_EPHE_PATH: ${{ runner.temp }}/ravi-swiss-ephe
+        run: pytest tests/integration/test_canonical_swiss_files.py

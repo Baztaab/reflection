@@ -53,6 +53,17 @@ Files must remain unchanged while an engine is in use; directory
 presence does not guarantee coverage of every date. The adapter still checks actual
 Swiss-file source flags during calculations.
 
+For the reproducible 1800–2399 reference dataset used by canonical CI:
+
+```bash
+python scripts/fetch_canonical_ephemeris.py .runtime/swiss-ephe
+```
+
+The fetcher downloads only `sepl_18.se1` and `semo_18.se1` from a pinned official
+Swiss Ephemeris commit and verifies their byte counts, SHA-256 values and combined
+manifest before use. The binaries are not vendored in this repository; upstream Swiss
+Ephemeris licensing still applies to distribution and public-service deployment.
+
 For explicitly **non-canonical** development without `.se1` data:
 
 ```python
@@ -84,6 +95,7 @@ does not keep a speculative "full future schema" beside the executable contract.
 - [Architecture decisions](docs/adr/)
 - [Pinned Kerykeion / Immanuel review](docs/research/M2_6_1_REFERENCE_REVIEW.md)
 - [SwissSession source review](docs/research/M2_6_2_SWISS_SESSION_REVIEW.md)
+- [Canonical Swiss dataset review](docs/research/M2_6_3_CANONICAL_SWISS_DATA.md)
 - [Frozen M2.6 baseline](docs/roadmap/M2_6_0_BASELINE.md)
 
 M3 Structural Jyotish is intentionally blocked until M2.6 Engine Foundation passes its

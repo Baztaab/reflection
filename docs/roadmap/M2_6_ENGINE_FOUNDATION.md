@@ -1,6 +1,6 @@
 # M2.6 — Engine Foundation Roadmap
 
-Status: In progress; M2.6.0–2 implemented and CI verified; M2.6.3 next
+Status: In progress; M2.6.0–3 implemented and CI verified; M2.6.4 next
 Date: 2026-09-22
 Goal: make the existing D1/D9/D10 core safe to extend before M3 Structural Jyotish.
 
@@ -161,6 +161,12 @@ Exit gate:
 - D1/D9/D10 golden outputs unchanged.
 
 ## M2.6.3 — Canonical Swiss-file integration lane
+
+Implemented and CI-verified. Quality run `35759070793`: Ruff passed,
+**88 tests passed, 1 skipped**, and exact full-payload parity remained **5/5**.
+Canonical run `35759070812`: pinned manifest verified and the strict reference chart
+integration passed. See ADR-0006 and the
+[pinned dataset review](../research/M2_6_3_CANONICAL_SWISS_DATA.md).
 
 Purpose: actually test the path called "canonical".
 
