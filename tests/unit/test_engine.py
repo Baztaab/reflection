@@ -4,6 +4,7 @@ from datetime import UTC
 import pytest
 
 from ravi_vedic import RAVI_VEDIC_MVP_V1, BirthInput, RaviEngine, calculate_core
+from ravi_vedic.domain.canon import ChartPolicies
 from ravi_vedic.domain.models import (
     AscendantPosition,
     AstronomicalSnapshot,
@@ -112,8 +113,11 @@ def test_pipeline_uses_supplied_ports_and_canonical_sidereal_values(birth):
 
 
 def test_engine_owns_a_detached_immutable_policy_snapshot(birth):
-    caller_map = dict(RAVI_VEDIC_MVP_V1.varga_policy_ids)
-    caller_canon = replace(RAVI_VEDIC_MVP_V1, varga_policy_ids=caller_map)
+    caller_map = dict(RAVI_VEDIC_MVP_V1.charts.varga_policy_ids)
+    caller_canon = replace(
+        RAVI_VEDIC_MVP_V1,
+        charts=replace(RAVI_VEDIC_MVP_V1.charts, varga_policy_ids=caller_map),
+    )
     engine = RaviEngine(
         astronomy=FakeAstronomy(),
         time_context_provider=FakeTime(),
@@ -124,9 +128,10 @@ def test_engine_owns_a_detached_immutable_policy_snapshot(birth):
     caller_map["D9"] = "unapproved-rule"
     caller_map.clear()
     assert engine.canon is not caller_canon
-    assert engine.canon.varga_policy_ids == RAVI_VEDIC_MVP_V1.varga_policy_ids
+    assert engine.canon.charts.varga_policy_ids == RAVI_VEDIC_MVP_V1.charts.varga_policy_ids
+    assert first.policy_manifest_sha256 == engine.canon.policy_manifest_sha256
     with pytest.raises(TypeError):
-        engine.canon.varga_policy_ids["D9"] = "unapproved-rule"
+        engine.canon.charts.varga_policy_ids["D9"] = "unapproved-rule"
     with pytest.raises(FrozenInstanceError):
         engine.canon = caller_canon
     with pytest.raises(FrozenInstanceError):
@@ -137,21 +142,46 @@ def test_engine_owns_a_detached_immutable_policy_snapshot(birth):
 
 
 @pytest.mark.parametrize(
-    "field",
+    "canon",
     [
-        "zodiac_policy_id",
-        "ayanamsha_policy_id",
-        "node_policy_id",
-        "house_policy_id",
+        replace(
+            RAVI_VEDIC_MVP_V1,
+            astronomy=replace(
+                RAVI_VEDIC_MVP_V1.astronomy,
+                zodiac_policy_id="unapproved-rule",
+            ),
+        ),
+        replace(
+            RAVI_VEDIC_MVP_V1,
+            astronomy=replace(
+                RAVI_VEDIC_MVP_V1.astronomy,
+                ayanamsha_policy_id="unapproved-rule",
+            ),
+        ),
+        replace(
+            RAVI_VEDIC_MVP_V1,
+            astronomy=replace(
+                RAVI_VEDIC_MVP_V1.astronomy,
+                node_policy_id="unapproved-rule",
+            ),
+        ),
+        replace(
+            RAVI_VEDIC_MVP_V1,
+            charts=replace(
+                RAVI_VEDIC_MVP_V1.charts,
+                house_policy_id="unapproved-rule",
+            ),
+        ),
+        replace(RAVI_VEDIC_MVP_V1, canon_id="ravi-vedic-mvp-v2"),
     ],
 )
-def test_engine_rejects_unsupported_policies_before_calculation(field):
+def test_engine_rejects_unsupported_policies_before_calculation(canon):
     astronomy = FakeAstronomy()
     with pytest.raises(ValueError, match="unsupported"):
         RaviEngine(
             astronomy=astronomy,
             time_context_provider=FakeTime(),
-            canon=replace(RAVI_VEDIC_MVP_V1, **{field: "unapproved-rule"}),
+            canon=canon,
         )
     assert astronomy.calls == []
 
@@ -162,7 +192,7 @@ def test_engine_rejects_unsupported_policies_before_calculation(field):
         {},
         {"D9": "unapproved-rule"},
         {
-            **RAVI_VEDIC_MVP_V1.varga_policy_ids,
+            **RAVI_VEDIC_MVP_V1.charts.varga_policy_ids,
             "D20": "not-implemented",
         },
     ],
@@ -172,7 +202,13 @@ def test_engine_rejects_missing_unknown_or_extra_varga_policies(mapping):
         RaviEngine(
             astronomy=FakeAstronomy(),
             time_context_provider=FakeTime(),
-            canon=replace(RAVI_VEDIC_MVP_V1, varga_policy_ids=mapping),
+            canon=replace(
+                RAVI_VEDIC_MVP_V1,
+                charts=ChartPolicies(
+                    house_policy_id=RAVI_VEDIC_MVP_V1.charts.house_policy_id,
+                    varga_policy_ids=mapping,
+                ),
+            ),
         )
 
 
