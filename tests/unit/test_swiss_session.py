@@ -113,3 +113,30 @@ def test_rejected_nested_session_preserves_outer_real_sidereal_state():
         after = swe.calc_ut(jd_ut, swe.SUN, sidereal_flags)[0][0]
 
     assert after == pytest.approx(before, abs=1e-12)
+
+
+@pytest.mark.parametrize(
+    ("path", "expected_args"),
+    [
+        ("/ephe/explicit", ("/ephe/explicit",)),
+        (None, ()),
+    ],
+)
+def test_session_masks_se_ephe_path_override_only_during_native_path_setup(
+    monkeypatch, path, expected_args
+):
+    observed = []
+    monkeypatch.setenv("SE_EPHE_PATH", "/hidden/external")
+
+    def set_ephe_path(*args):
+        observed.append((args, session_module.os.environ.get("SE_EPHE_PATH")))
+
+    monkeypatch.setattr(session_module.swe, "set_ephe_path", set_ephe_path)
+    monkeypatch.setattr(session_module.swe, "set_sid_mode", lambda mode: None)
+    monkeypatch.setattr(session_module.swe, "close", lambda: None)
+
+    with SwissSession(path).open():
+        assert session_module.os.environ["SE_EPHE_PATH"] == "/hidden/external"
+
+    assert observed == [(expected_args, "")]
+    assert session_module.os.environ["SE_EPHE_PATH"] == "/hidden/external"
