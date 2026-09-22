@@ -16,6 +16,7 @@ The canonical production profile MUST require actual Swiss Ephemeris file output
 - A non-canonical development/test profile MAY explicitly allow Moshier fallback.
 - Any allowed fallback MUST be visible in `AstronomyProvenance.source_profile`, `actual_sources`, and warnings.
 - Golden structural tests MAY use the explicit development profile when the execution environment lacks `.se1` data; release-grade astronomy baselines require the strict profile.
+- Swiss True Node is an analytical calculated point rather than a `.se1`-backed planet. It MUST be recorded explicitly as analytical provenance and is not subject to the file-source gate. If direct sidereal True Node calculation is unavailable, deriving it from tropical True Node minus the recorded True Pushya ayanamsha is permitted and MUST emit a provenance warning.
 - True Rahu is an analytical lunar-node point calculated by Swiss Ephemeris, not a planetary body read from a `.se1` file. It records analytical provenance and is exempt from the file-source flag gate.
 - If direct sidereal True Node calculation is unavailable, the adapter MAY derive sidereal True Rahu as tropical True Node minus the recorded True Pushya ayanamsha. That normalization MUST be explicit in provenance.
 
