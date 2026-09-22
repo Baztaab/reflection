@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass
+import os
 from threading import RLock, local
 
 import swisseph as swe
@@ -43,14 +44,23 @@ class SwissSession:
 
             _THREAD_STATE.depth = depth + 1
             try:
-                # After swe.close(), pyswisseph requires set_ephe_path() before further
-                # native use. Calling it without an argument selects the binding's
-                # compiled default path and, critically, does not inherit a prior
-                # session's custom path.
-                if self.ephemeris_path is None:
-                    swe.set_ephe_path()
-                else:
-                    swe.set_ephe_path(self.ephemeris_path)
+                # Swiss gives a non-empty SE_EPHE_PATH environment variable precedence
+                # over the function argument. RAVI's runtime path is authoritative, so
+                # mask that external override only while native path state is applied,
+                # then restore the caller's environment before yielding.
+                previous_env_path = os.environ.get("SE_EPHE_PATH")
+                os.environ["SE_EPHE_PATH"] = ""
+                try:
+                    if self.ephemeris_path is None:
+                        swe.set_ephe_path()
+                    else:
+                        swe.set_ephe_path(self.ephemeris_path)
+                finally:
+                    if previous_env_path is None:
+                        os.environ.pop("SE_EPHE_PATH", None)
+                    else:
+                        os.environ["SE_EPHE_PATH"] = previous_env_path
+
                 swe.set_sid_mode(self.sidereal_mode)
                 yield self.requested_flags
             finally:
