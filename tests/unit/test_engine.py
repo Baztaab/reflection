@@ -212,6 +212,28 @@ def test_engine_rejects_missing_unknown_or_extra_varga_policies(mapping):
         )
 
 
+def test_completed_result_retains_its_policy_identity_when_other_canons_exist(birth):
+    engine = RaviEngine(astronomy=FakeAstronomy(), time_context_provider=FakeTime())
+    completed = engine.calculate(birth)
+    original_identity = completed.policy_manifest_sha256
+
+    changed_canon = replace(
+        RAVI_VEDIC_MVP_V1,
+        charts=ChartPolicies(
+            house_policy_id=RAVI_VEDIC_MVP_V1.charts.house_policy_id,
+            varga_policy_ids={
+                **RAVI_VEDIC_MVP_V1.charts.varga_policy_ids,
+                "D9": "varga.parasari-navamsa-v2",
+            },
+        ),
+    )
+
+    assert changed_canon.policy_manifest_sha256 != original_identity
+    assert completed.policy_manifest_sha256 == original_identity
+    with pytest.raises(FrozenInstanceError):
+        completed.policy_manifest_sha256 = changed_canon.policy_manifest_sha256
+
+
 def test_low_level_facade_requires_both_ports(birth):
     with pytest.raises(TypeError, match="astronomy"):
         calculate_core(birth)
