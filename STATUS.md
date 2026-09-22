@@ -2,8 +2,8 @@
 
 Current milestone: **M2.6 — Engine Foundation IN PROGRESS**
 
-Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon**.
-Next phase: **M2.6.5 shared angular/boundary kernel — NOT STARTED**.
+Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon + M2.6.5 shared angular/boundary kernel**.
+Next phase: **M2.6.6 generic chart frame and chart collection — NOT STARTED**.
 
 Pre-M2.6 baseline: `c12308f50ef2959f6ccdd4c95afd4bc7a171ee2e`.
 M2.6.0–1 merged baseline on `main`: `0771aa8e9bf06103540f03e839bd8e64cb6b8bf1`.
@@ -14,6 +14,9 @@ M2.6.3 merged-main canonical run: `35759751103` (success).
 M2.6.4 implementation quality run: `35760275149` (success): Ruff passed; pytest
 **98 passed, 1 skipped**; exact full-payload parity **5/5**.
 M2.6.4 canonical Swiss run: `35760275320` (success).
+M2.6.5 implementation quality run: `35792691538` (success): Ruff passed; pytest
+**122 passed, 1 skipped**; exact full-payload parity **5/5**.
+M2.6.5 canonical Swiss run: `35792691473` (success).
 
 Canonical specification: `docs/spec/RAVI_VEDIC_MVP_v1.md`
 Active roadmap: `docs/roadmap/M2_6_ENGINE_FOUNDATION.md`
@@ -111,12 +114,25 @@ Evidence: ADR-0006, `docs/research/M2_6_3_CANONICAL_SWISS_DATA.md`, and the
 
 Evidence: ADR-0007 and `docs/research/M2_6_4_CANON_REVIEW.md`.
 
+## What M2.6.5 now enforces
+
+- One immutable `Longitude` primitive owns normalization to `[0, 360)`, sign ownership,
+  and degree-within-sign.
+- One rational partition classifier owns equal sign subdivisions used by Vargas.
+- Non-representable rational boundaries keep the existing nearest-IEEE-754 representative
+  contract; only that exact float owns the boundary.
+- D1 and Varga projection contain no private floor/modulo or rational-boundary arithmetic.
+- Tests cover periodicity, all 30° sign boundaries, rational boundary neighbors via
+  `nextafter`, non-finite rejection, and display-rounding independence.
+- Existing D1/D9/D10 payloads remain exactly unchanged.
+
+Evidence: ADR-0008 and `docs/research/M2_6_5_ANGLE_KERNEL_REVIEW.md`.
+
 ## Why M3 is still blocked
 
 The current core is numerically useful but still has foundation debt that should not be
 copied into Nakshatra/lordship/dispositor work:
 
-- D1 and Varga boundary logic do not yet share one angular primitive;
 - CoreResult/pipeline still hard-code D9 and D10 slots;
 - whole-calculation fingerprinting is incomplete;
 - current schema validation does not encode every semantic invariant.
@@ -132,8 +148,8 @@ These are M2.6 tasks, not M3 tasks.
 
 ## Next action
 
-Implement **M2.6.5 only**: create one normalized longitude/partition primitive and move
-D1 plus existing D9/D10 boundary ownership onto it. Preserve all current numerical
-results. Do not combine it with generic chart storage, new Vargas, or M3.
+Implement **M2.6.6 only**: replace hard-coded D1/D9/D10 domain slots with a generic,
+immutable chart collection while preserving the current serialized compatibility surface.
+Do not add new real Vargas or any M3 technique.
 
 Only after all M2.6 acceptance gates pass may M3 begin with Nakshatra/Pada.

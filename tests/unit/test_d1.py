@@ -1,7 +1,8 @@
 from types import MappingProxyType
 
 from ravi_vedic.domain.canon import RAVI_VEDIC_MVP_V1
-from ravi_vedic.domain.d1 import build_d1, sign_index, whole_sign_house
+from ravi_vedic.domain.d1 import build_d1
+from ravi_vedic.domain.geometry import sign_index, whole_sign_house
 from ravi_vedic.domain.models import (
     AscendantPosition,
     AstronomicalSnapshot,
