@@ -1,26 +1,27 @@
-name: canonical-swiss-probe
+name: canonical-swiss
 
 on:
   push:
-    branches:
-      - codex/m2-6-3-canonical-swiss-lane
+  pull_request:
 
 permissions:
   contents: read
 
 jobs:
-  probe:
+  canonical-swiss:
     runs-on: ubuntu-latest
+    env:
+      PYTHONHASHSEED: "0"
     steps:
-      - name: Download pinned official Swiss files
-        run: |
-          set -euo pipefail
-          mkdir -p ephe
-          base="https://raw.githubusercontent.com/aloistr/swisseph/9083a12d59e98034fb2337061481ac8800c16e64/ephe"
-          curl --fail --location --silent --show-error "$base/sepl_18.se1" -o ephe/sepl_18.se1
-          curl --fail --location --silent --show-error "$base/semo_18.se1" -o ephe/semo_18.se1
-      - name: Report immutable file identities
-        run: |
-          set -euo pipefail
-          sha256sum ephe/sepl_18.se1 ephe/semo_18.se1
-          wc -c ephe/sepl_18.se1 ephe/semo_18.se1
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: python -m pip install --disable-pip-version-check -e ".[dev]"
+      - name: Fetch and verify pinned official Swiss files
+        run: python scripts/fetch_canonical_ephemeris.py "$RUNNER_TEMP/ravi-swiss-ephe"
+      - name: Run strict canonical Swiss-file integration
+        env:
+          RAVI_CANONICAL_EPHE_PATH: ${{ runner.temp }}/ravi-swiss-ephe
+        run: pytest tests/integration/test_canonical_swiss_files.py
