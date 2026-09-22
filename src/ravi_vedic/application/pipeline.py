@@ -1,23 +1,26 @@
 from __future__ import annotations
 
+from ravi_vedic.application.ports import TimeContextPort
 from ravi_vedic.astronomy.port import AstronomyPort
 from ravi_vedic.domain.canon import RAVI_VEDIC_MVP_V1, CalculationCanon
 from ravi_vedic.domain.d1 import build_d1
 from ravi_vedic.domain.models import BirthInput, CoreResult
 from ravi_vedic.domain.varga import build_varga
-from ravi_vedic.infrastructure.swiss import SwissEphemerisAdapter
-from ravi_vedic.infrastructure.timezone import build_time_context
 
 
 def calculate_core(
     birth: BirthInput,
     *,
     canon: CalculationCanon = RAVI_VEDIC_MVP_V1,
-    astronomy: AstronomyPort | None = None,
+    astronomy: AstronomyPort,
+    time_context_provider: TimeContextPort,
 ) -> CoreResult:
-    adapter = astronomy or SwissEphemerisAdapter()
-    time_context = build_time_context(birth, adapter)
-    snapshot = adapter.snapshot(
+    """Low-level orchestration; never constructs runtime infrastructure.
+
+    Normal callers use a configured RaviEngine. Integrators must supply both ports.
+    """
+    time_context = time_context_provider.build(birth, astronomy)
+    snapshot = astronomy.snapshot(
         time_context=time_context,
         latitude_deg=birth.latitude_deg,
         longitude_deg=birth.longitude_deg,

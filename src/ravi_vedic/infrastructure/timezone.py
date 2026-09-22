@@ -8,6 +8,8 @@ from zoneinfo import ZoneInfo
 from ravi_vedic.astronomy.port import AstronomyPort
 from ravi_vedic.domain.models import BirthInput, TimeContext
 
+PINNED_TZDATA_VERSION = "2026.4"
+
 
 class TimeResolutionError(ValueError):
     def __init__(self, code: str, message: str) -> None:
@@ -40,12 +42,30 @@ def _load_pinned_zone(timezone_id: str) -> ZoneInfo:
 
 def _tzdb_identity() -> tuple[str, str]:
     try:
-        return "python-tzdata", metadata.version("tzdata")
+        version = metadata.version("tzdata")
     except metadata.PackageNotFoundError as exc:
         raise TimeResolutionError(
             "TZDATA_UNAVAILABLE",
             "canonical timezone resolution requires the pinned tzdata package",
         ) from exc
+    if version != PINNED_TZDATA_VERSION:
+        raise TimeResolutionError(
+            "TZDATA_VERSION_MISMATCH",
+            f"requires tzdata=={PINNED_TZDATA_VERSION}; installed {version}",
+        )
+    return "python-tzdata", version
+
+
+@dataclass(frozen=True, slots=True)
+class PinnedTimezoneProvider:
+    """Stateless time port, validated at composition and on each calculation."""
+
+    def __post_init__(self) -> None:
+        _tzdb_identity()
+        _load_pinned_zone("Etc/UTC")
+
+    def build(self, birth: BirthInput, astronomy: AstronomyPort) -> TimeContext:
+        return build_time_context(birth, astronomy)
 
 
 def _valid_candidates(local: datetime, zone: ZoneInfo) -> list[_Candidate]:
@@ -60,8 +80,8 @@ def _valid_candidates(local: datetime, zone: ZoneInfo) -> list[_Candidate]:
 
 
 def build_time_context(birth: BirthInput, astronomy: AstronomyPort) -> TimeContext:
-    zone = _load_pinned_zone(birth.timezone_id)
     provider, version = _tzdb_identity()
+    zone = _load_pinned_zone(birth.timezone_id)
 
     candidates = _valid_candidates(birth.local_datetime, zone)
     if not candidates:

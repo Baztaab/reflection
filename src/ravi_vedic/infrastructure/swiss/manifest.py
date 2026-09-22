@@ -44,3 +44,16 @@ def build_ephemeris_data_identity(path: str | Path) -> EphemerisDataIdentity:
         file_count=len(files),
         manifest_sha256=digest.hexdigest(),
     )
+
+
+def require_planetary_data_files(path: str | Path) -> None:
+    """Check basic runtime readiness, not file authenticity or date coverage.
+
+    Swiss searches the configured directory, not arbitrary nested directories.
+    Both planet and Moon file families are required by the canonical core.
+    Official checksums and supported coverage are pinned separately in M2.6.3.
+    """
+    root = Path(path)
+    for pattern in ("sepl*.se1", "semo*.se1"):
+        if not any(item.is_file() and item.stat().st_size > 0 for item in root.glob(pattern)):
+            raise ValueError(f"canonical ephemeris directory requires non-empty {pattern} files")
