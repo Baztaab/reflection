@@ -30,7 +30,7 @@ BirthInput
 - M1 and M2 are merged into `main`; no stacked feature debt remains.
 - Public application entry point is `calculate_core()`; misleading `calculate_d1()` alias is removed.
 - Canonical timezone resolution reads directly from exact-pinned `tzdata==2026.4`, never host OS zoneinfo.
-- Canonical Swiss execution requires an explicit directory containing `.se1` files.
+- Canonical Swiss execution requires an explicit directory containing `.se1` files for file-backed Sun–Saturn positions; True Node is modeled separately as a Swiss analytical point.
 - The ephemeris directory is identified by a SHA-256 content manifest and file count.
 - PySwissEph runtime package is exact-pinned to `pyswisseph==2.10.3.2`.
 - Ascendant calculation uses Swiss Whole Sign house mode (`W`) rather than an unrelated Placidus call.
@@ -44,7 +44,7 @@ BirthInput
 
 Latest hardening gate:
 - Ruff: **all checks passed**
-- Pytest: **25 passed**
+- Pytest: **26 passed**
 - Core JSON Schema: validated in CI
 - D1/D9/D10 golden regression: retained
 - D9/D10 explicit conformance vectors: enabled
