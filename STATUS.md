@@ -2,17 +2,18 @@
 
 Current milestone: **M2.6 — Engine Foundation IN PROGRESS**
 
-Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane**.
-Next phase: **M2.6.4 deep-frozen hierarchical Canon — NOT STARTED**.
+Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon**.
+Next phase: **M2.6.5 shared angular/boundary kernel — NOT STARTED**.
 
 Pre-M2.6 baseline: `c12308f50ef2959f6ccdd4c95afd4bc7a171ee2e`.
 M2.6.0–1 merged baseline on `main`: `0771aa8e9bf06103540f03e839bd8e64cb6b8bf1`.
 Merged-main quality run: `35741262323` (success).
 M2.6.2 merged-main quality run: `35758360140` (success).
-M2.6.3 implementation quality run: `35759070793` (success): Ruff passed; pytest
-**88 passed, 1 skipped**; exact full-payload parity **5/5**.
-M2.6.3 canonical Swiss run: `35759070812` (success): pinned dataset manifest verified
-and strict canonical integration **1 passed**.
+M2.6.3 merged-main quality run: `35759751214` (success).
+M2.6.3 merged-main canonical run: `35759751103` (success).
+M2.6.4 implementation quality run: `35760275149` (success): Ruff passed; pytest
+**98 passed, 1 skipped**; exact full-payload parity **5/5**.
+M2.6.4 canonical Swiss run: `35760275320` (success).
 
 Canonical specification: `docs/spec/RAVI_VEDIC_MVP_v1.md`
 Active roadmap: `docs/roadmap/M2_6_ENGINE_FOUNDATION.md`
@@ -89,12 +90,32 @@ Evidence: ADR-0005 and `docs/research/M2_6_2_SWISS_SESSION_REVIEW.md`.
 Evidence: ADR-0006, `docs/research/M2_6_3_CANONICAL_SWISS_DATA.md`, and the
 `canonical-swiss` workflow.
 
+## What M2.6.4 now enforces
+
+- `CalculationCanon` is hierarchical: typed `astronomy` and `charts` policy groups
+  are the internal source of truth.
+- Mutable Varga mappings supplied by callers are detached, sorted and exposed read-only;
+  nested policy objects are frozen dataclasses.
+- Each Canon emits a recursively immutable deterministic policy manifest and
+  `policy_manifest_sha256`.
+- `ravi-vedic-mvp-v1` pins policy manifest SHA-256
+  `8a77345a47ec1a747047323b291e8037f3b8cc1c4475c1f86406425705fca085`.
+- Equal Canons hash identically regardless of caller map order; any executable policy
+  change tested in astronomy, houses or Vargas changes the hash.
+- Each `RaviEngine` owns a detached Canon snapshot, and each completed `CoreResult`
+  retains the policy hash it was calculated under.
+- Flat policy properties remain read-only migration aliases only; a contract test rejects
+  internal calculation code that bypasses the hierarchy through those aliases.
+- Core JSON remains byte-for-byte compatible with the frozen pre-M2.6 contract; exposing
+  the policy hash externally is deferred to the later calculation-identity/schema phases.
+
+Evidence: ADR-0007 and `docs/research/M2_6_4_CANON_REVIEW.md`.
+
 ## Why M3 is still blocked
 
 The current core is numerically useful but still has foundation debt that should not be
 copied into Nakshatra/lordship/dispositor work:
 
-- standalone Canon still needs hierarchical deep freezing and a policy manifest;
 - D1 and Varga boundary logic do not yet share one angular primitive;
 - CoreResult/pipeline still hard-code D9 and D10 slots;
 - whole-calculation fingerprinting is incomplete;
@@ -111,8 +132,8 @@ These are M2.6 tasks, not M3 tasks.
 
 ## Next action
 
-Implement **M2.6.4 only**: replace the shallow executable Canon with recursively frozen
-typed policy structures, define one deterministic policy manifest, and hash it into a
-stable policy identity. Do not combine it with angle-kernel work, chart collection, or M3.
+Implement **M2.6.5 only**: create one normalized longitude/partition primitive and move
+D1 plus existing D9/D10 boundary ownership onto it. Preserve all current numerical
+results. Do not combine it with generic chart storage, new Vargas, or M3.
 
 Only after all M2.6 acceptance gates pass may M3 begin with Nakshatra/Pada.
