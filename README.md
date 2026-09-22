@@ -6,6 +6,9 @@ The project is optimized for auditable Jyotish research rather than feature coun
 Astronomy, Jyotish policy, derived structure, evidence and interpretation are kept as
 separate concerns.
 
+Current milestone: **M2.6 Engine Foundation**. M2.6.0–5 are merged and verified;
+**M2.6.6 generic chart frame and chart collection is next**.
+
 ## Current executable core
 
 The engine currently computes:

@@ -131,8 +131,8 @@ Exit gate:
 
 ## M2.6.2 — Hardened SwissSession
 
-Implemented and CI-verified. Quality run `35743579339`: Ruff passed, **84 tests passed**,
-and exact full-payload parity remained **5/5**. See ADR-0005 and the
+Implemented and CI-verified. Merged-main quality run `35758360140`: Ruff passed,
+**84 tests passed**, and exact full-payload parity remained **5/5**. See ADR-0005 and the
 [pinned session review](../research/M2_6_2_SWISS_SESSION_REVIEW.md).
 
 Purpose: make Swiss process-global state boring and contained.
@@ -162,10 +162,10 @@ Exit gate:
 
 ## M2.6.3 — Canonical Swiss-file integration lane
 
-Implemented and CI-verified. Quality run `35759070793`: Ruff passed,
+Implemented and CI-verified. Merged-main quality run `35759751214`: Ruff passed,
 **88 tests passed, 1 skipped**, and exact full-payload parity remained **5/5**.
-Canonical run `35759070812`: pinned manifest verified and the strict reference chart
-integration passed. See ADR-0006 and the
+Merged-main canonical run `35759751103`: pinned manifest verified and the strict
+reference-chart integration passed. See ADR-0006 and the
 [pinned dataset review](../research/M2_6_3_CANONICAL_SWISS_DATA.md).
 
 Purpose: actually test the path called "canonical".
@@ -188,9 +188,9 @@ Exit gate:
 
 ## M2.6.4 — Deep-frozen hierarchical Canon
 
-Implemented and CI-verified. Quality run `35760275149`: Ruff passed,
+Implemented and CI-verified. Merged-main quality run `35760665047`: Ruff passed,
 **98 tests passed, 1 skipped**, and exact full-payload parity remained **5/5**.
-Canonical Swiss run `35760275320` also passed. See ADR-0007 and the
+Merged-main canonical Swiss run `35760664798` also passed. See ADR-0007 and the
 [pinned source review](../research/M2_6_4_CANON_REVIEW.md).
 
 Purpose: make "same canon" mean the same immutable calculation policy.
@@ -228,7 +228,10 @@ Exit gate:
 
 ## M2.6.5 — One angular/boundary kernel
 
-Implemented and CI-verified. Quality run `35792691538`: Ruff passed, **122 tests passed, 1 skipped**, and exact full-payload parity remained **5/5**. Canonical Swiss run `35792691473` also passed. See ADR-0008 and the [pinned source review](../research/M2_6_5_ANGLE_KERNEL_REVIEW.md).
+Implemented and CI-verified. Merged-main quality run `35792895282`: Ruff passed,
+**122 tests passed, 1 skipped**, and exact full-payload parity remained **5/5**.
+Merged-main canonical Swiss run `35792895252` also passed. See ADR-0008 and the
+[pinned source review](../research/M2_6_5_ANGLE_KERNEL_REVIEW.md).
 
 Purpose: prevent D1, Vargas, Nakshatra and future divisions from inventing separate
 definitions of a boundary.

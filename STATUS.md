@@ -5,18 +5,23 @@ Current milestone: **M2.6 — Engine Foundation IN PROGRESS**
 Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon + M2.6.5 shared angular/boundary kernel**.
 Next phase: **M2.6.6 generic chart frame and chart collection — NOT STARTED**.
 
-Pre-M2.6 baseline: `c12308f50ef2959f6ccdd4c95afd4bc7a171ee2e`.
-M2.6.0–1 merged baseline on `main`: `0771aa8e9bf06103540f03e839bd8e64cb6b8bf1`.
-Merged-main quality run: `35741262323` (success).
-M2.6.2 merged-main quality run: `35758360140` (success).
-M2.6.3 merged-main quality run: `35759751214` (success).
-M2.6.3 merged-main canonical run: `35759751103` (success).
-M2.6.4 implementation quality run: `35760275149` (success): Ruff passed; pytest
-**98 passed, 1 skipped**; exact full-payload parity **5/5**.
-M2.6.4 canonical Swiss run: `35760275320` (success).
-M2.6.5 implementation quality run: `35792691538` (success): Ruff passed; pytest
-**122 passed, 1 skipped**; exact full-payload parity **5/5**.
-M2.6.5 canonical Swiss run: `35792691473` (success).
+Current verified `main`: `8cf1c22baebd27a5663362f06d9d090335d02fee`
+(M2.6.5 merged).
+
+Latest merged-main verification:
+- quality run `35792895282` — success; Ruff passed; pytest **122 passed, 1 skipped**;
+  exact full-payload parity **5/5**;
+- canonical Swiss run `35792895252` — success; pinned dataset manifest verified;
+  strict canonical integration **1 passed**.
+
+Historical milestone anchors:
+- pre-M2.6 baseline: `c12308f50ef2959f6ccdd4c95afd4bc7a171ee2e`;
+- M2.6.0–1 merged baseline: `0771aa8e9bf06103540f03e839bd8e64cb6b8bf1`,
+  quality run `35741262323`;
+- M2.6.2 merged-main quality run: `35758360140`;
+- M2.6.3 merged-main quality/canonical runs: `35759751214` / `35759751103`;
+- M2.6.4 merged-main quality/canonical runs: `35760665047` / `35760664798`;
+- M2.6.5 merged-main quality/canonical runs: `35792895282` / `35792895252`.
 
 Canonical specification: `docs/spec/RAVI_VEDIC_MVP_v1.md`
 Active roadmap: `docs/roadmap/M2_6_ENGINE_FOUNDATION.md`
@@ -42,7 +47,10 @@ RuntimeConfig -> create_engine(...) -> RaviEngine
 The D1/D9/D10 calculation outputs are regression-tested and must remain unchanged during
 M2.6 unless a separately reviewed calculation-policy decision explicitly changes them.
 
-## What M2.6.0–1 now enforce
+Current policy source of truth is `CalculationCanon.astronomy` and
+`CalculationCanon.charts`; the flat policy properties are read-only migration aliases only.
+
+## What M2.6.0–1 established
 
 - Both original numerical fixtures and the Core Schema have frozen SHA-256 identities.
 - Application/domain code do not import concrete runtime infrastructure.
@@ -50,7 +58,9 @@ M2.6 unless a separately reviewed calculation-policy decision explicitly changes
 - Runtime profile is explicit; canonical construction rejects missing/empty paths and
   missing, empty or only-nested planet/Moon file families, without a development fallback.
 - Exact tzdata version is checked at engine construction and use.
-- Each engine owns a detached immutable snapshot of the current flat policy map.
+- Each engine owns a detached immutable Canon snapshot. M2.6.1 began with an interim
+  flat Varga-map snapshot; M2.6.4 superseded that internal shape with the hierarchical
+  `astronomy` / `charts` Canon that is the current source of truth.
 - A → B → A, DST failure recovery, unknown policy rejection, and unchanged JSON are tested.
 - All previous golden/contract assertions are retained; test setup uses explicit engines.
 

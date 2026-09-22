@@ -1,6 +1,6 @@
 # ADR-0004 — Explicit runtime composition and engine-owned policy snapshot
 
-Status: Accepted for M2.6.1
+Status: Accepted for M2.6.1; Canon snapshot shape in decision 5 superseded by ADR-0007
 Date: 2026-09-22
 Supersedes ADR-0003 item 6 (normal public entry point).
 
@@ -37,6 +37,13 @@ and the precise patterns adopted. This is independent implementation, not source
    directory cannot silently retarget data. No host-OS timezone fallback is introduced.
 7. The engine is sequential. Supplied custom ports are trusted integrations; neither
    general concurrency safety nor immutable external files is promised by this step.
+
+## Current-state note
+
+ADR-0007 (M2.6.4) supersedes decision 5's interim flat Varga-policy snapshot. The current
+engine owns a detached hierarchical `CalculationCanon` snapshot with typed `astronomy`
+and `charts` groups plus a pinned policy-manifest hash. The rest of this ADR remains the
+historical decision record for explicit engine composition.
 
 ## Consequences
 
