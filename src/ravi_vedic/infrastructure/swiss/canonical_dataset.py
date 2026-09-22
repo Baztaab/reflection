@@ -11,8 +11,6 @@ from ravi_vedic.infrastructure.swiss.manifest import (
 
 SWISS_REFERENCE_REPOSITORY = "aloistr/swisseph"
 SWISS_REFERENCE_COMMIT = "9083a12d59e98034fb2337061481ac8800c16e64"
-SWISS_REFERENCE_COVERAGE_START_YEAR = 1800
-SWISS_REFERENCE_COVERAGE_END_YEAR = 2399
 SWISS_REFERENCE_MANIFEST_SHA256 = (
     "8d68647580a9952102ca50c975fc55d9e26f102aafcc090f853e172080118032"
 )
@@ -23,7 +21,6 @@ class CanonicalEphemerisFile:
     name: str
     size_bytes: int
     sha256: str
-    upstream_blob_sha: str
 
 
 SWISS_REFERENCE_FILES = (
@@ -31,13 +28,11 @@ SWISS_REFERENCE_FILES = (
         name="sepl_18.se1",
         size_bytes=484_061,
         sha256="ca1393ceab3a44fbc895887cf789c68819ae6a1cbc9b22225872dbe4ccd99a66",
-        upstream_blob_sha="786702cd04506371ee6223af1ebac02d54c848b8",
     ),
     CanonicalEphemerisFile(
         name="semo_18.se1",
         size_bytes=1_304_771,
         sha256="1ca07bd67c24374d77226180c20a4f9996cba013697894810518e7eb582ca4f7",
-        upstream_blob_sha="5427d9f885fd6cb9489584ade37e52c6abb4d407",
     ),
 )
 
