@@ -203,18 +203,21 @@
       }
     },
     "vargaGraha": {
-      "allOf": [
-        {"$ref": "#/$defs/vargaProjection"},
-        {
-          "type": "object",
-          "required": ["body", "house", "retrograde"],
-          "properties": {
-            "body": {"$ref": "#/$defs/bodyName"},
-            "house": {"$ref": "#/$defs/house"},
-            "retrograde": {"type": "boolean"}
-          }
-        }
-      ]
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["body", "source_longitude_deg", "segment_index", "target_sign_index", "target_sign", "longitude_within_target_sign_deg", "projected_longitude_deg", "mapping_policy_id", "house", "retrograde"],
+      "properties": {
+        "body": {"$ref": "#/$defs/bodyName"},
+        "source_longitude_deg": {"$ref": "#/$defs/longitude"},
+        "segment_index": {"type": "integer", "minimum": 0},
+        "target_sign_index": {"type": "integer", "minimum": 0, "maximum": 11},
+        "target_sign": {"$ref": "#/$defs/signName"},
+        "longitude_within_target_sign_deg": {"$ref": "#/$defs/degreeInSign"},
+        "projected_longitude_deg": {"$ref": "#/$defs/longitude"},
+        "mapping_policy_id": {"type": "string"},
+        "house": {"$ref": "#/$defs/house"},
+        "retrograde": {"type": "boolean"}
+      }
     },
     "vargaChart": {
       "type": "object",
