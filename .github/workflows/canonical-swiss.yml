@@ -1,0 +1,26 @@
+name: canonical-swiss-probe
+
+on:
+  push:
+    branches:
+      - codex/m2-6-3-canonical-swiss-lane
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download pinned official Swiss files
+        run: |
+          set -euo pipefail
+          mkdir -p ephe
+          base="https://raw.githubusercontent.com/aloistr/swisseph/9083a12d59e98034fb2337061481ac8800c16e64/ephe"
+          curl --fail --location --silent --show-error "$base/sepl_18.se1" -o ephe/sepl_18.se1
+          curl --fail --location --silent --show-error "$base/semo_18.se1" -o ephe/semo_18.se1
+      - name: Report immutable file identities
+        run: |
+          set -euo pipefail
+          sha256sum ephe/sepl_18.se1 ephe/semo_18.se1
+          wc -c ephe/sepl_18.se1 ephe/semo_18.se1
