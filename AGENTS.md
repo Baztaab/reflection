@@ -21,5 +21,8 @@ Non-negotiable rules:
 - `schemas/ravi_vedic_core_v1.schema.json` is the executable current contract; the full MVP schema is a future target and must not force placeholder output.
 - Use `calculate_core()` as the public application entry point.
 - Prefer a small vertical slice over speculative infrastructure.
+- Current executable output MUST validate against `schemas/ravi_vedic_core_v1.schema.json`.
+- The future full-MVP schema MUST NOT force placeholder timing/evidence/sensitivity fields.
+- Runtime data that changes canonical numbers (timezone DB or ephemeris files) must be versioned or content-identified.
 
 When finishing a meaningful implementation step, update `STATUS.md` with what is now executable and the exact next dependency.
