@@ -14,6 +14,7 @@ The engine currently computes:
 BirthInput
  -> pinned TimeContext
  -> SwissEphemerisAdapter
+    -> SwissSession (serialized native-state boundary)
  -> AstronomicalSnapshot
  -> D1
  -> D9
@@ -82,6 +83,7 @@ does not keep a speculative "full future schema" beside the executable contract.
 - [Schema lifecycle notes](schemas/README.md)
 - [Architecture decisions](docs/adr/)
 - [Pinned Kerykeion / Immanuel review](docs/research/M2_6_1_REFERENCE_REVIEW.md)
+- [SwissSession source review](docs/research/M2_6_2_SWISS_SESSION_REVIEW.md)
 - [Frozen M2.6 baseline](docs/roadmap/M2_6_0_BASELINE.md)
 
 M3 Structural Jyotish is intentionally blocked until M2.6 Engine Foundation passes its

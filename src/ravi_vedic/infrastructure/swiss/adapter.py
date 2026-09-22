@@ -1,10 +1,8 @@
 from __future__ import annotations
 
-from contextlib import contextmanager
 from datetime import UTC, datetime
 from importlib import metadata
 from pathlib import Path
-from threading import RLock
 
 import swisseph as swe
 
@@ -23,8 +21,7 @@ from ravi_vedic.infrastructure.swiss.manifest import (
     build_ephemeris_data_identity,
     require_planetary_data_files,
 )
-
-_LOCK = RLock()
+from ravi_vedic.infrastructure.swiss.session import SwissSession
 
 _BODY_IDS = {
     Graha.SUN: swe.SUN,
@@ -65,7 +62,6 @@ class SwissEphemerisAdapter:
         allow_moshier_fallback: bool = False,
     ) -> None:
         self._allow_moshier_fallback = allow_moshier_fallback
-        self._requested_flags = swe.FLG_SWIEPH | swe.FLG_SPEED
         self._data_identity: EphemerisDataIdentity | None = None
 
         if ephemeris_path is not None:
@@ -86,17 +82,7 @@ class SwissEphemerisAdapter:
             if self._data_identity is not None
             else str(Path(ephemeris_path).expanduser()) if ephemeris_path is not None else None
         )
-
-    @contextmanager
-    def _session(self):
-        with _LOCK:
-            try:
-                if self._ephemeris_path:
-                    swe.set_ephe_path(self._ephemeris_path)
-                swe.set_sid_mode(swe.SIDM_TRUE_PUSHYA)
-                yield
-            finally:
-                swe.close()
+        self._session = SwissSession(ephemeris_path=self._ephemeris_path)
 
     def julian_time(self, utc_datetime: datetime) -> JulianTime:
         if (
@@ -105,15 +91,16 @@ class SwissEphemerisAdapter:
         ):
             raise ValueError("utc_datetime must be timezone-aware UTC")
         seconds = utc_datetime.second + utc_datetime.microsecond / 1_000_000.0
-        jd_tt, jd_ut = swe.utc_to_jd(
-            utc_datetime.year,
-            utc_datetime.month,
-            utc_datetime.day,
-            utc_datetime.hour,
-            utc_datetime.minute,
-            seconds,
-            swe.GREG_CAL,
-        )
+        with self._session.open():
+            jd_tt, jd_ut = swe.utc_to_jd(
+                utc_datetime.year,
+                utc_datetime.month,
+                utc_datetime.day,
+                utc_datetime.hour,
+                utc_datetime.minute,
+                seconds,
+                swe.GREG_CAL,
+            )
         return JulianTime(
             jd_ut=jd_ut,
             jd_tt=jd_tt,
@@ -145,15 +132,15 @@ class SwissEphemerisAdapter:
         actual_sources: set[str] = set()
         bodies: dict[Graha, BodyPosition] = {}
 
-        with self._session():
+        with self._session.open() as requested_flags:
             ayanamsha = swe.get_ayanamsa_ut(time_context.jd_ut)
-            sidereal_flags = self._requested_flags | swe.FLG_SIDEREAL
+            sidereal_flags = requested_flags | swe.FLG_SIDEREAL
 
             for body, swiss_id in _BODY_IDS.items():
                 tropical, tropical_retflags = swe.calc_ut(
                     time_context.jd_ut,
                     swiss_id,
-                    self._requested_flags,
+                    requested_flags,
                 )
                 sidereal, sidereal_retflags = swe.calc_ut(
                     time_context.jd_ut,
@@ -187,7 +174,7 @@ class SwissEphemerisAdapter:
             rahu_tropical, rahu_tropical_retflags = swe.calc_ut(
                 time_context.jd_ut,
                 swe.TRUE_NODE,
-                self._requested_flags,
+                requested_flags,
             )
             actual_sources.add("swiss-true-node-analytical")
 
@@ -270,7 +257,7 @@ class SwissEphemerisAdapter:
                     identity.manifest_sha256 if identity is not None else None
                 ),
                 ephemeris_file_count=identity.file_count if identity is not None else 0,
-                requested_flags=self._requested_flags,
+                requested_flags=requested_flags,
                 sidereal_mode="SIDM_TRUE_PUSHYA",
                 ayanamsha_policy_id=canon.ayanamsha_policy_id,
                 source_profile=(
