@@ -1,6 +1,6 @@
 # M2.6 — Engine Foundation Roadmap
 
-Status: In progress; M2.6.0–4 implemented and CI verified; M2.6.5 next
+Status: In progress; M2.6.0–5 implemented and CI verified; M2.6.6 next
 Date: 2026-09-22
 Goal: make the existing D1/D9/D10 core safe to extend before M3 Structural Jyotish.
 
@@ -227,6 +227,8 @@ Exit gate:
 - old completed results retain their original policy identity.
 
 ## M2.6.5 — One angular/boundary kernel
+
+Implemented and CI-verified. Quality run `35792691538`: Ruff passed, **122 tests passed, 1 skipped**, and exact full-payload parity remained **5/5**. Canonical Swiss run `35792691473` also passed. See ADR-0008 and the [pinned source review](../research/M2_6_5_ANGLE_KERNEL_REVIEW.md).
 
 Purpose: prevent D1, Vargas, Nakshatra and future divisions from inventing separate
 definitions of a boundary.
