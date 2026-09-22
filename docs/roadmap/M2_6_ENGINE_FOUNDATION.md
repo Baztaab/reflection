@@ -1,6 +1,6 @@
 # M2.6 — Engine Foundation Roadmap
 
-Status: In progress; M2.6.0–1 implemented and locally verified; M2.6.2 not started
+Status: In progress; M2.6.0–2 implemented and CI verified; M2.6.3 next
 Date: 2026-09-22
 Goal: make the existing D1/D9/D10 core safe to extend before M3 Structural Jyotish.
 
@@ -90,8 +90,8 @@ Exit gate:
 
 ## M2.6.1 — Explicit runtime composition and RaviEngine
 
-Implemented in the M2.6.0–1 change. Local gates: 75 tests, Ruff, and exact full-payload
-parity for five births. PR quality must pass before merge. See ADR-0004 and the
+Implemented and merged in the M2.6.0–1 change. The merged-main quality workflow is green.
+See ADR-0004 and the
 [pinned source review](../research/M2_6_1_REFERENCE_REVIEW.md).
 
 Purpose: remove the false impression that `calculate_core(birth)` can safely invent its
@@ -131,6 +131,10 @@ Exit gate:
 
 ## M2.6.2 — Hardened SwissSession
 
+Implemented and CI-verified. Quality run `35742848270`: Ruff passed, **82 tests passed**,
+and exact full-payload parity remained **5/5**. See ADR-0005 and the
+[pinned session review](../research/M2_6_2_SWISS_SESSION_REVIEW.md).
+
 Purpose: make Swiss process-global state boring and contained.
 
 Work:
@@ -141,6 +145,11 @@ Work:
 - forbid direct session/global-state manipulation outside the Swiss infrastructure package;
 - make sequential sessions prove that one calculation cannot leak settings into the next;
 - use a known reset contract on exit; do not pretend to restore state Swiss cannot expose.
+
+Implemented reset contract: each entry reapplies the complete RAVI-owned path, sidereal
+mode and flags; each exit calls `swe.close()` to release native resources. Upstream
+pyswisseph explicitly documents that sidereal-mode parameters survive `close()`, so
+RAVI intentionally does not describe cleanup as restoration of an unknown prior state.
 
 Exit gate:
 
