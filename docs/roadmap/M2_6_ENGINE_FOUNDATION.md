@@ -1,6 +1,6 @@
 # M2.6 — Engine Foundation Roadmap
 
-Status: Planned; implementation not started
+Status: In progress; M2.6.0–1 implemented and locally verified; M2.6.2 not started
 Date: 2026-09-22
 Goal: make the existing D1/D9/D10 core safe to extend before M3 Structural Jyotish.
 
@@ -70,6 +70,8 @@ of the preceding phase is green.
 
 ## M2.6.0 — Baseline freeze
 
+Completed in the M2.6.0–1 change. See [baseline record](M2_6_0_BASELINE.md).
+
 Purpose: preserve the currently trusted behavior while the architecture changes.
 
 Work:
@@ -87,6 +89,10 @@ Exit gate:
 - no new Jyotish feature introduced.
 
 ## M2.6.1 — Explicit runtime composition and RaviEngine
+
+Implemented in the M2.6.0–1 change. Local gates: 75 tests, Ruff, and exact full-payload
+parity for five births. PR quality must pass before merge. See ADR-0004 and the
+[pinned source review](../research/M2_6_1_REFERENCE_REVIEW.md).
 
 Purpose: remove the false impression that `calculate_core(birth)` can safely invent its
 own production runtime.

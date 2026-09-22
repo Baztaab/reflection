@@ -25,6 +25,47 @@ BirthInput
 Canonical choices currently implemented include True Pushya, True Rahu with derived
 opposite Ketu, Whole Sign houses, Parashari Navamsha and Parashari Dashamsha.
 
+## Explicit engine setup
+
+Configure runtime once, then reuse the engine for sequential calculations:
+
+```python
+from ravi_vedic import BirthInput, RuntimeConfig, SourceProfile, create_engine
+from ravi_vedic.projection import to_core_dict
+
+engine = create_engine(RuntimeConfig(
+    source_profile=SourceProfile.CANONICAL,
+    ephemeris_path="/absolute/path/to/swiss-data",
+))
+birth = BirthInput.from_iso(
+    local_datetime="1997-06-07T20:28:36",
+    timezone_id="Asia/Tehran",
+    latitude_deg=36.15,
+    longitude_deg=51.6166666667,
+)
+payload = to_core_dict(engine.calculate(birth))
+```
+
+Canonical setup fails immediately for a missing/empty ephemeris directory, absent or empty
+planet/Moon file families at its top level, or unavailable/wrong-version tzdata.
+Files must remain unchanged while an engine is in use; directory
+presence does not guarantee coverage of every date. The adapter still checks actual
+Swiss-file source flags during calculations.
+
+For explicitly **non-canonical** development without `.se1` data:
+
+```python
+engine = create_engine(RuntimeConfig(source_profile=SourceProfile.DEVELOPMENT))
+```
+
+The development profile permits Moshier fallback; it is not a promise of a fixed Moshier
+dataset. The actual numerical source remains visible in result provenance.
+
+Migration: the pre-release `calculate_core(birth, astronomy=...)` signature now also
+requires `time_context_provider`. Normal callers should use the engine above. Tests and
+trusted integrations may construct `RaviEngine(astronomy=..., time_context_provider=...)`
+with fake ports. The serialized Core v1 schema is unchanged.
+
 ## Current machine contract
 
 There is exactly one executable JSON contract:
@@ -40,6 +81,8 @@ does not keep a speculative "full future schema" beside the executable contract.
 - [M2.6 Engine Foundation roadmap](docs/roadmap/M2_6_ENGINE_FOUNDATION.md)
 - [Schema lifecycle notes](schemas/README.md)
 - [Architecture decisions](docs/adr/)
+- [Pinned Kerykeion / Immanuel review](docs/research/M2_6_1_REFERENCE_REVIEW.md)
+- [Frozen M2.6 baseline](docs/roadmap/M2_6_0_BASELINE.md)
 
 M3 Structural Jyotish is intentionally blocked until M2.6 Engine Foundation passes its
 acceptance gates.
@@ -48,7 +91,7 @@ acceptance gates.
 
 ```bash
 python -m pip install -e ".[dev]"
-ruff check src tests
+ruff check src tests scripts
 pytest
 ```
 

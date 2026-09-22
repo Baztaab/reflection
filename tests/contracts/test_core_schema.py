@@ -3,8 +3,7 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator
 
-from ravi_vedic import BirthInput, calculate_core
-from ravi_vedic.infrastructure.swiss import SwissEphemerisAdapter
+from ravi_vedic import BirthInput, RuntimeConfig, SourceProfile, create_engine
 from ravi_vedic.projection import to_core_dict
 
 ROOT = Path(__file__).parents[2]
@@ -17,9 +16,8 @@ def test_core_projection_validates_against_executable_schema() -> None:
     Draft202012Validator.check_schema(schema)
 
     fixture = json.loads(FIXTURE.read_text())
-    result = calculate_core(
+    result = create_engine(RuntimeConfig(source_profile=SourceProfile.DEVELOPMENT)).calculate(
         BirthInput.from_iso(**fixture["input"]),
-        astronomy=SwissEphemerisAdapter(allow_moshier_fallback=True),
     )
     payload = to_core_dict(result)
 
@@ -33,9 +31,8 @@ def test_core_projection_validates_against_executable_schema() -> None:
 
 def test_core_projection_is_deterministic_for_same_result() -> None:
     fixture = json.loads(FIXTURE.read_text())
-    result = calculate_core(
+    result = create_engine(RuntimeConfig(source_profile=SourceProfile.DEVELOPMENT)).calculate(
         BirthInput.from_iso(**fixture["input"]),
-        astronomy=SwissEphemerisAdapter(allow_moshier_fallback=True),
     )
     first = to_core_dict(result)
     second = to_core_dict(result)

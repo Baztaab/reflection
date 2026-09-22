@@ -21,6 +21,7 @@ from ravi_vedic.domain.models import (
 from ravi_vedic.infrastructure.swiss.manifest import (
     EphemerisDataIdentity,
     build_ephemeris_data_identity,
+    require_planetary_data_files,
 )
 
 _LOCK = RLock()
@@ -70,6 +71,8 @@ class SwissEphemerisAdapter:
         if ephemeris_path is not None:
             try:
                 self._data_identity = build_ephemeris_data_identity(ephemeris_path)
+                if not allow_moshier_fallback:
+                    require_planetary_data_files(self._data_identity.root_path)
             except ValueError as exc:
                 if not allow_moshier_fallback:
                     raise EphemerisSourceError(str(exc)) from exc

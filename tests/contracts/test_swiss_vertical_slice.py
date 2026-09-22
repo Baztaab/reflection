@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from ravi_vedic import BirthInput, calculate_core
+from ravi_vedic import BirthInput, RuntimeConfig, SourceProfile, create_engine
 from ravi_vedic.domain.models import Graha
 from ravi_vedic.infrastructure.swiss import EphemerisSourceError, SwissEphemerisAdapter
 
@@ -37,7 +37,7 @@ def _assert_varga(actual, expected) -> None:
 def test_reference_chart_001_matches_golden_structure() -> None:
     fixture = json.loads(FIXTURE.read_text())
     birth = BirthInput.from_iso(**fixture["input"])
-    result = calculate_core(birth, astronomy=SwissEphemerisAdapter(allow_moshier_fallback=True))
+    result = create_engine(RuntimeConfig(source_profile=SourceProfile.DEVELOPMENT)).calculate(birth)
 
     expected = fixture["expected"]
     assert result.canon_id == "ravi-vedic-mvp-v1"
@@ -54,7 +54,9 @@ def test_reference_chart_001_matches_golden_structure() -> None:
     for name, item in expected["placements"].items():
         graha = Graha(name)
         actual = result.d1.placements[graha]
-        assert actual.sidereal_longitude_deg == pytest.approx(item["sidereal_longitude_deg"], abs=5e-5)
+        assert actual.sidereal_longitude_deg == pytest.approx(
+            item["sidereal_longitude_deg"], abs=5e-5
+        )
         assert actual.sign_index == item["sign_index"]
         assert actual.house == item["house"]
 
@@ -64,13 +66,14 @@ def test_reference_chart_001_matches_golden_structure() -> None:
 
 def test_ketu_is_exactly_opposite_true_rahu() -> None:
     fixture = json.loads(FIXTURE.read_text())
-    result = calculate_core(
+    result = create_engine(RuntimeConfig(source_profile=SourceProfile.DEVELOPMENT)).calculate(
         BirthInput.from_iso(**fixture["input"]),
-        astronomy=SwissEphemerisAdapter(allow_moshier_fallback=True),
     )
     rahu = result.astronomy.bodies[Graha.RAHU]
     ketu = result.astronomy.bodies[Graha.KETU]
-    assert (ketu.sidereal_longitude_deg - rahu.sidereal_longitude_deg) % 360.0 == pytest.approx(180.0, abs=1e-12)
+    assert (ketu.sidereal_longitude_deg - rahu.sidereal_longitude_deg) % 360.0 == pytest.approx(
+        180.0, abs=1e-12
+    )
     assert ketu.longitude_speed_deg_per_day == rahu.longitude_speed_deg_per_day
     assert ketu.source_method == "derived:exact-opposition-from-true-rahu"
 
@@ -82,9 +85,8 @@ def test_canonical_profile_requires_explicit_ephemeris_path() -> None:
 
 def test_calculate_core_exposes_default_vargas() -> None:
     fixture = json.loads(FIXTURE.read_text())
-    result = calculate_core(
+    result = create_engine(RuntimeConfig(source_profile=SourceProfile.DEVELOPMENT)).calculate(
         BirthInput.from_iso(**fixture["input"]),
-        astronomy=SwissEphemerisAdapter(allow_moshier_fallback=True),
     )
     assert result.d9.varga == "D9"
     assert result.d9.mapping_policy_id == "varga.parasari-navamsa-v1"
@@ -99,9 +101,8 @@ def test_whole_sign_ascendant_survives_high_latitude() -> None:
         latitude_deg=80.0,
         longitude_deg=20.0,
     )
-    result = calculate_core(
+    result = create_engine(RuntimeConfig(source_profile=SourceProfile.DEVELOPMENT)).calculate(
         birth,
-        astronomy=SwissEphemerisAdapter(allow_moshier_fallback=True),
     )
     assert 0.0 <= result.d1.ascendant_sidereal_longitude_deg < 360.0
     assert result.astronomy.ascendant.source_method == "swiss-houses-ex:whole-sign-ascendant"
@@ -109,9 +110,8 @@ def test_whole_sign_ascendant_survives_high_latitude() -> None:
 
 def test_true_node_records_analytical_provenance() -> None:
     fixture = json.loads(FIXTURE.read_text())
-    result = calculate_core(
+    result = create_engine(RuntimeConfig(source_profile=SourceProfile.DEVELOPMENT)).calculate(
         BirthInput.from_iso(**fixture["input"]),
-        astronomy=SwissEphemerisAdapter(allow_moshier_fallback=True),
     )
     rahu = result.astronomy.bodies[Graha.RAHU]
     assert "swiss-true-node-analytical" in result.astronomy.provenance.actual_sources

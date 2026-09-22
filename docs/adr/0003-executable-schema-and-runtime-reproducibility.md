@@ -12,7 +12,9 @@ actual ephemeris data files strongly enough.
 
 ## Decision
 
-1. Maintain an **executable Core Schema** separate from the future full-MVP schema.
+1. Maintain an **executable Core Schema** separate from the future full-MVP design.
+   The speculative future schema was removed by the M2.6 cleanup; future structures
+   remain in the specification until executable.
    CI MUST validate real engine output against the executable schema.
 2. Never add placeholder timing/evidence/sensitivity data merely to satisfy a future
    schema.
@@ -24,6 +26,8 @@ actual ephemeris data files strongly enough.
    for MVP v1.
 6. The public application entry point is `calculate_core()`. The misleading
    compatibility alias `calculate_d1()` is removed before any public release.
+   **Superseded by ADR-0004:** normal callers now use `RaviEngine.calculate()`;
+   the low-level `calculate_core()` requires explicit astronomy and time ports.
 7. Varga boundary classification MUST NOT use an epsilon/tolerance band. For rational
    boundaries that are not exactly representable in IEEE-754, the nearest representable
    float is the canonical boundary representative. Its immediate predecessor remains in
