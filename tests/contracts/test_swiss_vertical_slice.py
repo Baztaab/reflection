@@ -3,11 +3,35 @@ from pathlib import Path
 
 import pytest
 
-from ravi_vedic import BirthInput, calculate_d1
+from ravi_vedic import BirthInput, calculate_core, calculate_d1
 from ravi_vedic.domain.models import Graha
 from ravi_vedic.infrastructure.swiss import EphemerisSourceError, SwissEphemerisAdapter
 
 FIXTURE = Path(__file__).parents[1] / "fixtures" / "reference_chart_001_true_pushya.json"
+
+
+def _assert_varga(actual, expected) -> None:
+    asc = expected["ascendant"]
+    assert actual.ascendant.segment_index == asc["segment_index"]
+    assert actual.ascendant.target_sign_index == asc["target_sign_index"]
+    assert actual.ascendant.longitude_within_target_sign_deg == pytest.approx(
+        asc["longitude_within_target_sign_deg"], abs=5e-10
+    )
+    assert actual.ascendant.projected_longitude_deg == pytest.approx(
+        asc["projected_longitude_deg"], abs=5e-10
+    )
+
+    for name, item in expected["placements"].items():
+        placement = actual.placements[Graha(name)]
+        assert placement.projection.segment_index == item["segment_index"]
+        assert placement.projection.target_sign_index == item["target_sign_index"]
+        assert placement.projection.longitude_within_target_sign_deg == pytest.approx(
+            item["longitude_within_target_sign_deg"], abs=5e-10
+        )
+        assert placement.projection.projected_longitude_deg == pytest.approx(
+            item["projected_longitude_deg"], abs=5e-10
+        )
+        assert placement.house == item["house"]
 
 
 def test_reference_chart_001_matches_golden_structure() -> None:
@@ -34,6 +58,9 @@ def test_reference_chart_001_matches_golden_structure() -> None:
         assert actual.sign_index == item["sign_index"]
         assert actual.house == item["house"]
 
+    _assert_varga(result.d9, expected["vargas"]["D9"])
+    _assert_varga(result.d10, expected["vargas"]["D10"])
+
 
 def test_ketu_is_exactly_opposite_true_rahu() -> None:
     fixture = json.loads(FIXTURE.read_text())
@@ -57,3 +84,15 @@ def test_canonical_profile_rejects_silent_moshier_when_files_are_absent() -> Non
         return
     assert "swisseph-files" in result.astronomy.provenance.actual_sources
     assert result.astronomy.provenance.source_profile == "canonical-strict-swiss-files"
+
+
+def test_calculate_core_exposes_default_vargas() -> None:
+    fixture = json.loads(FIXTURE.read_text())
+    result = calculate_core(
+        BirthInput.from_iso(**fixture["input"]),
+        astronomy=SwissEphemerisAdapter(allow_moshier_fallback=True),
+    )
+    assert result.d9.varga == "D9"
+    assert result.d9.mapping_policy_id == "varga.parasari-navamsa-v1"
+    assert result.d10.varga == "D10"
+    assert result.d10.mapping_policy_id == "varga.parasari-dashamsa-v1"

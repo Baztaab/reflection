@@ -14,15 +14,199 @@
     "ascendant_sidereal_longitude_deg": 237.41339805282163,
     "ascendant_sign_index": 7,
     "placements": {
-      "sun": {"sidereal_longitude_deg": 54.24970958069625, "sign_index": 1, "house": 7},
-      "moon": {"sidereal_longitude_deg": 82.77337484459395, "sign_index": 2, "house": 8},
-      "mars": {"sidereal_longitude_deg": 152.59182149321572, "sign_index": 5, "house": 11},
-      "mercury": {"sidereal_longitude_deg": 35.06623548830817, "sign_index": 1, "house": 7},
-      "jupiter": {"sidereal_longitude_deg": 299.2497590918123, "sign_index": 9, "house": 3},
-      "venus": {"sidereal_longitude_deg": 71.58235105089206, "sign_index": 2, "house": 8},
-      "saturn": {"sidereal_longitude_deg": 355.22770858805205, "sign_index": 11, "house": 5},
-      "rahu": {"sidereal_longitude_deg": 152.14468394929304, "sign_index": 5, "house": 11},
-      "ketu": {"sidereal_longitude_deg": 332.14468394929304, "sign_index": 11, "house": 5}
+      "sun": {
+        "sidereal_longitude_deg": 54.24970958069625,
+        "sign_index": 1,
+        "house": 7
+      },
+      "moon": {
+        "sidereal_longitude_deg": 82.77337484459395,
+        "sign_index": 2,
+        "house": 8
+      },
+      "mars": {
+        "sidereal_longitude_deg": 152.59182149321572,
+        "sign_index": 5,
+        "house": 11
+      },
+      "mercury": {
+        "sidereal_longitude_deg": 35.06623548830817,
+        "sign_index": 1,
+        "house": 7
+      },
+      "jupiter": {
+        "sidereal_longitude_deg": 299.2497590918123,
+        "sign_index": 9,
+        "house": 3
+      },
+      "venus": {
+        "sidereal_longitude_deg": 71.58235105089206,
+        "sign_index": 2,
+        "house": 8
+      },
+      "saturn": {
+        "sidereal_longitude_deg": 355.22770858805205,
+        "sign_index": 11,
+        "house": 5
+      },
+      "rahu": {
+        "sidereal_longitude_deg": 152.14468394929304,
+        "sign_index": 5,
+        "house": 11
+      },
+      "ketu": {
+        "sidereal_longitude_deg": 332.14468394929304,
+        "sign_index": 11,
+        "house": 5
+      }
+    },
+    "vargas": {
+      "D9": {
+        "ascendant": {
+          "segment_index": 8,
+          "target_sign_index": 11,
+          "longitude_within_target_sign_deg": 6.720582475394696,
+          "projected_longitude_deg": 336.7205824753947
+        },
+        "placements": {
+          "sun": {
+            "segment_index": 7,
+            "target_sign_index": 4,
+            "longitude_within_target_sign_deg": 8.24738622626624,
+            "projected_longitude_deg": 128.24738622626623,
+            "house": 6
+          },
+          "moon": {
+            "segment_index": 6,
+            "target_sign_index": 0,
+            "longitude_within_target_sign_deg": 24.96037360134551,
+            "projected_longitude_deg": 24.96037360134551,
+            "house": 2
+          },
+          "mars": {
+            "segment_index": 0,
+            "target_sign_index": 9,
+            "longitude_within_target_sign_deg": 23.326393438941466,
+            "projected_longitude_deg": 293.32639343894147,
+            "house": 11
+          },
+          "mercury": {
+            "segment_index": 1,
+            "target_sign_index": 10,
+            "longitude_within_target_sign_deg": 15.596119394773563,
+            "projected_longitude_deg": 315.59611939477355,
+            "house": 12
+          },
+          "jupiter": {
+            "segment_index": 8,
+            "target_sign_index": 5,
+            "longitude_within_target_sign_deg": 23.247831826310517,
+            "projected_longitude_deg": 173.24783182631052,
+            "house": 7
+          },
+          "venus": {
+            "segment_index": 3,
+            "target_sign_index": 9,
+            "longitude_within_target_sign_deg": 14.241159458028525,
+            "projected_longitude_deg": 284.2411594580285,
+            "house": 11
+          },
+          "saturn": {
+            "segment_index": 7,
+            "target_sign_index": 10,
+            "longitude_within_target_sign_deg": 17.04937729246849,
+            "projected_longitude_deg": 317.0493772924685,
+            "house": 12
+          },
+          "rahu": {
+            "segment_index": 0,
+            "target_sign_index": 9,
+            "longitude_within_target_sign_deg": 19.302155543637355,
+            "projected_longitude_deg": 289.30215554363735,
+            "house": 11
+          },
+          "ketu": {
+            "segment_index": 0,
+            "target_sign_index": 3,
+            "longitude_within_target_sign_deg": 19.302155543637355,
+            "projected_longitude_deg": 109.30215554363735,
+            "house": 5
+          }
+        }
+      },
+      "D10": {
+        "ascendant": {
+          "segment_index": 9,
+          "target_sign_index": 0,
+          "longitude_within_target_sign_deg": 4.133980528216359,
+          "projected_longitude_deg": 4.133980528216359
+        },
+        "placements": {
+          "sun": {
+            "segment_index": 8,
+            "target_sign_index": 5,
+            "longitude_within_target_sign_deg": 2.497095806962495,
+            "projected_longitude_deg": 152.4970958069625,
+            "house": 6
+          },
+          "moon": {
+            "segment_index": 7,
+            "target_sign_index": 9,
+            "longitude_within_target_sign_deg": 17.73374844593946,
+            "projected_longitude_deg": 287.73374844593945,
+            "house": 10
+          },
+          "mars": {
+            "segment_index": 0,
+            "target_sign_index": 1,
+            "longitude_within_target_sign_deg": 25.918214932157184,
+            "projected_longitude_deg": 55.918214932157184,
+            "house": 2
+          },
+          "mercury": {
+            "segment_index": 1,
+            "target_sign_index": 10,
+            "longitude_within_target_sign_deg": 20.66235488308173,
+            "projected_longitude_deg": 320.6623548830817,
+            "house": 11
+          },
+          "jupiter": {
+            "segment_index": 9,
+            "target_sign_index": 2,
+            "longitude_within_target_sign_deg": 22.497590918122814,
+            "projected_longitude_deg": 82.49759091812281,
+            "house": 3
+          },
+          "venus": {
+            "segment_index": 3,
+            "target_sign_index": 5,
+            "longitude_within_target_sign_deg": 25.823510508920577,
+            "projected_longitude_deg": 175.82351050892058,
+            "house": 6
+          },
+          "saturn": {
+            "segment_index": 8,
+            "target_sign_index": 3,
+            "longitude_within_target_sign_deg": 12.277085880520548,
+            "projected_longitude_deg": 102.27708588052054,
+            "house": 4
+          },
+          "rahu": {
+            "segment_index": 0,
+            "target_sign_index": 1,
+            "longitude_within_target_sign_deg": 21.446839492930394,
+            "projected_longitude_deg": 51.446839492930394,
+            "house": 2
+          },
+          "ketu": {
+            "segment_index": 0,
+            "target_sign_index": 7,
+            "longitude_within_target_sign_deg": 21.446839492930394,
+            "projected_longitude_deg": 231.4468394929304,
+            "house": 8
+          }
+        }
+      }
     }
   }
 }
