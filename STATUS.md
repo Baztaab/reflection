@@ -1,10 +1,10 @@
 # Project status
 
-Current milestone: **M2.5 — Foundation Hardening**
+Current milestone: **M2.5 — Foundation Hardening COMPLETE**
 
 Canonical specification: `docs/spec/RAVI_VEDIC_MVP_v1.md`
 Architecture decisions: `docs/adr/0001-canonical-policy-pipeline.md`, `docs/adr/0002-ephemeris-source-strictness.md`, `docs/adr/0003-executable-schema-and-runtime-reproducibility.md`
-Implementation branch: `feat/m2.5-foundation-hardening`
+Implementation branch: `feat/m2.5-foundation-hardening` (ready to merge)
 
 ## Stable calculation core
 
@@ -36,9 +36,15 @@ BirthInput
 - High-latitude Whole Sign Ascendant behavior has a contract test.
 - CI installs pinned dev tooling and runs Ruff + pytest.
 
-## Validation gate
+## Validation
 
-M2.5 is ready to merge only when the current branch GitHub Actions run is fully green. No M3 code should be started before that gate passes.
+GitHub Actions on Python 3.11 is green at commit `66caada5c9709c4325111cdb3130f44a79b8cb18`:
+
+- Ruff: all checks passed;
+- pytest: **33 passed**;
+- exhaustive D9/D10 mapping and boundary conformance included.
+
+M2.5 is approved for merge.
 
 ## Deliberately not started
 
