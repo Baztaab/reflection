@@ -177,18 +177,16 @@ class SwissEphemerisAdapter:
                     retflags_sidereal=sidereal_retflags,
                 )
 
+            # True Node is an analytical point calculated by Swiss Ephemeris,
+            # not a planetary position read from a .se1 file. The strict file
+            # source gate therefore applies to Sun-Saturn, while the node
+            # records analytical provenance explicitly.
             rahu_tropical, rahu_tropical_retflags = swe.calc_ut(
                 time_context.jd_ut,
                 swe.TRUE_NODE,
                 self._requested_flags,
             )
-            rahu_tropical_source = _source_from_flags(rahu_tropical_retflags)
-            self._require_source(rahu_tropical_source)
-            actual_sources.add(rahu_tropical_source)
-            if rahu_tropical_source != "swisseph-files":
-                warning = f"EPHEMERIS_SOURCE_FALLBACK:{rahu_tropical_source}"
-                if warning not in warnings:
-                    warnings.append(warning)
+            actual_sources.add("swiss-true-node-analytical")
 
             rahu_sidereal_retflags: int | None = None
             try:
@@ -201,15 +199,13 @@ class SwissEphemerisAdapter:
                 rahu_lat = rahu_sidereal[1]
                 rahu_distance = rahu_sidereal[2]
                 rahu_speed = rahu_sidereal[3]
-                rahu_method = f"swiss-direct:{_source_from_flags(rahu_sidereal_retflags)}"
+                rahu_method = "swiss-true-node:direct-sidereal"
             except swe.Error:
-                if not self._allow_moshier_fallback:
-                    raise
                 rahu_sidereal_lon = _normalize(rahu_tropical[0] - ayanamsha)
                 rahu_lat = rahu_tropical[1]
                 rahu_distance = rahu_tropical[2]
                 rahu_speed = rahu_tropical[3]
-                rahu_method = "derived:tropical-true-node-minus-true-pushya"
+                rahu_method = "derived:swiss-true-node-minus-true-pushya"
                 warnings.append("TRUE_NODE_SIDEREAL_DERIVED_FROM_TROPICAL_AND_AYANAMSHA")
 
             rahu = BodyPosition(
