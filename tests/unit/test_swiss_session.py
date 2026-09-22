@@ -95,3 +95,21 @@ def test_real_pyswisseph_sidereal_mode_is_reapplied_between_sessions():
 
     assert lahiri_second == pytest.approx(lahiri_first, abs=1e-12)
     assert abs(lahiri_first - pushya_value) > 0.1
+
+
+def test_rejected_nested_session_preserves_outer_real_sidereal_state():
+    jd_ut = 2451545.0
+    outer = SwissSession(None, sidereal_mode=swe.SIDM_LAHIRI)
+
+    with outer.open() as flags:
+        sidereal_flags = flags | swe.FLG_SIDEREAL
+        before = swe.calc_ut(jd_ut, swe.SUN, sidereal_flags)[0][0]
+
+        with pytest.raises(SwissSessionError, match="nested SwissSession"), SwissSession(
+            None, sidereal_mode=swe.SIDM_TRUE_PUSHYA
+        ).open():
+            pass
+
+        after = swe.calc_ut(jd_ut, swe.SUN, sidereal_flags)[0][0]
+
+    assert after == pytest.approx(before, abs=1e-12)
