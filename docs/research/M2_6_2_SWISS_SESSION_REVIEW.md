@@ -52,6 +52,8 @@ Relevant upstream evidence:
   `set_sid_mode()` survive `close()`;
 - `pyswisseph.c` documents `close()` as releasing resources and requires
   `set_ephe_path()` again before subsequent Swiss use;
+- the ephemeris-path manual states that a non-empty `SE_EPHE_PATH` environment variable
+  overrides the explicit path argument;
 - upstream tests routinely call no-argument `swe.set_ephe_path()` during setup.
 
 This means `close()` is **resource cleanup, not a universal state restore**.
@@ -64,6 +66,7 @@ This means `close()` is **resource cleanup, not a universal state restore**.
 | `RLock` permits recursion but inner cleanup is semantically unsafe. | Reject same-thread nesting before mutation. | Mock lifecycle test + real outer-state preservation test. |
 | `close()` does not erase sidereal configuration. | Reapply complete known RAVI state on every entry; never claim prior-state restoration. | Real Lahiri → True Pushya → Lahiri A/B/A test. |
 | Development mode could inherit an old custom path if path setup is skipped. | Even a `None` path executes `swe.set_ephe_path()`. | A/B/A lifecycle event test. |
+| `SE_EPHE_PATH` can override an explicit path argument. | Mask it only during native path setup, then restore the caller's environment before yielding. | Explicit/default path parameterized environment-masking test. |
 | Exceptions can leave native resources open. | `close()` runs in `finally`. | Failure-recovery test. |
 | Julian conversion previously bypassed the lock/session. | Put `utc_to_jd` inside the same session contract. | Static adapter native-call boundary test. |
 

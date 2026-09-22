@@ -8,8 +8,8 @@ Next phase: **M2.6.3 canonical Swiss-file integration lane — NOT STARTED**.
 Pre-M2.6 baseline: `c12308f50ef2959f6ccdd4c95afd4bc7a171ee2e`.
 M2.6.0–1 merged baseline on `main`: `0771aa8e9bf06103540f03e839bd8e64cb6b8bf1`.
 Merged-main quality run: `35741262323` (success).
-M2.6.2 implementation quality run: `35742848270` (success): Ruff passed; pytest
-**82 passed**; exact full-payload parity **5/5**, with no omitted fields or tolerances.
+M2.6.2 implementation quality run: `35743579339` (success): Ruff passed; pytest
+**84 passed**; exact full-payload parity **5/5**, with no omitted fields or tolerances.
 
 Canonical specification: `docs/spec/RAVI_VEDIC_MVP_v1.md`
 Active roadmap: `docs/roadmap/M2_6_ENGINE_FOUNDATION.md`
@@ -57,6 +57,9 @@ Evidence: `docs/research/M2_6_1_REFERENCE_REVIEW.md`, ADR-0004,
 - RAVI serializes access to Swiss process-global state with one lock and rejects unsafe
   same-thread nested sessions before the inner session can mutate state.
 - Every session re-applies ephemeris path and True Pushya sidereal mode on entry.
+- A non-empty process `SE_EPHE_PATH` is masked only while RAVI applies its own runtime
+  path, then restored before calculation; hidden environment state cannot override the
+  configured RAVI source.
 - Session exit calls `swe.close()` as resource cleanup; RAVI does **not** claim that this
   restores hidden prior Swiss state.
 - A → B → A session tests cover path and sidereal-state reapplication, failure cleanup,

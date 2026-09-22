@@ -11,6 +11,9 @@ Pyswisseph exposes process-global native configuration. RAVI already serialized
 - `julian_time()` called `swe.utc_to_jd()` outside the session;
 - path setup happened only when RAVI had a non-null path, so a later development
   calculation could inherit process state set by unrelated prior Swiss use;
+- upstream Swiss lets a non-empty `SE_EPHE_PATH` environment variable override even an
+  explicit `set_ephe_path(path)` argument, which could defeat RAVI's explicit canonical
+  runtime path;
 - the adapter itself owned `set_ephe_path`, `set_sid_mode`, and `close`;
 - there was no same-thread nested-session guard;
 - cleanup used `close()` without an explicit statement of what it does and does not reset.
@@ -30,21 +33,26 @@ not a truthful contract because Swiss does not expose all prior state for recons
    semantically destructive sessions.
 4. On every entry, explicitly apply the complete state RAVI currently depends on:
    ephemeris path, sidereal mode, and calculation flags.
-5. Development sessions with no explicit ephemeris directory still call
-   `swe.set_ephe_path()`, so they initialize the binding's default path instead of
-   implicitly inheriting a prior RAVI path.
-6. On every exit, including exceptions, call `swe.close()` to release native resources.
+5. While applying the RAVI ephemeris path, temporarily mask a non-empty process
+   `SE_EPHE_PATH` so upstream Swiss cannot override the explicit runtime choice. Restore
+   the caller's environment immediately after `set_ephe_path()`, before yielding.
+6. Development sessions with no explicit ephemeris directory still call
+   `swe.set_ephe_path()`, so they reinitialize path state instead of implicitly inheriting
+   a prior RAVI path.
+7. On every exit, including exceptions, call `swe.close()` to release native resources.
    Do **not** claim that this restores an unknown pre-session sidereal/path configuration.
    Safety comes from deterministic reapplication on the next entry.
-7. Every direct native Swiss function used by `SwissEphemerisAdapter`, including
+8. Every direct native Swiss function used by `SwissEphemerisAdapter`, including
    `utc_to_jd`, must execute inside `SwissSession.open()`.
-8. Static contract tests make direct Swiss global-state mutators outside `session.py`
+9. Static contract tests make direct Swiss global-state mutators outside `session.py`
    fail CI.
 
 ## Consequences
 
 - Sequential A → B → A calculations cannot depend on RAVI's preceding session path or
   sidereal setting.
+- A process-level `SE_EPHE_PATH` cannot silently replace the RAVI runtime path, while
+  the user's environment is preserved outside the brief native path-setup call.
 - Failed calculations still close native resources and the next session starts from
   explicitly applied RAVI state.
 - A rejected nested session cannot reset or change the active outer session.

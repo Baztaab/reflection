@@ -131,7 +131,7 @@ Exit gate:
 
 ## M2.6.2 — Hardened SwissSession
 
-Implemented and CI-verified. Quality run `35742848270`: Ruff passed, **82 tests passed**,
+Implemented and CI-verified. Quality run `35743579339`: Ruff passed, **84 tests passed**,
 and exact full-payload parity remained **5/5**. See ADR-0005 and the
 [pinned session review](../research/M2_6_2_SWISS_SESSION_REVIEW.md).
 
@@ -147,7 +147,9 @@ Work:
 - use a known reset contract on exit; do not pretend to restore state Swiss cannot expose.
 
 Implemented reset contract: each entry reapplies the complete RAVI-owned path, sidereal
-mode and flags; each exit calls `swe.close()` to release native resources. Upstream
+mode and flags. Because upstream Swiss lets a non-empty `SE_EPHE_PATH` override the path
+argument, RAVI masks that environment override only while applying its runtime path and
+restores it before calculation. Each exit calls `swe.close()` to release native resources. Upstream
 pyswisseph explicitly documents that sidereal-mode parameters survive `close()`, so
 RAVI intentionally does not describe cleanup as restoration of an unknown prior state.
 
