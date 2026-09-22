@@ -29,9 +29,8 @@ def test_nested_session_is_rejected_before_inner_state_mutation(monkeypatch):
 
     with session.open():
         before_nested_attempt = list(events)
-        with pytest.raises(SwissSessionError, match="nested SwissSession"):
-            with session.open():
-                pass
+        with pytest.raises(SwissSessionError, match="nested SwissSession"), session.open():
+            pass
         assert events == before_nested_attempt
 
     assert events == [
@@ -70,9 +69,8 @@ def test_exception_closes_session_and_does_not_poison_next_entry(monkeypatch):
     events = _record_native_lifecycle(monkeypatch)
     session = SwissSession(None)
 
-    with pytest.raises(RuntimeError, match="boom"):
-        with session.open():
-            raise RuntimeError("boom")
+    with pytest.raises(RuntimeError, match="boom"), session.open():
+        raise RuntimeError("boom")
 
     with session.open():
         pass
