@@ -105,3 +105,17 @@ def test_whole_sign_ascendant_survives_high_latitude() -> None:
     )
     assert 0.0 <= result.d1.ascendant_sidereal_longitude_deg < 360.0
     assert result.astronomy.ascendant.source_method == "swiss-houses-ex:whole-sign-ascendant"
+
+
+def test_true_node_records_analytical_provenance() -> None:
+    fixture = json.loads(FIXTURE.read_text())
+    result = calculate_core(
+        BirthInput.from_iso(**fixture["input"]),
+        astronomy=SwissEphemerisAdapter(allow_moshier_fallback=True),
+    )
+    rahu = result.astronomy.bodies[Graha.RAHU]
+    assert "swiss-true-node-analytical" in result.astronomy.provenance.actual_sources
+    assert rahu.source_method in {
+        "swiss-true-node:direct-sidereal",
+        "derived:swiss-true-node-minus-true-pushya",
+    }
