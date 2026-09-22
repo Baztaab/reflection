@@ -24,9 +24,11 @@ actual ephemeris data files strongly enough.
    for MVP v1.
 6. The public application entry point is `calculate_core()`. The misleading
    compatibility alias `calculate_d1()` is removed before any public release.
-7. Varga boundary classification uses decimal arithmetic plus a documented 1e-12°
-   snap window around internal rational boundaries. This absorbs float arithmetic noise
-   far below astronomical precision while preserving ordinary near-boundary distinctions.
+7. Varga boundary classification MUST NOT use an epsilon/tolerance band. For rational
+   boundaries that are not exactly representable in IEEE-754, the nearest representable
+   float is the canonical boundary representative. Its immediate predecessor remains in
+   the previous segment and its immediate successor remains in the new segment. Internal
+   classification uses exact rational arithmetic over the represented float value.
 
 ## Consequences
 
