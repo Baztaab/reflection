@@ -2,6 +2,7 @@ import inspect
 
 import pytest
 
+from ravi_vedic.domain.diagnostics import Diagnostic
 from ravi_vedic.domain.models import (
     AscendantPosition,
     AstronomicalSnapshot,
@@ -31,7 +32,7 @@ def _body() -> BodyPosition:
     )
 
 
-def _provenance(actual_sources=("fake",), warnings=()) -> AstronomyProvenance:
+def _provenance(actual_sources=("fake",), diagnostics=()) -> AstronomyProvenance:
     return AstronomyProvenance(
         implementation="fake",
         implementation_version="1",
@@ -44,7 +45,7 @@ def _provenance(actual_sources=("fake",), warnings=()) -> AstronomyProvenance:
         ayanamsha_policy_id="ayanamsha.true-pushya.swiss-v1",
         source_profile="test",
         actual_sources=actual_sources,
-        warnings=warnings,
+        diagnostics=diagnostics,
     )
 
 
@@ -114,14 +115,14 @@ def test_chart_constructors_detach_placements_and_enforce_policy_lineage():
 
 def test_provenance_detaches_sequence_inputs():
     sources = ["fake"]
-    warnings = ["example"]
-    provenance = _provenance(sources, warnings)
+    diagnostics: list[Diagnostic] = []
+    provenance = _provenance(sources, diagnostics)
 
     sources.append("mutated")
-    warnings.clear()
+    diagnostics.clear()
 
     assert provenance.actual_sources == ("fake",)
-    assert provenance.warnings == ("example",)
+    assert provenance.diagnostics == ()
 
 
 def test_core_result_requires_complete_calculation_identity():
@@ -131,6 +132,8 @@ def test_core_result_requires_complete_calculation_identity():
         "runtime_identity",
         "input_sha256",
         "calculation_fingerprint",
+        "diagnostics",
+        "calculation_status",
     ):
         assert parameters[name].default is inspect.Parameter.empty
 

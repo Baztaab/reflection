@@ -40,7 +40,7 @@ def _snapshot(asc: float, body_lon: float) -> AstronomicalSnapshot:
             ayanamsha_policy_id=RAVI_VEDIC_MVP_V1.astronomy.ayanamsha_policy_id,
             source_profile="test",
             actual_sources=("test",),
-            warnings=(),
+            diagnostics=(),
         ),
     )
 

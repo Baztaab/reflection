@@ -6,8 +6,8 @@ The project is optimized for auditable Jyotish research rather than feature coun
 Astronomy, Jyotish policy, derived structure, evidence and interpretation are kept as
 separate concerns.
 
-Current milestone: **M2.6 Engine Foundation**. M2.6.0–6 and M2.6.7 slices 7.1–7.3 are
-implemented and CI verified; **M2.6.7.4 typed diagnostics and calculation status is next**.
+Current milestone: **M2.6 Engine Foundation**. M2.6.0–6 and M2.6.7 slices 7.1–7.4 are
+implemented and CI verified; **M2.6.7.5 projection and acceptance is next**.
 
 ## Current executable core
 
@@ -98,6 +98,12 @@ Each completed `CoreResult` now retains two internal identities:
 
 These fields are intentionally **not serialized yet**. M2.6.7.5 owns projection changes;
 this keeps fingerprint construction independent from external contract migration.
+
+Internally, warnings are now typed immutable diagnostics carrying code, severity, layer,
+affected fields, canonicality impact and structured details. Every completed result also
+has an explicit `canonical | development | degraded` status. Core-v1 still renders the
+legacy warning strings for byte-compatible output until slice 7.5 migrates the external
+contract.
 
 ## Current machine contract
 
