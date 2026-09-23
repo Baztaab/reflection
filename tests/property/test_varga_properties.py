@@ -1,6 +1,7 @@
 import math
 
-from hypothesis import given, settings, strategies as st
+from hypothesis import given, settings
+from hypothesis import strategies as st
 
 from ravi_vedic.domain.geometry import normalize_longitude
 from ravi_vedic.domain.varga import get_varga_policy, project_longitude
