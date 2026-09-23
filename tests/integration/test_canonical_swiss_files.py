@@ -78,8 +78,13 @@ def test_tehran_reference_chart_uses_verified_swiss_files_end_to_end():
         Graha.VENUS,
         Graha.SATURN,
     )
+    projected_bodies = {
+        item["body"]: item
+        for item in payload["astronomy"]["bodies"]
+    }
     for body in file_backed_bodies:
         position = result.astronomy.bodies[body]
+        projected = projected_bodies[body.value.capitalize()]
         assert position.source_method == "swiss-direct:swisseph-files"
         assert position.retflags_tropical is not None
         assert position.retflags_sidereal is not None
@@ -87,3 +92,12 @@ def test_tehran_reference_chart_uses_verified_swiss_files_end_to_end():
         assert position.retflags_sidereal & swe.FLG_SWIEPH
         assert not position.retflags_tropical & swe.FLG_MOSEPH
         assert not position.retflags_sidereal & swe.FLG_MOSEPH
+        assert projected["source_method"] == position.source_method
+        assert projected["retflags_tropical"] == position.retflags_tropical
+        assert projected["retflags_sidereal"] == position.retflags_sidereal
+
+    ketu = payload["astronomy"]["bodies"][-1]
+    assert ketu["body"] == "Ketu"
+    assert ketu["source_method"] == "derived:exact-opposition-from-true-rahu"
+    assert ketu["retflags_tropical"] is None
+    assert ketu["retflags_sidereal"] is None

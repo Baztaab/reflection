@@ -66,3 +66,9 @@ identifiers have one runtime vocabulary and executable tests that prevent drift.
 - Current domain calculations and the exact parity gate remain untouched in 8.1–8.3.
 - Retflags are added only in 8.4, where the external contract explicitly begins preserving
   those already-computed execution details.
+- The frozen pre-M2.6 parity harness removes only `retflags_tropical` and
+  `retflags_sidereal` when comparing against the historical payload that predates those
+  fields. Current-schema tests require both fields and verify exact domain-to-JSON values,
+  so this compatibility normalization cannot hide a current-contract omission.
+- Derived bodies such as Ketu serialize explicit `null` return flags because no separate
+  Swiss call produced those values; absence is represented, not invented.

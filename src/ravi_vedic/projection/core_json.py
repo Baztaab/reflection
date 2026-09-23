@@ -178,6 +178,8 @@ def to_core_dict(result: CoreResult) -> dict[str, Any]:
                     ),
                     "retrograde": astronomy.bodies[body].retrograde,
                     "source_method": astronomy.bodies[body].source_method,
+                    "retflags_tropical": astronomy.bodies[body].retflags_tropical,
+                    "retflags_sidereal": astronomy.bodies[body].retflags_sidereal,
                 }
                 for body in CORE_GRAHA_ORDER
             ],
