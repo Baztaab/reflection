@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
 
+from ravi_vedic.errors import RuntimeDataError
+
 
 @dataclass(frozen=True, slots=True)
 class EphemerisDataIdentity:
@@ -23,14 +25,14 @@ def _file_sha256(path: Path) -> bytes:
 def build_ephemeris_data_identity(path: str | Path) -> EphemerisDataIdentity:
     root = Path(path).expanduser().resolve()
     if not root.is_dir():
-        raise ValueError(f"ephemeris path is not a directory: {root}")
+        raise RuntimeDataError(f"ephemeris path is not a directory: {root}")
 
     files = sorted(
         (item for item in root.rglob("*.se1") if item.is_file()),
         key=lambda item: item.relative_to(root).as_posix(),
     )
     if not files:
-        raise ValueError(f"no .se1 files found under ephemeris path: {root}")
+        raise RuntimeDataError(f"no .se1 files found under ephemeris path: {root}")
 
     digest = sha256()
     for item in files:
@@ -56,4 +58,4 @@ def require_planetary_data_files(path: str | Path) -> None:
     root = Path(path)
     for pattern in ("sepl*.se1", "semo*.se1"):
         if not any(item.is_file() and item.stat().st_size > 0 for item in root.glob(pattern)):
-            raise ValueError(f"canonical ephemeris directory requires non-empty {pattern} files")
+            raise RuntimeDataError(f"canonical ephemeris directory requires non-empty {pattern} files")
