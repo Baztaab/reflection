@@ -22,6 +22,7 @@ from ravi_vedic.domain.identity import (
     RuntimeIdentity,
     TimezoneRuntimeIdentity,
 )
+from ravi_vedic.errors import InvariantViolationError, UnsupportedPolicyError
 from ravi_vedic.domain.models import (
     AscendantPosition,
     AstronomicalSnapshot,
@@ -230,7 +231,7 @@ def test_engine_owns_a_detached_immutable_policy_snapshot(birth):
 )
 def test_engine_rejects_unsupported_policies_before_calculation(canon):
     astronomy = FakeAstronomy()
-    with pytest.raises(ValueError, match="unsupported"):
+    with pytest.raises(UnsupportedPolicyError, match="unsupported"):
         RaviEngine(
             astronomy=astronomy,
             time_context_provider=FakeTime(),
@@ -255,7 +256,7 @@ def test_engine_rejects_unsupported_policies_before_calculation(canon):
     ],
 )
 def test_engine_rejects_noncanonical_chart_policy_map(mapping, message):
-    with pytest.raises(ValueError, match=message):
+    with pytest.raises(UnsupportedPolicyError, match=message):
         RaviEngine(
             astronomy=FakeAstronomy(),
             time_context_provider=FakeTime(),
@@ -308,7 +309,7 @@ def test_synthetic_chart_extends_collection_without_pipeline_or_core_result_edit
     assert set(result.charts) == {"D1", "D9", "D10", "DTEST"}
     assert result.charts.require_varga("DTEST").factor == 2
     assert result.d9 is result.charts["D9"]
-    with pytest.raises(ValueError, match="requires exactly D1/D9/D10"):
+    with pytest.raises(InvariantViolationError, match="requires exactly D1/D9/D10"):
         to_core_dict(result)
 
 
