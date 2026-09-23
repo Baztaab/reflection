@@ -327,8 +327,10 @@ M2.6.8.3 verification on implementation head
 
 - Core JSON preserves the `retflags_tropical` and `retflags_sidereal` already retained
   by every `BodyPosition`; projection does not rediscover or recalculate them.
-- The executable schema requires both fields on every astronomy body and permits explicit
-  `null` only for derived/nonexistent Swiss calls such as exact-opposition Ketu.
+- The executable schema requires both fields on every astronomy body and couples them to
+  actual source semantics: Sun through Saturn require integer direct-Swiss flags; Rahu's
+  sidereal flag is integer for direct sidereal calculation and null only for the documented
+  tropical-minus-ayanamsha derivation; exact-opposition Ketu requires null flags.
 - Projection contract tests verify `source_method` and both return flags exactly against
   the completed domain result.
 - Canonical integration verifies the serialized Sun-through-Saturn/Moon flags retain
@@ -341,11 +343,11 @@ M2.6.8.3 verification on implementation head
 - M2.6.8 exit gates are complete: duplicate/missing Grahas and mismatched Varga payloads
   are rejected, real executable output validates, and the machine contract is unambiguous.
 
-M2.6.8.4 verification on implementation head
-`411f4a3f52e0159b3e9439c0eba51b1440a59849`:
-- quality run `35867317946` — success; Ruff passed; pytest **192 passed, 1 skipped**;
+M2.6.8.4 final semantic-acceptance verification on implementation head
+`cbe2ef023f3551dabd8e4a59ee561c1924c29c8b`:
+- quality run `35868078132` — success; Ruff passed; pytest **199 passed, 1 skipped**;
   exact zero-tolerance calculation-payload parity **5/5**;
-- canonical Swiss run `35867317923` — success; pinned dataset manifest verified;
+- canonical Swiss run `35868078195` — success; pinned dataset manifest verified;
   strict canonical projection/integration **1 passed**.
 
 ## Why M3 is still blocked

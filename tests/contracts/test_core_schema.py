@@ -239,6 +239,65 @@ def test_astronomy_execution_details_survive_projection_exactly() -> None:
         assert item["retflags_sidereal"] == position.retflags_sidereal
 
 
+def _astronomy_body(payload: dict, body_name: str) -> dict:
+    return next(
+        item
+        for item in payload["astronomy"]["bodies"]
+        if item["body"] == body_name
+    )
+
+
+@pytest.mark.parametrize(
+    ("body_name", "field", "invalid_value"),
+    [
+        ("Sun", "retflags_tropical", None),
+        ("Sun", "retflags_sidereal", None),
+        ("Rahu", "retflags_tropical", None),
+        ("Ketu", "retflags_tropical", 0),
+        ("Ketu", "retflags_sidereal", 0),
+    ],
+)
+def test_schema_rejects_impossible_body_retflag_shapes(
+    body_name: str,
+    field: str,
+    invalid_value: int | None,
+) -> None:
+    schema = _schema()
+    malformed = deepcopy(to_core_dict(_development_result()))
+    _astronomy_body(malformed, body_name)[field] = invalid_value
+
+    with pytest.raises(ValidationError):
+        Draft202012Validator(schema).validate(malformed)
+
+
+def test_schema_couples_rahu_source_method_to_sidereal_retflag() -> None:
+    schema = _schema()
+    payload = to_core_dict(_development_result())
+    rahu = _astronomy_body(payload, "Rahu")
+
+    if rahu["source_method"] == "derived:swiss-true-node-minus-true-pushya":
+        assert rahu["retflags_sidereal"] is None
+        malformed = deepcopy(payload)
+        _astronomy_body(malformed, "Rahu")["retflags_sidereal"] = 0
+    else:
+        assert rahu["source_method"] == "swiss-true-node:direct-sidereal"
+        assert isinstance(rahu["retflags_sidereal"], int)
+        malformed = deepcopy(payload)
+        _astronomy_body(malformed, "Rahu")["retflags_sidereal"] = None
+
+    with pytest.raises(ValidationError):
+        Draft202012Validator(schema).validate(malformed)
+
+
+def test_schema_rejects_impossible_ketu_source_method() -> None:
+    schema = _schema()
+    malformed = deepcopy(to_core_dict(_development_result()))
+    _astronomy_body(malformed, "Ketu")["source_method"] = "swiss-direct:moshier"
+
+    with pytest.raises(ValidationError):
+        Draft202012Validator(schema).validate(malformed)
+
+
 @pytest.mark.parametrize("field", ["retflags_tropical", "retflags_sidereal"])
 def test_schema_requires_astronomy_return_flags(field: str) -> None:
     schema = _schema()

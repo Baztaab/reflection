@@ -72,3 +72,6 @@ identifiers have one runtime vocabulary and executable tests that prevent drift.
   so this compatibility normalization cannot hide a current-contract omission.
 - Derived bodies such as Ketu serialize explicit `null` return flags because no separate
   Swiss call produced those values; absence is represented, not invented.
+- Retflag nullability is coupled to source semantics: direct Sun-through-Saturn calculations
+  require integer flags; direct sidereal Rahu requires an integer sidereal flag; derived
+  Rahu requires a null sidereal flag; exact-opposition Ketu requires null flags.

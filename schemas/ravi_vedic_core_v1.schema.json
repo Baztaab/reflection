@@ -417,7 +417,112 @@
             "null"
           ]
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "body": {
+                "enum": [
+                  "Sun",
+                  "Moon",
+                  "Mars",
+                  "Mercury",
+                  "Jupiter",
+                  "Venus",
+                  "Saturn"
+                ]
+              }
+            },
+            "required": [
+              "body"
+            ]
+          },
+          "then": {
+            "properties": {
+              "source_method": {
+                "enum": [
+                  "swiss-direct:swisseph-files",
+                  "swiss-direct:moshier"
+                ]
+              },
+              "retflags_tropical": {
+                "type": "integer"
+              },
+              "retflags_sidereal": {
+                "type": "integer"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "body": {
+                "const": "Rahu"
+              }
+            },
+            "required": [
+              "body"
+            ]
+          },
+          "then": {
+            "oneOf": [
+              {
+                "properties": {
+                  "source_method": {
+                    "const": "swiss-true-node:direct-sidereal"
+                  },
+                  "retflags_tropical": {
+                    "type": "integer"
+                  },
+                  "retflags_sidereal": {
+                    "type": "integer"
+                  }
+                }
+              },
+              {
+                "properties": {
+                  "source_method": {
+                    "const": "derived:swiss-true-node-minus-true-pushya"
+                  },
+                  "retflags_tropical": {
+                    "type": "integer"
+                  },
+                  "retflags_sidereal": {
+                    "type": "null"
+                  }
+                }
+              }
+            ]
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "body": {
+                "const": "Ketu"
+              }
+            },
+            "required": [
+              "body"
+            ]
+          },
+          "then": {
+            "properties": {
+              "source_method": {
+                "const": "derived:exact-opposition-from-true-rahu"
+              },
+              "retflags_tropical": {
+                "type": "null"
+              },
+              "retflags_sidereal": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
     },
     "astronomy": {
       "type": "object",
