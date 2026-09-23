@@ -48,10 +48,14 @@ def test_reference_chart_001_matches_golden_structure() -> None:
     assert result.astronomy.provenance.implementation == "pyswisseph"
     assert result.astronomy.provenance.sidereal_mode == "SIDM_TRUE_PUSHYA"
     assert result.calculation_status == CalculationStatus.DEVELOPMENT
-    assert [item.code for item in result.diagnostics] == ["EPHEMERIS_SOURCE_FALLBACK"]
+    assert [item.code for item in result.diagnostics] == [
+        "EPHEMERIS_SOURCE_FALLBACK",
+        "TRUE_NODE_SIDEREAL_DERIVED_FROM_TROPICAL_AND_AYANAMSHA",
+    ]
     assert result.diagnostics[0].details["source"] == "moshier"
     assert to_core_dict(result)["provenance"]["astronomy"]["warnings"] == [
-        "EPHEMERIS_SOURCE_FALLBACK:moshier"
+        "EPHEMERIS_SOURCE_FALLBACK:moshier",
+        "TRUE_NODE_SIDEREAL_DERIVED_FROM_TROPICAL_AND_AYANAMSHA",
     ]
     assert result.astronomy.ayanamsha_deg == pytest.approx(expected["ayanamsha_deg"], abs=5e-5)
     assert result.d1.ascendant_sidereal_longitude_deg == pytest.approx(
