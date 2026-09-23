@@ -71,6 +71,33 @@ Mypy and Ruff intentionally target 3.11, the minimum supported language level. P
 is outside this milestone's contract; any future expansion requires package metadata, both
 CI matrices and the Python-support contract test to change together and pass.
 
+## Property-test boundary
+
+M2.6.9.4 pins **Hypothesis 6.168.1** and gives property testing an explicit CI step on
+every supported Python minor. The generated tests target pure deterministic domain
+surfaces:
+
+- `Longitude` normalization/range/periodicity;
+- rational partition range and exact boundary-neighbor ownership;
+- whole-sign-house range and rotational invariance;
+- D9/D10 projection range, policy preservation and zodiac periodicity;
+- Varga policy target-sign validity.
+
+Swiss/native execution is intentionally excluded from Hypothesis. Its process-global
+lifecycle, source flags and pinned-file behavior remain covered by the dedicated canonical
+integration lane.
+
+The first generated run found an actual shared-kernel bug: for sufficiently tiny negative
+floats, Python's `value % 360.0` may round to exactly `360.0`. That violated the
+half-open `[0, 360)` domain contract, created sign index 12 and broke Varga projection.
+RAVI now canonicalizes that overflow representative to `nextafter(360.0, 0.0)`, which is
+the nearest representable value inside the allowed interval and preserves ownership on the
+Pisces side of the zero boundary. A deterministic regression test accompanies the property
+test.
+
+The historical calculation-parity fixtures remain exact 5/5, so this is treated as a
+boundary-invariant bug fix rather than a Jyotish policy change.
+
 ## Exception hierarchy
 
 `ravi_vedic.errors` is the single public source of RAVI-owned exception classes:
