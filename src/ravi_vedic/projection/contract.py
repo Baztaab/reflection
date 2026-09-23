@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from types import MappingProxyType
 
+from ravi_vedic.domain.canon import RAVI_VEDIC_MVP_V1
 from ravi_vedic.domain.models import Graha
+from ravi_vedic.domain.varga.registry import get_varga_policy
 
 CORE_SCHEMA_VERSION = "ravi-vedic-core-v1"
 CORE_CHART_IDS = ("D1", "D9", "D10")
@@ -12,6 +14,17 @@ CORE_GRAHA_NAMES = tuple(body.value.capitalize() for body in CORE_GRAHA_ORDER)
 CORE_GRAHA_NAME_BY_BODY = MappingProxyType(
     dict(zip(CORE_GRAHA_ORDER, CORE_GRAHA_NAMES, strict=True))
 )
+CORE_VARGA_SIGNATURES = MappingProxyType(
+    {
+        chart_id: (
+            get_varga_policy(RAVI_VEDIC_MVP_V1.charts.varga_policy_ids[chart_id]).factor,
+            RAVI_VEDIC_MVP_V1.charts.varga_policy_ids[chart_id],
+        )
+        for chart_id in CORE_CHART_IDS
+        if chart_id != "D1"
+    }
+)
+
 CORE_SIGN_NAMES = (
     "Aries",
     "Taurus",

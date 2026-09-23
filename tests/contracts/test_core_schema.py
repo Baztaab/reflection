@@ -14,6 +14,7 @@ from ravi_vedic.projection.contract import (
     CORE_GRAHA_NAMES,
     CORE_SCHEMA_VERSION,
     CORE_SIGN_NAMES,
+    CORE_VARGA_SIGNATURES,
 )
 
 ROOT = Path(__file__).parents[2]
@@ -94,6 +95,80 @@ def test_schema_rejects_missing_graha_identity(array_name: str) -> None:
     grahas = _graha_arrays(malformed)[array_name]
 
     grahas.pop()
+
+    with pytest.raises(ValidationError):
+        Draft202012Validator(schema).validate(malformed)
+
+
+def test_varga_schema_signatures_match_pinned_core_contract() -> None:
+    schema = _schema()
+    branches = schema["$defs"]["vargaChart"]["oneOf"]
+
+    actual = {
+        branch["properties"]["varga"]["const"]: (
+            branch["properties"]["factor"]["const"],
+            branch["properties"]["mapping_policy_id"]["const"],
+        )
+        for branch in branches
+    }
+    assert actual == dict(CORE_VARGA_SIGNATURES)
+
+    for branch in branches:
+        policy_id = branch["properties"]["mapping_policy_id"]["const"]
+        assert (
+            branch["properties"]["ascendant"]["properties"]["mapping_policy_id"]["const"]
+            == policy_id
+        )
+        assert (
+            branch["properties"]["grahas"]["items"]["properties"]["mapping_policy_id"]["const"]
+            == policy_id
+        )
+
+
+@pytest.mark.parametrize("chart_id", ["D9", "D10"])
+@pytest.mark.parametrize("field", ["varga", "factor", "mapping_policy_id"])
+def test_schema_rejects_mismatched_varga_signature(chart_id: str, field: str) -> None:
+    schema = _schema()
+    payload = to_core_dict(_development_result())
+    malformed = deepcopy(payload)
+    chart = malformed["charts"][chart_id]
+    other_id = "D10" if chart_id == "D9" else "D9"
+    other_factor, other_policy = CORE_VARGA_SIGNATURES[other_id]
+
+    replacements = {
+        "varga": other_id,
+        "factor": other_factor,
+        "mapping_policy_id": other_policy,
+    }
+    chart[field] = replacements[field]
+
+    with pytest.raises(ValidationError):
+        Draft202012Validator(schema).validate(malformed)
+
+
+@pytest.mark.parametrize("chart_id", ["D9", "D10"])
+def test_schema_rejects_mismatched_varga_ascendant_policy(chart_id: str) -> None:
+    schema = _schema()
+    payload = to_core_dict(_development_result())
+    malformed = deepcopy(payload)
+    other_id = "D10" if chart_id == "D9" else "D9"
+    _, other_policy = CORE_VARGA_SIGNATURES[other_id]
+
+    malformed["charts"][chart_id]["ascendant"]["mapping_policy_id"] = other_policy
+
+    with pytest.raises(ValidationError):
+        Draft202012Validator(schema).validate(malformed)
+
+
+@pytest.mark.parametrize("chart_id", ["D9", "D10"])
+def test_schema_rejects_mismatched_varga_graha_policy(chart_id: str) -> None:
+    schema = _schema()
+    payload = to_core_dict(_development_result())
+    malformed = deepcopy(payload)
+    other_id = "D10" if chart_id == "D9" else "D9"
+    _, other_policy = CORE_VARGA_SIGNATURES[other_id]
+
+    malformed["charts"][chart_id]["grahas"][0]["mapping_policy_id"] = other_policy
 
     with pytest.raises(ValidationError):
         Draft202012Validator(schema).validate(malformed)

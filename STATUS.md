@@ -5,7 +5,7 @@ Current milestone: **M2.6 — Engine Foundation IN PROGRESS**
 Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon + M2.6.5 shared angular/boundary kernel + M2.6.6 generic chart collection**.
 Completed phase: **M2.6.7 complete calculation identity and typed diagnostics — COMPLETE**.
 Current phase: **M2.6.8 contract/schema hardening — IN PROGRESS**.
-Completed slices: **8.1 contract vocabulary + 8.2 Graha cardinality**. Next slice: **8.3 Varga discriminators**.
+Completed slices: **8.1 contract vocabulary + 8.2 Graha cardinality + 8.3 Varga discriminators**. Next slice: **8.4 astronomy execution detail + acceptance**.
 
 M2.6.5 verified calculation baseline: `8cf1c22baebd27a5663362f06d9d090335d02fee`.
 Later documentation-only cleanup commits do not redefine this calculation baseline.
@@ -302,6 +302,27 @@ M2.6.8.2 verification on implementation head
 - canonical Swiss run `35866168421` — success; pinned dataset manifest verified;
   strict canonical integration **1 passed**.
 
+## What M2.6.8.3 now enforces
+
+- Core Varga signatures are derived from the pinned RAVI Canon and Varga policy registry,
+  rather than duplicated as independent Python constants.
+- The executable schema discriminates D9 and D10 by the complete tuple
+  `chart id + factor + mapping policy id`.
+- D9 can validate only as factor 9 with `varga.parasari-navamsa-v1`; D10 can validate
+  only as factor 10 with `varga.parasari-dashamsa-v1`.
+- Ascendant and every Graha projection inside each Varga must carry that same mapping
+  policy ID.
+- Negative contract tests reject wrong chart IDs, factors, top-level policy IDs, ascendant
+  policy IDs and Graha policy IDs.
+- Calculation and serialized numerical values remain unchanged.
+
+M2.6.8.3 verification on implementation head
+`6a179764c6b9d1766dd4d980a7c51a1d5be39dea`:
+- quality run `35866614254` — success; Ruff passed; pytest **188 passed, 1 skipped**;
+  exact zero-tolerance calculation-payload parity **5/5**;
+- canonical Swiss run `35866614293` — success; pinned dataset manifest verified;
+  strict canonical integration **1 passed**.
+
 ## Why M3 is still blocked
 
 The current core is numerically useful but still has foundation debt that should not be
@@ -334,8 +355,8 @@ These are M2.6 tasks, not M3 tasks.
 
 ## Next action
 
-Implement **M2.6.8.3 Varga discriminators only**: make the executable schema reject
-D9/D10 payloads whose chart ID, factor and mapping policy do not belong together. Do not
-start retflag projection, M2.6.9 or any M3 technique in that slice.
+Implement **M2.6.8.4 astronomy execution detail + acceptance only**: serialize the
+tropical/sidereal Swiss return flags already retained by BodyPosition, validate them in the
+executable schema, and close every M2.6.8 exit gate. Do not start M2.6.9 or M3 early.
 
 Only after all M2.6 acceptance gates pass may M3 begin with Nakshatra/Pada.
