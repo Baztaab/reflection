@@ -57,6 +57,8 @@ def _runtime_manifest(identity: RuntimeIdentity) -> dict[str, Any]:
         "python": {
             "implementation": identity.python.implementation,
             "version": identity.python.version,
+            "system": identity.python.system,
+            "machine": identity.python.machine,
         },
         "astronomy": {
             "implementation": identity.astronomy.implementation,
