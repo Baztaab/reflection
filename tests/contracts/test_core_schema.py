@@ -11,6 +11,7 @@ from ravi_vedic.domain.calculation_identity import CALCULATION_FINGERPRINT_MANIF
 from ravi_vedic.projection import to_core_dict
 from ravi_vedic.projection.contract import (
     CORE_CHART_IDS,
+    CORE_GRAHA_NAME_BY_BODY,
     CORE_GRAHA_NAMES,
     CORE_SCHEMA_VERSION,
     CORE_SIGN_NAMES,
@@ -213,6 +214,32 @@ def test_projection_uses_completed_result_identity_without_rehashing() -> None:
 
     assert "deterministic_input_hash" not in provenance
     assert "warnings" not in provenance["astronomy"]
+
+
+def test_astronomy_execution_details_survive_projection_exactly() -> None:
+    result = _development_result()
+    payload = to_core_dict(result)
+    projected = {
+        item["body"]: item
+        for item in payload["astronomy"]["bodies"]
+    }
+
+    for body, position in result.astronomy.bodies.items():
+        item = projected[CORE_GRAHA_NAME_BY_BODY[body]]
+        assert item["source_method"] == position.source_method
+        assert item["retflags_tropical"] == position.retflags_tropical
+        assert item["retflags_sidereal"] == position.retflags_sidereal
+
+
+@pytest.mark.parametrize("field", ["retflags_tropical", "retflags_sidereal"])
+def test_schema_requires_astronomy_return_flags(field: str) -> None:
+    schema = _schema()
+    payload = to_core_dict(_development_result())
+    malformed = deepcopy(payload)
+    del malformed["astronomy"]["bodies"][0][field]
+
+    with pytest.raises(ValidationError):
+        Draft202012Validator(schema).validate(malformed)
 
 
 def test_typed_diagnostics_survive_json_projection() -> None:
