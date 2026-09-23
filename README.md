@@ -6,9 +6,8 @@ The project is optimized for auditable Jyotish research rather than feature coun
 Astronomy, Jyotish policy, derived structure, evidence and interpretation are kept as
 separate concerns.
 
-Current milestone: **M2.6 Engine Foundation**. M2.6.0–6 and **M2.6.7 complete calculation
-identity and typed diagnostics** are implemented and CI verified; **M2.6.8 contract/schema
-hardening is next**.
+Current milestone: **M2.6 Engine Foundation**. M2.6.0–8 are implemented and CI verified;
+**M2.6.9 errors, typing and broader quality gates is next**.
 
 ## Current executable core
 
@@ -100,6 +99,12 @@ top-level `canonical | development | degraded` calculation status, and typed dia
 with code, severity, layer, affected fields, canonicality impact and structured details.
 The obsolete mixed `deterministic_input_hash` and encoded string `warnings` fields were
 retired at the explicit M2.6.7.5 contract migration recorded by ADR-0011.
+
+M2.6.8 hardens that contract further: public chart/Graha/sign vocabulary is aligned with
+the projection runtime, astronomy/D1/Varga arrays require exactly one of each Core Graha,
+D9 and D10 are discriminated by chart ID + factor + mapping policy, and each astronomy body
+serializes its retained `retflags_tropical`, `retflags_sidereal` and `source_method`.
+Derived Ketu therefore carries explicit null retflags rather than invented Swiss flags.
 
 ## Current machine contract
 
