@@ -69,6 +69,11 @@ def test_tehran_reference_chart_uses_verified_swiss_files_end_to_end():
     assert result.diagnostics == ()
     assert result.calculation_status == CalculationStatus.CANONICAL
 
+    projected_bodies = {
+        item["body"]: item
+        for item in payload["astronomy"]["bodies"]
+    }
+
     file_backed_bodies = (
         Graha.SUN,
         Graha.MOON,
@@ -81,9 +86,42 @@ def test_tehran_reference_chart_uses_verified_swiss_files_end_to_end():
     for body in file_backed_bodies:
         position = result.astronomy.bodies[body]
         assert position.source_method == "swiss-direct:swisseph-files"
+        projected = projected_bodies[body.value.capitalize()]
+        assert projected["source_method"] == position.source_method
+        assert projected["retflags_tropical"] == position.retflags_tropical
+        assert projected["retflags_sidereal"] == position.retflags_sidereal
         assert position.retflags_tropical is not None
         assert position.retflags_sidereal is not None
         assert position.retflags_tropical & swe.FLG_SWIEPH
         assert position.retflags_sidereal & swe.FLG_SWIEPH
         assert not position.retflags_tropical & swe.FLG_MOSEPH
         assert not position.retflags_sidereal & swe.FLG_MOSEPH
+
+
+def test_canonical_projection_retains_node_execution_flag_semantics():
+    assert _EPHE_PATH is not None
+    engine = create_engine(
+        RuntimeConfig(
+            source_profile=SourceProfile.CANONICAL,
+            ephemeris_path=_EPHE_PATH,
+        )
+    )
+    result = engine.calculate(
+        BirthInput.from_iso(
+            local_datetime="1997-06-07T20:28:36",
+            timezone_id="Asia/Tehran",
+            latitude_deg=36.15,
+            longitude_deg=51.6166666667,
+        )
+    )
+    payload = to_core_dict(result)
+    projected = {item["body"]: item for item in payload["astronomy"]["bodies"]}
+
+    rahu = result.astronomy.bodies[Graha.RAHU]
+    assert projected["Rahu"]["retflags_tropical"] == rahu.retflags_tropical
+    assert projected["Rahu"]["retflags_sidereal"] == rahu.retflags_sidereal
+    assert projected["Rahu"]["source_method"] == rahu.source_method
+
+    assert projected["Ketu"]["retflags_tropical"] is None
+    assert projected["Ketu"]["retflags_sidereal"] is None
+    assert projected["Ketu"]["source_method"] == "derived:exact-opposition-from-true-rahu"
