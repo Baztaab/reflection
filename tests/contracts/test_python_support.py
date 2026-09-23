@@ -14,6 +14,16 @@ def test_declared_python_support_matches_current_stable_minor_range() -> None:
     pyproject = tomllib.loads(PYPROJECT.read_text())
 
     assert pyproject["project"]["requires-python"] == REQUIRES_PYTHON
+    classifiers = pyproject["project"]["classifiers"]
+    assert "Programming Language :: Python :: 3 :: Only" in classifiers
+    assert {
+        f"Programming Language :: Python :: {minor}"
+        for minor in SUPPORTED_MINORS
+    } == {
+        classifier
+        for classifier in classifiers
+        if classifier.startswith("Programming Language :: Python :: 3.")
+    }
     assert pyproject["tool"]["mypy"]["python_version"] == SUPPORTED_MINORS[0]
     assert pyproject["tool"]["ruff"]["target-version"] == "py311"
 
