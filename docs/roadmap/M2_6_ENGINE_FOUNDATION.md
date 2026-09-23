@@ -370,6 +370,19 @@ Exit gate:
 - executable output validates;
 - there is one unambiguous current machine contract.
 
+### M2.6.8 execution slices
+
+1. **8.1 Contract vocabulary** — centralize projection-side schema version, chart IDs,
+   Graha order/names and sign names; executable-schema alignment tests prevent drift.
+2. **8.2 Graha cardinality** — require exactly one of every required Graha in astronomy,
+   D1 and every Varga frame.
+3. **8.3 Varga discriminators** — couple chart ID, factor and mapping policy for D9/D10.
+4. **8.4 Astronomy execution detail + acceptance** — project retained tropical/sidereal
+   retflags and close all M2.6.8 gates.
+
+Each slice is independently reviewed and green before the next begins. Numerical
+D1/D9/D10 calculations remain unchanged throughout M2.6.8.
+
 ## M2.6.9 — Errors, typing, and broader quality gates
 
 Purpose: catch architectural mistakes before they become runtime astrology mistakes.

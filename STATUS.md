@@ -4,7 +4,8 @@ Current milestone: **M2.6 — Engine Foundation IN PROGRESS**
 
 Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon + M2.6.5 shared angular/boundary kernel + M2.6.6 generic chart collection**.
 Completed phase: **M2.6.7 complete calculation identity and typed diagnostics — COMPLETE**.
-Next phase: **M2.6.8 contract/schema hardening — NOT STARTED**.
+Current phase: **M2.6.8 contract/schema hardening — IN PROGRESS**.
+Completed slice: **8.1 contract vocabulary**. Next slice: **8.2 Graha cardinality**.
 
 M2.6.5 verified calculation baseline: `8cf1c22baebd27a5663362f06d9d090335d02fee`.
 Later documentation-only cleanup commits do not redefine this calculation baseline.
@@ -262,6 +263,26 @@ M2.6.7.5 verification on implementation head
 - canonical Swiss run `35864395738` — success; pinned dataset manifest verified;
   strict canonical projection/integration **1 passed**.
 
+## What M2.6.8.1 now enforces
+
+- ADR-0012 fixes a four-slice contract-hardening sequence so schema work cannot collapse
+  into one large migration.
+- Core schema version, representable chart IDs, ordered Grahas/external Graha names and
+  zodiac sign names have one projection-side runtime vocabulary.
+- `core_json.py` no longer carries its own duplicated chart/Graha/sign constants.
+- Executable-schema contract tests require schema version, body enum, sign enum and chart
+  keys to match the runtime projection vocabulary exactly.
+- The JSON Schema remains a standalone machine contract; consumers do not need to import
+  RAVI Python code to validate payloads.
+- No calculation, chart value or serialized payload changed in this slice.
+
+M2.6.8.1 verification on implementation head
+`a3dd24e5c66058f37459a54065817cd639f2def4`:
+- quality run `35865732058` — success; Ruff passed; pytest **168 passed, 1 skipped**;
+  exact zero-tolerance calculation-payload parity **5/5**;
+- canonical Swiss run `35865731939` — success; pinned dataset manifest verified;
+  strict canonical integration **1 passed**.
+
 ## Why M3 is still blocked
 
 The current core is numerically useful but still has foundation debt that should not be
@@ -294,9 +315,9 @@ These are M2.6 tasks, not M3 tasks.
 
 ## Next action
 
-Implement **M2.6.8 contract/schema hardening only**: remove duplicated contract
-constants where appropriate, enforce exactly one required Graha, couple each Varga ID to
-its factor/policy, and preserve the remaining astronomy retflag/source details required by
-the roadmap. Do not start M2.6.9 quality-gate expansion or any M3 technique early.
+Implement **M2.6.8.2 Graha cardinality only**: make the executable schema require
+exactly one occurrence of every required Graha in astronomy, D1 and each projected Varga
+frame, with negative contract tests for duplicate/missing identities. Do not start Varga
+discriminators, retflag projection, M2.6.9 or any M3 technique in that slice.
 
 Only after all M2.6 acceptance gates pass may M3 begin with Nakshatra/Pada.
