@@ -7,6 +7,7 @@ from ravi_vedic.domain.varga.policies import (
     ParasariDashamsaV1,
     ParasariNavamsaV1,
 )
+from ravi_vedic.errors import UnsupportedPolicyError
 
 _POLICIES = MappingProxyType(
     {
@@ -20,4 +21,4 @@ def get_varga_policy(policy_id: str) -> VargaPolicy:
     try:
         return _POLICIES[policy_id]
     except KeyError as exc:
-        raise ValueError(f"unknown varga policy: {policy_id}") from exc
+        raise UnsupportedPolicyError(f"unknown varga policy: {policy_id}") from exc
