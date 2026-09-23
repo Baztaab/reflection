@@ -4,10 +4,9 @@ Current milestone: **M2.6 — Engine Foundation IN PROGRESS**
 
 Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon + M2.6.5 shared angular/boundary kernel + M2.6.6 generic chart collection**.
 Completed phases: **M2.6.7 complete calculation identity and typed diagnostics — COMPLETE**;
-**M2.6.8 contract/schema hardening — COMPLETE**.
-Current phase: **M2.6.9 errors, typing and broader quality gates — IN PROGRESS**.
-Completed slices: **9.1 error taxonomy + 9.2 static typing + 9.3 Python support contract**.
-Next slice: **9.4 property tests + acceptance**.
+**M2.6.8 contract/schema hardening — COMPLETE**;
+**M2.6.9 errors, typing and broader quality gates — COMPLETE**.
+Next phase: **M2.6.10 architecture acceptance — NOT STARTED**.
 
 M2.6.5 verified calculation baseline: `8cf1c22baebd27a5663362f06d9d090335d02fee`.
 Later documentation-only cleanup commits do not redefine this calculation baseline.
@@ -422,18 +421,44 @@ M2.6.9.3 verification on implementation head
 - canonical Swiss matrix run `35871379439` — success on Python 3.11 / 3.12 / 3.13 /
   3.14.
 
+## What M2.6.9.4 now enforces
+
+- `hypothesis==6.168.1` is pinned in development dependencies.
+- Every supported Python minor runs an explicit `pytest tests/property` gate before the
+  full suite.
+- Eight property tests cover canonical longitude range/decomposition, circular periodicity,
+  generated partition domains and rational-boundary neighbor ownership, whole-sign
+  rotational invariance, and registered D9/D10 projection domains/periodicity.
+- The first property run found a real IEEE-754 edge: tiny negative finite longitudes could
+  normalize to exactly `360.0`, violating the half-open `[0, 360)` contract and
+  yielding sign index 12.
+- The production fix maps only that rounded endpoint to
+  `nextafter(360.0, 0.0)`, preserving the below-zero side; deterministic regression
+  tests lock the discovered cases.
+- Existing dependency-direction/import-boundary tests remain in the full pytest gate on
+  every supported Python minor.
+- Trusted D1/D9/D10 calculation parity remains exact **5/5** with zero numerical tolerance.
+
+M2.6.9.4 verification on implementation head
+`004dd51a18024468345e8d9efc8e93a16383499d`:
+- quality matrix run `35873579452` — success on Python **3.11 / 3.12 / 3.13 / 3.14**;
+  each job passed Ruff, strict mypy over 36 source files, property tests **8/8**, full
+  pytest **217 passed, 1 skipped**, and exact calculation parity **5/5**;
+- canonical Swiss matrix run `35873578950` — success on Python
+  **3.11 / 3.12 / 3.13 / 3.14**, with the pinned Swiss dataset verified and strict
+  canonical integration **1/1** on every minor.
+
 ## Why M3 is still blocked
 
 The current core is numerically useful but still has foundation debt that should not be
 copied into Nakshatra/lordship/dispositor work:
 
-- M2.6.7 calculation identity/diagnostics and M2.6.8 executable contract hardening are
-  complete;
-- M2.6.9.1 typed exceptions, M2.6.9.2 strict static typing and M2.6.9.3 tested Python
-  support alignment are complete;
-- M2.6.9 still needs property-based domain/geometry testing and final acceptance.
+- M2.6.7 calculation identity/diagnostics, M2.6.8 executable contract hardening and
+  M2.6.9 quality gates are complete;
+- M2.6.10 still must run the explicit twelve-point architecture acceptance review and
+  verify the integrated repository against every Foundation gate.
 
-These remaining quality gates are M2.6 work, not M3 work.
+That acceptance is M2.6 work, not M3 work.
 
 ## CI execution contract after cleanup
 
@@ -455,9 +480,9 @@ These remaining quality gates are M2.6 work, not M3 work.
 
 ## Next action
 
-Implement **M2.6.9.4 property tests + acceptance only**: pin Hypothesis, add focused
-property tests for the shared geometry/domain invariants, confirm dependency-direction
-contract tests remain active, and close every M2.6.9 gate. Do not start M2.6.10 or M3 in
-that slice.
+Implement **M2.6.10 architecture acceptance only**: audit the integrated `main` against
+all twelve Foundation acceptance gates, fix only genuine remaining Foundation defects,
+and declare M2.6 complete only if every gate is evidenced and green. Do not begin
+Nakshatra/Pada or any M3 technique before that acceptance is merged.
 
 Only after all M2.6 acceptance gates pass may M3 begin with Nakshatra/Pada.
