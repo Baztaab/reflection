@@ -8,6 +8,13 @@ from ravi_vedic import RAVI_VEDIC_MVP_V1, BirthInput, RaviEngine
 from ravi_vedic.application.pipeline import calculate_core
 from ravi_vedic.domain.canon import ChartPolicies
 from ravi_vedic.domain.chart_builders import RAVI_CHART_BUILDERS, VargaChartBuilder
+from ravi_vedic.domain.diagnostics import (
+    CalculationStatus,
+    CanonicalityImpact,
+    Diagnostic,
+    DiagnosticLayer,
+    DiagnosticSeverity,
+)
 from ravi_vedic.domain.identity import (
     AstronomyRuntimeIdentity,
     PythonRuntimeIdentity,
@@ -75,7 +82,7 @@ class FakeAstronomy:
                 ayanamsha_policy_id=canon.astronomy.ayanamsha_policy_id,
                 source_profile="test-only",
                 actual_sources=("fake",),
-                warnings=(),
+                diagnostics=(),
             ),
         )
 
@@ -316,6 +323,33 @@ def test_effective_input_identity_ignores_display_note_and_redundant_fold(birth)
 
     assert baseline.input_sha256 == equivalent.input_sha256
     assert baseline.calculation_fingerprint == equivalent.calculation_fingerprint
+
+
+def test_degrading_diagnostic_drives_top_level_status(birth):
+    class DegradedAstronomy(FakeAstronomy):
+        def snapshot(self, **kwargs):
+            snapshot = super().snapshot(**kwargs)
+            diagnostic = Diagnostic(
+                code="TEST_DEGRADED",
+                severity=DiagnosticSeverity.WARNING,
+                layer=DiagnosticLayer.ASTRONOMY,
+                affected_fields=("astronomy",),
+                canonicality_impact=CanonicalityImpact.DEGRADED,
+                details={"reason": "test"},
+            )
+            return replace(
+                snapshot,
+                provenance=replace(snapshot.provenance, diagnostics=(diagnostic,)),
+            )
+
+    result = RaviEngine(
+        astronomy=DegradedAstronomy(),
+        time_context_provider=FakeTime(),
+        runtime_identity=fake_runtime_identity(),
+    ).calculate(birth)
+
+    assert result.calculation_status == CalculationStatus.DEGRADED
+    assert result.diagnostics[0].code == "TEST_DEGRADED"
 
 
 def test_runtime_identity_change_changes_fingerprint_without_changing_chart(birth):
