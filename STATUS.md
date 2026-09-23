@@ -5,7 +5,9 @@ Current milestone: **M2.6 — Engine Foundation IN PROGRESS**
 Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon + M2.6.5 shared angular/boundary kernel + M2.6.6 generic chart collection**.
 Completed phases: **M2.6.7 complete calculation identity and typed diagnostics — COMPLETE**;
 **M2.6.8 contract/schema hardening — COMPLETE**.
-Next phase: **M2.6.9 errors, typing and broader quality gates — NOT STARTED**.
+Current phase: **M2.6.9 errors, typing and broader quality gates — IN PROGRESS**.
+Completed slice: **9.1 typed exception hierarchy**. Next slice: **9.2 static typing +
+Python support contract**.
 
 M2.6.5 verified calculation baseline: `8cf1c22baebd27a5663362f06d9d090335d02fee`.
 Later documentation-only cleanup commits do not redefine this calculation baseline.
@@ -348,6 +350,33 @@ M2.6.8.4 verification on implementation head
 - canonical Swiss run `35867317923` — success; pinned dataset manifest verified;
   strict canonical projection/integration **1 passed**.
 
+## What M2.6.9.1 now enforces
+
+- ADR-0013 fixes a four-slice quality-gate sequence so exceptions, typing, interpreter
+  support and property testing do not collapse into one repair-heavy PR.
+- Public callers can catch stable semantic categories: `RaviError`, `InputError`,
+  `TimeResolutionError`, `UnsupportedPolicyError`, `RuntimeDataError`,
+  `AstronomyBackendError` and `InvariantViolationError`.
+- `InputError` / `UnsupportedPolicyError` remain `ValueError`-compatible;
+  runtime/backend/invariant failures remain `RuntimeError`-compatible.
+- Existing useful specific names remain valid: timezone `TimeResolutionError`,
+  `EphemerisSourceError` and `SwissSessionError` now sit inside the public hierarchy.
+- Missing/corrupt canonical ephemeris data and invalid pinned runtime configuration are
+  classified as runtime-data failures; forbidden actual Swiss sources/session misuse are
+  astronomy-backend failures.
+- Unsupported Canon/Varga policies are distinct from malformed input.
+- Cross-object chart/projection lineage failures are explicit invariant violations.
+- Direct Python API misuse still raises ordinary `TypeError`; the hierarchy is not used
+  to disguise programmer call-signature mistakes.
+- Numerical calculation and serialized output remain unchanged.
+
+M2.6.9.1 verification on implementation head
+`65b10c47ac0c80ea5682f6a90241c4bbc8552899`:
+- quality run `35869583486` — success; Ruff passed; pytest **205 passed, 1 skipped**;
+  exact zero-tolerance calculation-payload parity **5/5**;
+- canonical Swiss run `35869583795` — success; pinned dataset manifest verified;
+  strict canonical integration **1 passed**.
+
 ## Why M3 is still blocked
 
 The current core is numerically useful but still has foundation debt that should not be
@@ -355,8 +384,9 @@ copied into Nakshatra/lordship/dispositor work:
 
 - M2.6.7 calculation identity/diagnostics and M2.6.8 executable contract hardening are
   complete;
-- M2.6.9 still needs the typed exception hierarchy, static typing gate, declared/tested
-  Python support alignment and property-based domain tests.
+- M2.6.9 typed exception hierarchy is complete;
+- static typing, declared/tested Python support alignment and property-based domain tests
+  remain before quality acceptance.
 
 These remaining quality gates are M2.6 work, not M3 work.
 
@@ -380,8 +410,9 @@ These remaining quality gates are M2.6 work, not M3 work.
 
 ## Next action
 
-Implement **M2.6.9 only**, beginning with a bounded design/audit of the exception
-hierarchy, static type-checker choice, supported Python-version contract and property-test
-surface. Do not start M2.6.10 acceptance or any M3 technique until those gates are green.
+Implement **M2.6.9.2 static typing + Python support contract only**: pin mypy,
+type-check production `src/ravi_vedic` in CI, narrow package metadata to the validated
+Python 3.11 minor line, and repair genuine type defects without blanket suppressions.
+Do not start Hypothesis/property tests, M2.6.10 or M3 in that slice.
 
 Only after all M2.6 acceptance gates pass may M3 begin with Nakshatra/Pada.
