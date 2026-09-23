@@ -25,6 +25,10 @@ def _deep_freeze(value: object) -> object:
     return value
 
 
+def _deep_freeze_manifest(value: Mapping[str, object]) -> Mapping[str, object]:
+    return MappingProxyType({key: _deep_freeze(item) for key, item in value.items()})
+
+
 @dataclass(frozen=True, slots=True)
 class AstronomyPolicies:
     zodiac_policy_id: str
@@ -102,10 +106,7 @@ class CalculationCanon:
     @property
     def policy_manifest(self) -> Mapping[str, object]:
         """Detached recursively immutable representation used for policy identity."""
-        frozen = _deep_freeze(self._policy_manifest_dict())
-        if not isinstance(frozen, Mapping):
-            raise RuntimeError("policy manifest freeze must preserve mapping shape")
-        return frozen
+        return _deep_freeze_manifest(self._policy_manifest_dict())
 
     def snapshot(self) -> CalculationCanon:
         """Return a detached immutable copy safe for one engine to own."""
