@@ -13,6 +13,7 @@ import swisseph as swe
 from ravi_vedic.astronomy.port import AstronomySessionPort
 from ravi_vedic.domain.canon import CalculationCanon
 from ravi_vedic.domain.geometry import normalize_longitude
+from ravi_vedic.domain.identity import AstronomyRuntimeIdentity
 from ravi_vedic.domain.models import (
     AscendantPosition,
     AstronomicalSnapshot,
@@ -291,6 +292,23 @@ class SwissEphemerisAdapter:
             else str(Path(ephemeris_path).expanduser()) if ephemeris_path is not None else None
         )
         self._session = SwissSession(ephemeris_path=self._ephemeris_path)
+        self._runtime_identity = AstronomyRuntimeIdentity(
+            implementation="pyswisseph",
+            binding_version=metadata.version("pyswisseph"),
+            library_version=swe.version,
+            ephemeris_manifest_sha256=(
+                self._data_identity.manifest_sha256
+                if self._data_identity is not None
+                else None
+            ),
+            ephemeris_file_count=(
+                self._data_identity.file_count if self._data_identity is not None else 0
+            ),
+        )
+
+    @property
+    def runtime_identity(self) -> AstronomyRuntimeIdentity:
+        return self._runtime_identity
 
     @contextmanager
     def open_session(self) -> Iterator[AstronomySessionPort]:
