@@ -2,8 +2,8 @@
 
 Current milestone: **M2.6 — Engine Foundation IN PROGRESS**
 
-Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon + M2.6.5 shared angular/boundary kernel**.
-Next phase: **M2.6.6 generic chart frame and chart collection — NOT STARTED**.
+Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon + M2.6.5 shared angular/boundary kernel + M2.6.6 generic chart collection**.
+Next phase: **M2.6.7 complete calculation identity and typed diagnostics — NOT STARTED**.
 
 M2.6.5 verified calculation baseline: `8cf1c22baebd27a5663362f06d9d090335d02fee`.
 Later documentation-only cleanup commits do not redefine this calculation baseline.
@@ -37,11 +37,13 @@ RuntimeConfig -> create_engine(...) -> RaviEngine
  -> SwissEphemerisAdapter
     -> SwissSession (serialized native-state boundary)
  -> AstronomicalSnapshot
- -> D1
- -> D9
- -> D10
+ -> policy-driven chart builders
+ -> immutable ChartCollection
+      D1 -> D1Chart
+      D9 -> VargaChart
+      D10 -> VargaChart
  -> CoreResult
- -> Core JSON projection
+ -> Core JSON v1 compatibility projection
 ```
 
 The D1/D9/D10 calculation outputs are regression-tested and must remain unchanged during
@@ -158,14 +160,41 @@ Verification on `718c8dc0cfb236b68fcb9af21265d147cc0fcecd`:
   exact full-payload parity **5/5**;
 - canonical Swiss run `35798255522` — success.
 
-These corrections do not implement M2.6.6 and do not change serialized D1/D9/D10 output.
+These corrections preceded M2.6.6 and did not change serialized D1/D9/D10 output.
+
+## What M2.6.6 now enforces
+
+- `CoreResult.charts` is the only stored chart source of truth; there are no stored
+  `d1`, `d9` or `d10` dataclass fields.
+- `ChartCollection` is detached and immutable, validates key/frame identity, and keeps
+  typed access to D1 versus projected Varga frames.
+- The common chart protocol intentionally contains no generic longitude field. D1 retains
+  observed canonical sidereal longitude while Varga frames retain mathematical source and
+  projected longitudes as separate facts.
+- Chart construction iterates `CalculationCanon.charts.varga_policy_ids` and dispatches
+  through an immutable policy-id builder registry; the application pipeline contains no
+  named D9/D10 build path.
+- `result.d1`, `result.d9` and `result.d10` are compatibility accessors backed by
+  the collection, not storage slots.
+- The production `RaviEngine` remains locked to the pinned RAVI MVP v1 Canon. A low-level
+  test seam can inject an extended immutable builder registry to prove a synthetic chart
+  can be added without editing the pipeline or CoreResult.
+- Core JSON v1 still requires exactly D1/D9/D10 and rejects an extended chart collection
+  rather than silently dropping an unrepresentable chart.
+- The frozen serialized D1/D9/D10 payload remains exactly unchanged.
+
+Verification on implementation head `d474159497b82e72f1d77a1b516938d86adbc5d4`:
+- quality run `35804533184` — success; Ruff passed; pytest **132 passed, 1 skipped**;
+  exact full-payload parity **5/5**;
+- canonical Swiss run `35804533202` — success.
+
+Evidence: ADR-0009 and `docs/research/M2_6_6_CHART_COLLECTION_REVIEW.md`.
 
 ## Why M3 is still blocked
 
 The current core is numerically useful but still has foundation debt that should not be
 copied into Nakshatra/lordship/dispositor work:
 
-- CoreResult/pipeline still hard-code D9 and D10 slots;
 - whole-calculation fingerprinting is incomplete;
 - current schema validation does not encode every semantic invariant.
 
@@ -180,8 +209,8 @@ These are M2.6 tasks, not M3 tasks.
 
 ## Next action
 
-Implement **M2.6.6 only**: replace hard-coded D1/D9/D10 domain slots with a generic,
-immutable chart collection while preserving the current serialized compatibility surface.
-Do not add new real Vargas or any M3 technique.
+Implement **M2.6.7 only**: complete calculation identity and typed diagnostics while
+preserving the current D1/D9/D10 calculation and serialized compatibility contracts.
+Do not start schema redesign, new Vargas, or any M3 technique early.
 
 Only after all M2.6 acceptance gates pass may M3 begin with Nakshatra/Pada.

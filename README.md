@@ -6,8 +6,8 @@ The project is optimized for auditable Jyotish research rather than feature coun
 Astronomy, Jyotish policy, derived structure, evidence and interpretation are kept as
 separate concerns.
 
-Current milestone: **M2.6 Engine Foundation**. M2.6.0–5 are merged and verified;
-**M2.6.6 generic chart frame and chart collection is next**.
+Current milestone: **M2.6 Engine Foundation**. M2.6.0–6 are implemented and CI verified;
+**M2.6.7 complete calculation identity and typed diagnostics is next**.
 
 ## Current executable core
 
@@ -19,11 +19,10 @@ BirthInput
  -> SwissEphemerisAdapter
     -> SwissSession (serialized native-state boundary)
  -> AstronomicalSnapshot
- -> D1
- -> D9
- -> D10
+ -> policy-driven chart builders
+ -> immutable ChartCollection (D1 / D9 / D10)
  -> CoreResult
- -> Core JSON projection
+ -> Core JSON v1 compatibility projection
 ```
 
 Canonical choices currently implemented include True Pushya, True Rahu with derived
@@ -103,6 +102,7 @@ does not keep a speculative "full future schema" beside the executable contract.
 - [Canonical Swiss dataset review](docs/research/M2_6_3_CANONICAL_SWISS_DATA.md)
 - [Hierarchical Canon review](docs/research/M2_6_4_CANON_REVIEW.md)
 - [Angular/boundary kernel review](docs/research/M2_6_5_ANGLE_KERNEL_REVIEW.md)
+- [Generic chart collection review](docs/research/M2_6_6_CHART_COLLECTION_REVIEW.md)
 - [Frozen M2.6 baseline](docs/roadmap/M2_6_0_BASELINE.md)
 
 M3 Structural Jyotish is intentionally blocked until M2.6 Engine Foundation passes its
