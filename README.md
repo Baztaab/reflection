@@ -6,9 +6,8 @@ The project is optimized for auditable Jyotish research rather than feature coun
 Astronomy, Jyotish policy, derived structure, evidence and interpretation are kept as
 separate concerns.
 
-Current milestone: **M2.6 Engine Foundation**. M2.6.0–6 and **M2.6.7 complete calculation
-identity and typed diagnostics** are implemented and CI verified; **M2.6.8 contract/schema
-hardening is next**.
+Current milestone: **M2.6 Engine Foundation**. M2.6.0–8 are implemented and CI verified;
+**M2.6.9 errors, typing and broader quality gates is next**.
 
 ## Current executable core
 
@@ -95,11 +94,13 @@ Each completed `CoreResult` retains and serializes two distinct identities:
   identity, exact RAVI/runtime identity, resolved time facts and actual astronomy
   provenance/source methods.
 
-Core JSON v1 now also serializes `policy_manifest_sha256`, the immutable runtime identity,
-top-level `canonical | development | degraded` calculation status, and typed diagnostics
-with code, severity, layer, affected fields, canonicality impact and structured details.
-The obsolete mixed `deterministic_input_hash` and encoded string `warnings` fields were
-retired at the explicit M2.6.7.5 contract migration recorded by ADR-0011.
+Core JSON v1 also serializes `policy_manifest_sha256`, the immutable runtime identity,
+top-level `canonical | development | degraded` calculation status, typed diagnostics,
+and the tropical/sidereal Swiss return flags retained for each astronomical body.
+The executable schema rejects duplicate/missing Grahas and impossible D9/D10
+chart-factor-policy combinations. The obsolete mixed `deterministic_input_hash` and
+encoded string `warnings` fields were retired at the explicit M2.6.7.5 contract
+migration recorded by ADR-0011.
 
 ## Current machine contract
 
