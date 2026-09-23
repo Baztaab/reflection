@@ -3,7 +3,6 @@ import inspect
 import pytest
 
 from ravi_vedic.domain.diagnostics import Diagnostic
-from ravi_vedic.errors import InvariantViolationError
 from ravi_vedic.domain.models import (
     AscendantPosition,
     AstronomicalSnapshot,
@@ -18,6 +17,7 @@ from ravi_vedic.domain.models import (
     VargaPlacement,
     VargaProjection,
 )
+from ravi_vedic.errors import InvariantViolationError
 
 
 def _body() -> BodyPosition:
