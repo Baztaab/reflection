@@ -18,6 +18,7 @@ def create_engine(
     if not isinstance(runtime, RuntimeConfig):
         raise TypeError("create_engine requires an explicit RuntimeConfig")
 
+    from ravi_vedic.infrastructure.runtime_identity import build_runtime_identity
     from ravi_vedic.infrastructure.swiss import SwissEphemerisAdapter
     from ravi_vedic.infrastructure.timezone import PinnedTimezoneProvider
 
@@ -26,4 +27,14 @@ def create_engine(
         ephemeris_path=runtime.ephemeris_path,
         allow_moshier_fallback=runtime.source_profile == SourceProfile.DEVELOPMENT,
     )
-    return RaviEngine(astronomy=astronomy, time_context_provider=timezone, canon=canon)
+    runtime_identity = build_runtime_identity(
+        source_profile=runtime.source_profile.value,
+        astronomy=astronomy.runtime_identity,
+        timezone=timezone.runtime_identity,
+    )
+    return RaviEngine(
+        astronomy=astronomy,
+        time_context_provider=timezone,
+        runtime_identity=runtime_identity,
+        canon=canon,
+    )

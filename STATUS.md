@@ -3,7 +3,8 @@
 Current milestone: **M2.6 — Engine Foundation IN PROGRESS**
 
 Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon + M2.6.5 shared angular/boundary kernel + M2.6.6 generic chart collection**.
-Current phase: **M2.6.7 complete calculation identity and typed diagnostics — IN PROGRESS**.\nCompleted slice: **7.1 identity contract**. Next slice: **7.2 runtime identity snapshot**.
+Current phase: **M2.6.7 complete calculation identity and typed diagnostics — IN PROGRESS**.
+Completed slices: **7.1 identity contract + 7.2 runtime identity snapshot**. Next slice: **7.3 calculation fingerprint**.
 
 M2.6.5 verified calculation baseline: `8cf1c22baebd27a5663362f06d9d090335d02fee`.
 Later documentation-only cleanup commits do not redefine this calculation baseline.
@@ -190,6 +191,29 @@ Verification on implementation head `d474159497b82e72f1d77a1b516938d86adbc5d4`:
 
 Evidence: ADR-0009 and `docs/research/M2_6_6_CHART_COLLECTION_REVIEW.md`.
 
+## What M2.6.7.1–2 now enforce
+
+- ADR-0010 fixes the difference between input identity and complete calculation identity and
+  keeps diagnostics separate from fingerprint semantics.
+- M2.6.7 is split into five bounded PR-sized slices so identity, fingerprint, diagnostics
+  and projection cannot collapse into one large refactor.
+- `create_engine(...)` captures one immutable `RuntimeIdentity` at composition time.
+- Runtime identity records RAVI package version, Python implementation/version,
+  pyswisseph binding version, Swiss library version, ephemeris manifest/file count,
+  pinned timezone provider/version and source profile.
+- Absolute ephemeris paths are deliberately excluded from runtime identity.
+- Swiss calculation provenance now reuses the captured Swiss identity snapshot instead of
+  rediscovering version/data identity during each calculation.
+- Direct `RaviEngine` construction requires an explicit identity snapshot; application
+  and domain layers do not discover installed packages or runtime infrastructure.
+- CoreResult, Core JSON v1, schema and D1/D9/D10 numerical behavior remain unchanged.
+
+Verification on implementation head `9064fb196cf4516dbc3cc306b6faa16f7c4ed991`:
+- quality run `35859308970` — success; Ruff passed; pytest **139 passed, 1 skipped**;
+  exact full-payload parity **5/5**;
+- canonical Swiss run `35859308975` — success; pinned dataset manifest verified;
+  strict canonical integration **1 passed**.
+
 ## Why M3 is still blocked
 
 The current core is numerically useful but still has foundation debt that should not be
@@ -220,8 +244,10 @@ These are M2.6 tasks, not M3 tasks.
 
 ## Next action
 
-Implement **M2.6.7 only**: complete calculation identity and typed diagnostics while
-preserving the current D1/D9/D10 calculation and serialized compatibility contracts.
-Do not start schema redesign, new Vargas, or any M3 technique early.
+Implement **M2.6.7.3 calculation fingerprint only**: build the deterministic versioned
+calculation-identity manifest from normalized input + policy + captured runtime identity +
+actual calculation source facts, then attach its SHA-256 fingerprint to the completed
+result. Do not start typed diagnostics/status, JSON/schema projection changes, new Vargas,
+or any M3 technique in that slice.
 
 Only after all M2.6 acceptance gates pass may M3 begin with Nakshatra/Pada.

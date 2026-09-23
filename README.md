@@ -76,8 +76,15 @@ The development profile permits Moshier fallback; it is not a promise of a fixed
 dataset. The actual numerical source remains visible in result provenance.
 
 The supported package-level calculation entry points are `create_engine(...)` and
-`RaviEngine.calculate(...)`. Tests and trusted integrations may construct
-`RaviEngine(astronomy=..., time_context_provider=...)` with fake ports. The low-level
+`RaviEngine.calculate(...)`. `create_engine(...)` captures one immutable
+`RuntimeIdentity` snapshot at composition time: RAVI package version, Python runtime,
+pyswisseph/Swiss versions, ephemeris dataset identity, pinned timezone-data identity and
+source profile. Absolute ephemeris paths are provenance only and are not part of that
+identity.
+
+Tests and trusted integrations may construct `RaviEngine` with fake ports, but must also
+supply an explicit fake `RuntimeIdentity`; there is no hidden runtime-identity discovery in
+the application/domain layers. The low-level
 `ravi_vedic.application.pipeline.calculate_core` function remains available only as an
 explicit integration seam and is intentionally not re-exported from the package root.
 The serialized Core v1 schema is unchanged.

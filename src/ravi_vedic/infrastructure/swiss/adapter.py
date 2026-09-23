@@ -13,6 +13,7 @@ import swisseph as swe
 from ravi_vedic.astronomy.port import AstronomySessionPort
 from ravi_vedic.domain.canon import CalculationCanon
 from ravi_vedic.domain.geometry import normalize_longitude
+from ravi_vedic.domain.identity import AstronomyRuntimeIdentity
 from ravi_vedic.domain.models import (
     AscendantPosition,
     AstronomicalSnapshot,
@@ -60,7 +61,7 @@ class _SwissAstronomySession:
 
     requested_flags: int
     allow_moshier_fallback: bool
-    data_identity: EphemerisDataIdentity | None
+    runtime_identity: AstronomyRuntimeIdentity
     ephemeris_path: str | None
     owner_thread_id: int
     _active: bool = field(default=True, init=False, repr=False)
@@ -232,20 +233,18 @@ class _SwissAstronomySession:
             source_method="swiss-houses-ex:whole-sign-ascendant",
         )
 
-        identity = self.data_identity
+        runtime_identity = self.runtime_identity
         return AstronomicalSnapshot(
             ayanamsha_deg=ayanamsha,
             bodies=bodies,
             ascendant=ascendant,
             provenance=AstronomyProvenance(
-                implementation="pyswisseph",
-                implementation_version=metadata.version("pyswisseph"),
-                library_version=swe.version,
+                implementation=runtime_identity.implementation,
+                implementation_version=runtime_identity.binding_version,
+                library_version=runtime_identity.library_version,
                 ephemeris_path=self.ephemeris_path,
-                ephemeris_manifest_sha256=(
-                    identity.manifest_sha256 if identity is not None else None
-                ),
-                ephemeris_file_count=identity.file_count if identity is not None else 0,
+                ephemeris_manifest_sha256=runtime_identity.ephemeris_manifest_sha256,
+                ephemeris_file_count=runtime_identity.ephemeris_file_count,
                 requested_flags=self.requested_flags,
                 sidereal_mode="SIDM_TRUE_PUSHYA",
                 ayanamsha_policy_id=canon.astronomy.ayanamsha_policy_id,
@@ -291,6 +290,23 @@ class SwissEphemerisAdapter:
             else str(Path(ephemeris_path).expanduser()) if ephemeris_path is not None else None
         )
         self._session = SwissSession(ephemeris_path=self._ephemeris_path)
+        self._runtime_identity = AstronomyRuntimeIdentity(
+            implementation="pyswisseph",
+            binding_version=metadata.version("pyswisseph"),
+            library_version=swe.version,
+            ephemeris_manifest_sha256=(
+                self._data_identity.manifest_sha256
+                if self._data_identity is not None
+                else None
+            ),
+            ephemeris_file_count=(
+                self._data_identity.file_count if self._data_identity is not None else 0
+            ),
+        )
+
+    @property
+    def runtime_identity(self) -> AstronomyRuntimeIdentity:
+        return self._runtime_identity
 
     @contextmanager
     def open_session(self) -> Iterator[AstronomySessionPort]:
@@ -298,7 +314,7 @@ class SwissEphemerisAdapter:
             active = _SwissAstronomySession(
                 requested_flags=requested_flags,
                 allow_moshier_fallback=self._allow_moshier_fallback,
-                data_identity=self._data_identity,
+                runtime_identity=self._runtime_identity,
                 ephemeris_path=self._ephemeris_path,
                 owner_thread_id=get_ident(),
             )

@@ -1,10 +1,12 @@
 import json
+import platform
 import tomllib
 from dataclasses import FrozenInstanceError, replace
 from importlib import metadata
 from pathlib import Path
 
 import pytest
+import swisseph as swe
 
 from ravi_vedic import BirthInput, RuntimeConfig, SourceProfile, create_engine
 from ravi_vedic.infrastructure.swiss import EphemerisSourceError
@@ -112,6 +114,58 @@ def test_blank_path_is_not_current_directory(path):
 def test_system_timezone_provider_is_not_accepted():
     with pytest.raises(ValueError, match="pinned python-tzdata"):
         RuntimeConfig(source_profile=SourceProfile.CANONICAL, timezone_provider="system")
+
+
+def test_composed_engine_owns_complete_runtime_identity_snapshot():
+    engine = create_engine(RuntimeConfig(source_profile=SourceProfile.DEVELOPMENT))
+    identity = engine.runtime_identity
+
+    assert identity.ravi.distribution_name == "ravi-vedic"
+    assert identity.ravi.package_version == metadata.version("ravi-vedic")
+    assert identity.python.implementation == platform.python_implementation()
+    assert identity.python.version == platform.python_version()
+    assert identity.astronomy.implementation == "pyswisseph"
+    assert identity.astronomy.binding_version == metadata.version("pyswisseph")
+    assert identity.astronomy.library_version == swe.version
+    assert identity.astronomy.ephemeris_manifest_sha256 is None
+    assert identity.astronomy.ephemeris_file_count == 0
+    assert identity.timezone.provider == "python-tzdata"
+    assert identity.timezone.version == PINNED_TZDATA_VERSION
+    assert identity.source_profile == SourceProfile.DEVELOPMENT.value
+
+    with pytest.raises(FrozenInstanceError):
+        identity.source_profile = SourceProfile.CANONICAL.value
+
+
+def test_absolute_ephemeris_path_is_not_part_of_runtime_identity(tmp_path):
+    roots = (tmp_path / "a", tmp_path / "b")
+    for root in roots:
+        root.mkdir()
+        (root / "sepl_18.se1").write_bytes(b"same-planet-data")
+        (root / "semo_18.se1").write_bytes(b"same-moon-data")
+
+    first = create_engine(
+        RuntimeConfig(source_profile=SourceProfile.CANONICAL, ephemeris_path=roots[0])
+    )
+    second = create_engine(
+        RuntimeConfig(source_profile=SourceProfile.CANONICAL, ephemeris_path=roots[1])
+    )
+
+    assert first.runtime_identity == second.runtime_identity
+
+
+def test_runtime_identity_is_a_composition_time_snapshot(tmp_path):
+    (tmp_path / "sepl_18.se1").write_bytes(b"planet-data")
+    (tmp_path / "semo_18.se1").write_bytes(b"moon-data")
+    engine = create_engine(
+        RuntimeConfig(source_profile=SourceProfile.CANONICAL, ephemeris_path=tmp_path)
+    )
+    before = engine.runtime_identity
+
+    (tmp_path / "sepl_18.se1").write_bytes(b"mutated-after-construction")
+
+    assert engine.runtime_identity is before
+    assert engine.runtime_identity == before
 
 
 def test_timezone_version_requirement_matches_package_pin():

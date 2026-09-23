@@ -6,6 +6,7 @@ from ravi_vedic.application.pipeline import calculate_core
 from ravi_vedic.application.ports import TimeContextPort
 from ravi_vedic.astronomy.port import AstronomyPort
 from ravi_vedic.domain.canon import RAVI_VEDIC_MVP_V1, CalculationCanon
+from ravi_vedic.domain.identity import RuntimeIdentity
 from ravi_vedic.domain.models import BirthInput, CoreResult
 
 
@@ -19,11 +20,14 @@ class RaviEngine:
 
     astronomy: AstronomyPort
     time_context_provider: TimeContextPort
+    runtime_identity: RuntimeIdentity
     canon: CalculationCanon = RAVI_VEDIC_MVP_V1
 
     def __post_init__(self) -> None:
         if self.astronomy is None or self.time_context_provider is None:
             raise TypeError("RaviEngine requires astronomy and time_context_provider ports")
+        if not isinstance(self.runtime_identity, RuntimeIdentity):
+            raise TypeError("RaviEngine requires an explicit RuntimeIdentity snapshot")
 
         snapshot = self.canon.snapshot()
         if snapshot.canon_id != RAVI_VEDIC_MVP_V1.canon_id:

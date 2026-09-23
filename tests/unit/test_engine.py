@@ -8,6 +8,13 @@ from ravi_vedic import RAVI_VEDIC_MVP_V1, BirthInput, RaviEngine
 from ravi_vedic.application.pipeline import calculate_core
 from ravi_vedic.domain.canon import ChartPolicies
 from ravi_vedic.domain.chart_builders import RAVI_CHART_BUILDERS, VargaChartBuilder
+from ravi_vedic.domain.identity import (
+    AstronomyRuntimeIdentity,
+    PythonRuntimeIdentity,
+    RaviBuildIdentity,
+    RuntimeIdentity,
+    TimezoneRuntimeIdentity,
+)
 from ravi_vedic.domain.models import (
     AscendantPosition,
     AstronomicalSnapshot,
@@ -96,6 +103,22 @@ class FakeTime:
         )
 
 
+def fake_runtime_identity() -> RuntimeIdentity:
+    return RuntimeIdentity(
+        ravi=RaviBuildIdentity(distribution_name="ravi-vedic", package_version="test"),
+        python=PythonRuntimeIdentity(implementation="test-python", version="test"),
+        astronomy=AstronomyRuntimeIdentity(
+            implementation="fake",
+            binding_version="test",
+            library_version="test",
+            ephemeris_manifest_sha256=None,
+            ephemeris_file_count=0,
+        ),
+        timezone=TimezoneRuntimeIdentity(provider="fake", version="test"),
+        source_profile="test-only",
+    )
+
+
 @pytest.fixture
 def birth():
     return BirthInput.from_iso(
@@ -108,7 +131,11 @@ def birth():
 
 def test_pipeline_uses_supplied_ports_and_canonical_sidereal_values(birth):
     astronomy, time = FakeAstronomy(), FakeTime()
-    engine = RaviEngine(astronomy=astronomy, time_context_provider=time)
+    engine = RaviEngine(
+        astronomy=astronomy,
+        time_context_provider=time,
+        runtime_identity=fake_runtime_identity(),
+    )
     result = engine.calculate(birth)
     assert astronomy.session_entries == 1
     assert time.calls == [(birth, astronomy)]
@@ -131,6 +158,7 @@ def test_engine_owns_a_detached_immutable_policy_snapshot(birth):
     engine = RaviEngine(
         astronomy=FakeAstronomy(),
         time_context_provider=FakeTime(),
+        runtime_identity=fake_runtime_identity(),
         canon=caller_canon,
     )
     first = engine.calculate(birth)
@@ -190,6 +218,7 @@ def test_engine_rejects_unsupported_policies_before_calculation(canon):
         RaviEngine(
             astronomy=astronomy,
             time_context_provider=FakeTime(),
+            runtime_identity=fake_runtime_identity(),
             canon=canon,
         )
     assert astronomy.calls == []
@@ -214,6 +243,7 @@ def test_engine_rejects_noncanonical_chart_policy_map(mapping, message):
         RaviEngine(
             astronomy=FakeAstronomy(),
             time_context_provider=FakeTime(),
+            runtime_identity=fake_runtime_identity(),
             canon=replace(
                 RAVI_VEDIC_MVP_V1,
                 charts=ChartPolicies(
@@ -266,7 +296,11 @@ def test_synthetic_chart_extends_collection_without_pipeline_or_core_result_edit
 
 
 def test_completed_result_retains_its_policy_identity_when_other_canons_exist(birth):
-    engine = RaviEngine(astronomy=FakeAstronomy(), time_context_provider=FakeTime())
+    engine = RaviEngine(
+        astronomy=FakeAstronomy(),
+        time_context_provider=FakeTime(),
+        runtime_identity=fake_runtime_identity(),
+    )
     completed = engine.calculate(birth)
     original_identity = completed.policy_manifest_sha256
 
@@ -310,7 +344,11 @@ def test_time_failure_prevents_astronomy_and_is_not_swallowed(birth):
             raise failure
 
     astronomy = FakeAstronomy()
-    engine = RaviEngine(astronomy=astronomy, time_context_provider=FailingTime())
+    engine = RaviEngine(
+        astronomy=astronomy,
+        time_context_provider=FailingTime(),
+        runtime_identity=fake_runtime_identity(),
+    )
     with pytest.raises(ValueError) as caught:
         engine.calculate(birth)
     assert caught.value is failure
@@ -324,13 +362,30 @@ def test_astronomy_failure_is_not_replaced_with_another_backend(birth):
         def snapshot(self, **kwargs):
             raise failure
 
-    engine = RaviEngine(astronomy=FailingAstronomy(), time_context_provider=FakeTime())
+    engine = RaviEngine(
+        astronomy=FailingAstronomy(),
+        time_context_provider=FakeTime(),
+        runtime_identity=fake_runtime_identity(),
+    )
     with pytest.raises(RuntimeError) as caught:
         engine.calculate(birth)
     assert caught.value is failure
 
 
+def test_engine_requires_explicit_runtime_identity():
+    with pytest.raises(TypeError, match="explicit RuntimeIdentity"):
+        RaviEngine(
+            astronomy=FakeAstronomy(),
+            time_context_provider=FakeTime(),
+            runtime_identity=None,
+        )
+
+
 @pytest.mark.parametrize("astronomy,time", [(None, FakeTime()), (FakeAstronomy(), None)])
 def test_engine_rejects_missing_ports(astronomy, time):
     with pytest.raises(TypeError, match="requires"):
-        RaviEngine(astronomy=astronomy, time_context_provider=time)
+        RaviEngine(
+            astronomy=astronomy,
+            time_context_provider=time,
+            runtime_identity=fake_runtime_identity(),
+        )
