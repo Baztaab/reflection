@@ -7,6 +7,7 @@ from enum import StrEnum
 from types import MappingProxyType
 from typing import Protocol
 
+from ravi_vedic.domain.diagnostics import CalculationStatus, Diagnostic
 from ravi_vedic.domain.identity import RuntimeIdentity
 
 
@@ -130,11 +131,14 @@ class AstronomyProvenance:
     ayanamsha_policy_id: str
     source_profile: str
     actual_sources: tuple[str, ...]
-    warnings: tuple[str, ...]
+    diagnostics: tuple[Diagnostic, ...]
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "actual_sources", tuple(self.actual_sources))
-        object.__setattr__(self, "warnings", tuple(self.warnings))
+        diagnostics = tuple(self.diagnostics)
+        if any(not isinstance(item, Diagnostic) for item in diagnostics):
+            raise TypeError("astronomy diagnostics must contain Diagnostic values")
+        object.__setattr__(self, "diagnostics", diagnostics)
 
 
 @dataclass(frozen=True, slots=True)
@@ -308,6 +312,8 @@ class CoreResult:
     runtime_identity: RuntimeIdentity
     input_sha256: str
     calculation_fingerprint: str
+    diagnostics: tuple[Diagnostic, ...]
+    calculation_status: CalculationStatus
 
     def __post_init__(self) -> None:
         if not isinstance(self.charts, ChartCollection):
@@ -323,6 +329,15 @@ class CoreResult:
         _require_sha256(
             self.calculation_fingerprint,
             field_name="calculation_fingerprint",
+        )
+        diagnostics = tuple(self.diagnostics)
+        if any(not isinstance(item, Diagnostic) for item in diagnostics):
+            raise TypeError("diagnostics must contain Diagnostic values")
+        object.__setattr__(self, "diagnostics", diagnostics)
+        object.__setattr__(
+            self,
+            "calculation_status",
+            CalculationStatus(self.calculation_status),
         )
 
     @property
