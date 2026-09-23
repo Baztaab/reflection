@@ -19,7 +19,6 @@ from ravi_vedic.domain.diagnostics import (
     DiagnosticSeverity,
 )
 from ravi_vedic.domain.geometry import normalize_longitude
-from ravi_vedic.errors import AstronomyBackendError, RuntimeDataError, UnsupportedPolicyError
 from ravi_vedic.domain.identity import AstronomyRuntimeIdentity
 from ravi_vedic.domain.models import (
     AscendantPosition,
@@ -29,6 +28,12 @@ from ravi_vedic.domain.models import (
     Graha,
     JulianTime,
     TimeContext,
+)
+from ravi_vedic.errors import (
+    AstronomyBackendError,
+    InputError,
+    RuntimeDataError,
+    UnsupportedPolicyError,
 )
 from ravi_vedic.infrastructure.swiss.manifest import (
     EphemerisDataIdentity,
@@ -88,7 +93,7 @@ class _SwissAstronomySession:
             utc_datetime.tzinfo is None
             or utc_datetime.utcoffset() != UTC.utcoffset(utc_datetime)
         ):
-            raise ValueError("utc_datetime must be timezone-aware UTC")
+            raise InputError("utc_datetime must be timezone-aware UTC")
 
         seconds = utc_datetime.second + utc_datetime.microsecond / 1_000_000.0
         jd_tt, jd_ut = swe.utc_to_jd(
