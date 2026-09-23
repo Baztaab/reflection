@@ -47,8 +47,8 @@ def build_runtime_identity(
         python=PythonRuntimeIdentity(
             implementation=platform.python_implementation(),
             version=platform.python_version(),
-            system=platform.system(),
-            machine=platform.machine(),
+            system=platform.system() or "unknown",
+            machine=platform.machine() or "unknown",
         ),
         astronomy=astronomy,
         timezone=timezone,
