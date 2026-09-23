@@ -5,34 +5,11 @@ from typing import Any
 from ravi_vedic.domain.calculation_identity import CALCULATION_FINGERPRINT_MANIFEST_VERSION
 from ravi_vedic.domain.diagnostics import Diagnostic
 from ravi_vedic.domain.models import CoreResult, Graha, VargaChart, VargaProjection
-
-_CORE_V1_CHART_IDS = frozenset({"D1", "D9", "D10"})
-
-_SIGN_NAMES = (
-    "Aries",
-    "Taurus",
-    "Gemini",
-    "Cancer",
-    "Leo",
-    "Virgo",
-    "Libra",
-    "Scorpio",
-    "Sagittarius",
-    "Capricorn",
-    "Aquarius",
-    "Pisces",
-)
-
-_GRAHA_ORDER = (
-    Graha.SUN,
-    Graha.MOON,
-    Graha.MARS,
-    Graha.MERCURY,
-    Graha.JUPITER,
-    Graha.VENUS,
-    Graha.SATURN,
-    Graha.RAHU,
-    Graha.KETU,
+from ravi_vedic.projection.contract import (
+    CORE_CHART_IDS,
+    CORECORE_GRAHA_ORDER,
+    CORE_SCHEMA_VERSION,
+    CORECORE_SIGN_NAMES,
 )
 
 
@@ -103,7 +80,7 @@ def _projection_dict(projection: VargaProjection) -> dict[str, Any]:
         "source_longitude_deg": projection.source_longitude_deg,
         "segment_index": projection.segment_index,
         "target_sign_index": projection.target_sign_index,
-        "target_sign": _SIGN_NAMES[projection.target_sign_index],
+        "target_sign": CORE_SIGN_NAMES[projection.target_sign_index],
         "longitude_within_target_sign_deg": projection.longitude_within_target_sign_deg,
         "projected_longitude_deg": projection.projected_longitude_deg,
         "mapping_policy_id": projection.mapping_policy_id,
@@ -123,13 +100,13 @@ def _varga_dict(chart: VargaChart) -> dict[str, Any]:
                 "house": chart.placements[body].house,
                 "retrograde": chart.placements[body].retrograde,
             }
-            for body in _GRAHA_ORDER
+            for body in CORE_GRAHA_ORDER
         ],
     }
 
 
 def to_core_dict(result: CoreResult) -> dict[str, Any]:
-    if set(result.charts) != _CORE_V1_CHART_IDS:
+    if set(result.charts) != frozenset(CORE_CHART_IDS):
         raise ValueError(
             "ravi-vedic-core-v1 projection requires exactly D1/D9/D10; "
             f"actual={sorted(result.charts)}"
@@ -143,7 +120,7 @@ def to_core_dict(result: CoreResult) -> dict[str, Any]:
     d10 = result.charts.require_varga("D10")
 
     return {
-        "schema_version": "ravi-vedic-core-v1",
+        "schema_version": CORE_SCHEMA_VERSION,
         "canon_id": result.canon_id,
         "calculation_status": result.calculation_status.value,
         "diagnostics": [_diagnostic_dict(item) for item in result.diagnostics],
@@ -201,7 +178,7 @@ def to_core_dict(result: CoreResult) -> dict[str, Any]:
                     "retrograde": astronomy.bodies[body].retrograde,
                     "source_method": astronomy.bodies[body].source_method,
                 }
-                for body in _GRAHA_ORDER
+                for body in CORE_GRAHA_ORDER
             ],
         },
         "charts": {
@@ -212,7 +189,7 @@ def to_core_dict(result: CoreResult) -> dict[str, Any]:
                 "ascendant": {
                     "sidereal_longitude_deg": d1.ascendant_sidereal_longitude_deg,
                     "sign_index": d1.ascendant_sign_index,
-                    "sign": _SIGN_NAMES[d1.ascendant_sign_index],
+                    "sign": CORE_SIGN_NAMES[d1.ascendant_sign_index],
                     "degree_in_sign": d1.ascendant_degree_in_sign,
                 },
                 "grahas": [
@@ -220,13 +197,13 @@ def to_core_dict(result: CoreResult) -> dict[str, Any]:
                         "body": _body_name(body),
                         "sidereal_longitude_deg": d1.placements[body].sidereal_longitude_deg,
                         "sign_index": d1.placements[body].sign_index,
-                        "sign": _SIGN_NAMES[d1.placements[body].sign_index],
+                        "sign": CORE_SIGN_NAMES[d1.placements[body].sign_index],
                         "degree_in_sign": d1.placements[body].degree_in_sign,
                         "house": d1.placements[body].house,
                         "retrograde": d1.placements[body].retrograde,
                         "mapping_policy_id": d1.placements[body].mapping_policy_id,
                     }
-                    for body in _GRAHA_ORDER
+                    for body in CORE_GRAHA_ORDER
                 ],
             },
             "D9": _varga_dict(d9),
