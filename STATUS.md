@@ -4,8 +4,8 @@ Current milestone: **M2.6 — Engine Foundation IN PROGRESS**
 
 Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon + M2.6.5 shared angular/boundary kernel + M2.6.6 generic chart collection**.
 Completed phase: **M2.6.7 complete calculation identity and typed diagnostics — COMPLETE**.
-Current phase: **M2.6.8 contract/schema hardening — IN PROGRESS**.
-Completed slices: **8.1 contract vocabulary + 8.2 Graha cardinality + 8.3 Varga discriminators**. Next slice: **8.4 astronomy execution detail + acceptance**.
+Completed phase: **M2.6.8 contract/schema hardening — COMPLETE**.
+Next phase: **M2.6.9 errors, typing, and broader quality gates — NOT STARTED**.
 
 M2.6.5 verified calculation baseline: `8cf1c22baebd27a5663362f06d9d090335d02fee`.
 Later documentation-only cleanup commits do not redefine this calculation baseline.
@@ -323,15 +323,41 @@ M2.6.8.3 verification on implementation head
 - canonical Swiss run `35866614293` — success; pinned dataset manifest verified;
   strict canonical integration **1 passed**.
 
+## What M2.6.8.4 now enforces
+
+- Every astronomy body now serializes the `retflags_tropical` and
+  `retflags_sidereal` values already retained by `BodyPosition`, alongside its
+  `source_method`.
+- Sun through Saturn require integer tropical and sidereal return flags.
+- Rahu requires a tropical return flag while its sidereal flag may be null when the
+  sidereal True Node is derived from tropical True Rahu minus the canonical ayanamsha.
+- Ketu is an exact derived opposition and therefore requires explicit null tropical and
+  sidereal return flags rather than invented Swiss metadata.
+- Projection tests require serialized source methods/retflags to equal the completed
+  domain result exactly; canonical integration checks the same contract against pinned
+  Swiss files.
+- The repository is contract-tested to contain exactly one executable `*.schema.json`.
+- The frozen cross-version gate still compares every pre-existing calculation field
+  exactly with zero numerical tolerance; only the new retflag metadata (absent from the
+  frozen baseline) is excluded in addition to the explicit M2.6.7 envelope migration.
+
+M2.6.8.4 verification on implementation head
+`311ab2b420b51246da0b0aebe3f67bc6645efdff`:
+- quality run `35867204886` — success; Ruff passed; pytest **195 passed, 2 skipped**;
+  exact zero-tolerance calculation-payload parity **5/5**;
+- canonical Swiss run `35867204814` — success; pinned dataset manifest verified;
+  strict canonical projection/integration **2 passed**.
+
 ## Why M3 is still blocked
 
 The current core is numerically useful but still has foundation debt that should not be
 copied into Nakshatra/lordship/dispositor work:
 
 - M2.6.7 identity/diagnostic projection is complete;
-- current schema validation still does not encode every semantic invariant required by
-  M2.6.8 (duplicate Grahas, Varga ID/factor/policy coupling and complete retflag/source
-  preservation).
+- M2.6.8 executable contract/schema hardening is complete;
+- M2.6.9 must still add typed errors, static typing, declared/tested Python support and
+  property-based quality gates;
+- M2.6.10 must perform the final architecture acceptance pass.
 
 These are M2.6 tasks, not M3 tasks.
 
@@ -355,8 +381,8 @@ These are M2.6 tasks, not M3 tasks.
 
 ## Next action
 
-Implement **M2.6.8.4 astronomy execution detail + acceptance only**: serialize the
-tropical/sidereal Swiss return flags already retained by BodyPosition, validate them in the
-executable schema, and close every M2.6.8 exit gate. Do not start M2.6.9 or M3 early.
+Implement **M2.6.9 only**, beginning with a bounded design/audit of the typed exception
+hierarchy and static-typing choice before changing runtime behavior. Do not start M2.6.10
+acceptance or any M3 technique early.
 
 Only after all M2.6 acceptance gates pass may M3 begin with Nakshatra/Pada.
