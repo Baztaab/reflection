@@ -198,18 +198,18 @@ def test_engine_rejects_unsupported_policies_before_calculation(canon):
 @pytest.mark.parametrize(
     ("mapping", "message"),
     [
-        ({}, "enabled D1"),
-        ({"D1": "unapproved-rule"}, "unsupported chart policy"),
+        ({}, "D1/D9/D10"),
+        ({"D1": "unapproved-rule"}, "D1/D9/D10"),
         (
             {
                 **RAVI_VEDIC_MVP_V1.charts.varga_policy_ids,
                 "DTEST": "test.not-registered-v1",
             },
-            "unsupported chart policy",
+            "D1/D9/D10",
         ),
     ],
 )
-def test_engine_rejects_missing_or_unknown_chart_policies(mapping, message):
+def test_engine_rejects_noncanonical_chart_policy_map(mapping, message):
     with pytest.raises(ValueError, match=message):
         RaviEngine(
             astronomy=FakeAstronomy(),
@@ -222,18 +222,6 @@ def test_engine_rejects_missing_or_unknown_chart_policies(mapping, message):
                 ),
             ),
         )
-
-
-def test_engine_accepts_new_canon_identity_when_policies_are_executable(birth):
-    canon = replace(RAVI_VEDIC_MVP_V1, canon_id="ravi-vedic-compatible-test-v1")
-    engine = RaviEngine(
-        astronomy=FakeAstronomy(),
-        time_context_provider=FakeTime(),
-        canon=canon,
-    )
-    result = engine.calculate(birth)
-    assert result.canon_id == "ravi-vedic-compatible-test-v1"
-    assert result.policy_manifest_sha256 == canon.policy_manifest_sha256
 
 
 @dataclass(frozen=True, slots=True)
@@ -262,14 +250,13 @@ def test_synthetic_chart_extends_collection_without_pipeline_or_core_result_edit
             },
         ),
     )
-    engine = RaviEngine(
+    result = calculate_core(
+        birth,
         astronomy=FakeAstronomy(),
         time_context_provider=FakeTime(),
         canon=canon,
         chart_builders=registry,
     )
-
-    result = engine.calculate(birth)
 
     assert set(result.charts) == {"D1", "D9", "D10", "DTEST"}
     assert result.charts.require_varga("DTEST").factor == 2

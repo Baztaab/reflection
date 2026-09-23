@@ -67,8 +67,10 @@ M2.6.6 will introduce:
 8. a test-only synthetic chart policy proving that extension needs no pipeline/CoreResult
    edit.
 
-The default registry remains static and explicit. This is dependency injection, not a
-runtime plugin system.
+The default registry remains static and explicit. The production `RaviEngine` stays locked
+to the pinned RAVI MVP v1 Canon and default builder set. Registry injection exists only on
+the explicit low-level calculation seam so tests can prove extension without turning the
+production engine into a runtime plugin host.
 
 ## Semantic invariant
 
@@ -100,7 +102,8 @@ M2.6.6 is complete only if:
 - pipeline contains no named D9/D10 build calls;
 - `CoreResult` stores one immutable chart collection;
 - D1/D9/D10 compatibility accessors resolve through that collection;
-- a synthetic test-only chart can be added using Canon + an extended immutable builder
-  registry without editing pipeline or CoreResult;
+- a synthetic test-only chart can be added through the low-level seam using Canon + an
+  extended immutable builder registry without editing pipeline or CoreResult, while the
+  production RaviEngine still rejects non-canonical policy manifests;
 - exact full-payload parity remains 5/5;
 - canonical Swiss integration remains green.
