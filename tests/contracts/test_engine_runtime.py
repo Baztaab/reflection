@@ -126,6 +126,8 @@ def test_composed_engine_owns_complete_runtime_identity_snapshot():
     assert all(char in "0123456789abcdef" for char in identity.ravi.source_sha256)
     assert identity.python.implementation == platform.python_implementation()
     assert identity.python.version == platform.python_version()
+    assert identity.python.system == platform.system()
+    assert identity.python.machine == platform.machine()
     assert identity.astronomy.implementation == "pyswisseph"
     assert identity.astronomy.binding_version == metadata.version("pyswisseph")
     assert identity.astronomy.library_version == swe.version
