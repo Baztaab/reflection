@@ -110,7 +110,12 @@ def fake_runtime_identity() -> RuntimeIdentity:
             package_version="test",
             source_sha256="0" * 64,
         ),
-        python=PythonRuntimeIdentity(implementation="test-python", version="test"),
+        python=PythonRuntimeIdentity(
+            implementation="test-python",
+            version="test",
+            system="test-system",
+            machine="test-machine",
+        ),
         astronomy=AstronomyRuntimeIdentity(
             implementation="fake",
             binding_version="test",
