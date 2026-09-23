@@ -53,10 +53,12 @@ def test_reference_chart_001_matches_golden_structure() -> None:
         "TRUE_NODE_SIDEREAL_DERIVED_FROM_TROPICAL_AND_AYANAMSHA",
     ]
     assert result.diagnostics[0].details["source"] == "moshier"
-    assert to_core_dict(result)["provenance"]["astronomy"]["warnings"] == [
-        "EPHEMERIS_SOURCE_FALLBACK:moshier",
+    projected = to_core_dict(result)
+    assert [item["code"] for item in projected["diagnostics"]] == [
+        "EPHEMERIS_SOURCE_FALLBACK",
         "TRUE_NODE_SIDEREAL_DERIVED_FROM_TROPICAL_AND_AYANAMSHA",
     ]
+    assert "warnings" not in projected["provenance"]["astronomy"]
     assert result.astronomy.ayanamsha_deg == pytest.approx(expected["ayanamsha_deg"], abs=5e-5)
     assert result.d1.ascendant_sidereal_longitude_deg == pytest.approx(
         expected["ascendant_sidereal_longitude_deg"], abs=5e-5
