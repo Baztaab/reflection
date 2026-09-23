@@ -409,6 +409,17 @@ Exit gate:
 - declared Python support equals CI-tested support;
 - dependency-direction violations fail CI.
 
+### M2.6.9 execution slices
+
+1. **9.1 Error taxonomy** — public RAVI exception tree and typed semantic failure paths.
+2. **9.2 Static typing** — pin one checker, make production code pass, add CI enforcement.
+3. **9.3 Python support contract** — align package metadata with an explicit tested minor
+   version matrix.
+4. **9.4 Property tests + acceptance** — add Hypothesis domain/geometry properties and
+   close all M2.6.9 gates.
+
+Each slice is independently reviewed and green before the next begins.
+
 ## M2.6.10 — Architecture acceptance
 
 M2.6 is complete only when all of the following are true:
