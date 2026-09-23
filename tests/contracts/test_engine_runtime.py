@@ -122,6 +122,8 @@ def test_composed_engine_owns_complete_runtime_identity_snapshot():
 
     assert identity.ravi.distribution_name == "ravi-vedic"
     assert identity.ravi.package_version == metadata.version("ravi-vedic")
+    assert len(identity.ravi.source_sha256) == 64
+    assert all(char in "0123456789abcdef" for char in identity.ravi.source_sha256)
     assert identity.python.implementation == platform.python_implementation()
     assert identity.python.version == platform.python_version()
     assert identity.astronomy.implementation == "pyswisseph"
