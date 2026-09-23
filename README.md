@@ -6,9 +6,9 @@ The project is optimized for auditable Jyotish research rather than feature coun
 Astronomy, Jyotish policy, derived structure, evidence and interpretation are kept as
 separate concerns.
 
-Current milestone: **M2.6 Engine Foundation**. M2.6.0–8 and **M2.6.9.1–2 typed errors +
-strict static typing** are implemented and CI verified; **M2.6.9.3 Python support contract
-is next**.
+Current milestone: **M2.6 Engine Foundation**. M2.6.0–8 and **M2.6.9.1–3 typed errors,
+strict static typing and tested Python support** are implemented and CI verified;
+**M2.6.9.4 property tests + acceptance is next**.
 
 ## Current executable core
 
@@ -103,6 +103,18 @@ chart-factor-policy combinations. The obsolete mixed `deterministic_input_hash` 
 encoded string `warnings` fields were retired at the explicit M2.6.7.5 contract
 migration recorded by ADR-0011.
 
+## Python support contract
+
+RAVI supports **CPython 3.11, 3.12, 3.13 and 3.14**, expressed as
+`requires-python = ">=3.11,<3.15"`. Both the normal quality/parity lane and the strict
+canonical-Swiss lane run that exact four-minor matrix. Support is therefore based on
+executed RAVI tests, not dependency metadata alone.
+
+The pinned `pyswisseph==2.10.3.2` publishes prebuilt wheels through CPython 3.11, while
+RAVI CI also verifies successful source installation and canonical execution on 3.12–3.14.
+A future Python minor is unsupported until package metadata and both CI matrices are
+expanded together and pass.
+
 ## Static typing contract
 
 The production package is checked with pinned **mypy 2.3.1** in strict mode. CI runs
@@ -151,6 +163,7 @@ acceptance gates.
 ```bash
 python -m pip install -e ".[dev]"
 ruff check src tests scripts
+mypy src/ravi_vedic
 pytest
 ```
 

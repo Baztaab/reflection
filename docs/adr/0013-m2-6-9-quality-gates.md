@@ -48,6 +48,29 @@ Reasons:
 No blanket `# type: ignore` policy is introduced. A local ignore would require a
 specific documented incompatibility and is not part of this slice.
 
+## Python support contract
+
+M2.6.9.3 declares **CPython 3.11 through 3.14** as the supported minor range and encodes
+that as `requires-python = ">=3.11,<3.15"`.
+
+This range is based on execution evidence:
+
+- both `quality` and `canonical-swiss` run explicit 3.11/3.12/3.13/3.14 matrices;
+- quality installs the pinned dependencies and runs Ruff, strict mypy, the complete pytest
+  suite and frozen calculation parity on every supported minor;
+- canonical CI independently downloads/verifies the pinned Swiss dataset and runs strict
+  Swiss-file integration on every supported minor;
+- all four minors passed before the support declaration was accepted.
+
+The initial conservative review noted that `pyswisseph==2.10.3.2` publishes prebuilt
+CPython wheels through 3.11. RAVI therefore did not infer newer-minor support from package
+metadata. CI demonstrated that the pinned source distribution builds and passes RAVI's
+gates on 3.12, 3.13 and 3.14 as well.
+
+Mypy and Ruff intentionally target 3.11, the minimum supported language level. Python 3.15
+is outside this milestone's contract; any future expansion requires package metadata, both
+CI matrices and the Python-support contract test to change together and pass.
+
 ## Exception hierarchy
 
 `ravi_vedic.errors` is the single public source of RAVI-owned exception classes:
