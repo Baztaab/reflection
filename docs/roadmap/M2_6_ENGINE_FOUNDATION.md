@@ -420,6 +420,12 @@ Exit gate:
 
 Each slice is independently reviewed and green before the next begins.
 
+**M2.6.9 status: COMPLETE.** CI now has typed semantic errors, strict mypy, a declared
+and tested CPython 3.11–3.14 support matrix, an explicit Hypothesis property lane, active
+dependency-direction contracts and canonical Swiss integration. Property testing also
+found and fixed a shared-longitude IEEE-754 edge case without drifting the frozen trusted
+D1/D9/D10 payloads.
+
 ## M2.6.10 — Architecture acceptance
 
 M2.6 is complete only when all of the following are true:

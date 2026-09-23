@@ -27,6 +27,15 @@ def test_longitude_periodicity_property(value):
         )
 
 
+def test_tiny_negative_longitude_stays_inside_half_open_zodiac():
+    longitude = Longitude(-2.866157805194779e-223)
+
+    assert longitude.degrees == math.nextafter(360.0, 0.0)
+    assert 0.0 <= longitude.degrees < 360.0
+    assert longitude.sign_index == 11
+    assert 0.0 <= longitude.degree_in_sign < 30.0
+
+
 def test_exact_sign_boundaries_enter_new_half_open_owner():
     for boundary_number in range(13):
         longitude = boundary_number * 30.0
