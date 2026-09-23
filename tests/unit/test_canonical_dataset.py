@@ -3,7 +3,6 @@ from hashlib import sha256
 import pytest
 
 from ravi_vedic.errors import RuntimeDataError
-
 from ravi_vedic.infrastructure.swiss.canonical_dataset import (
     SWISS_REFERENCE_COMMIT,
     SWISS_REFERENCE_FILES,
