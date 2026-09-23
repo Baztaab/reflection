@@ -3,7 +3,6 @@ from pathlib import Path
 import pytest
 
 from ravi_vedic.errors import RuntimeDataError
-
 from ravi_vedic.infrastructure.swiss.manifest import build_ephemeris_data_identity
 
 
