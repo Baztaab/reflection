@@ -71,6 +71,32 @@ Mypy and Ruff intentionally target 3.11, the minimum supported language level. P
 is outside this milestone's contract; any future expansion requires package metadata, both
 CI matrices and the Python-support contract test to change together and pass.
 
+## Property-test acceptance
+
+M2.6.9.4 pins **Hypothesis 6.168.1** and gives property tests an explicit CI step on each
+supported Python minor before the full pytest suite.
+
+The generated properties focus on domain laws rather than random object construction:
+
+- every finite `Longitude` must satisfy the canonical half-open `[0, 360)` contract,
+  sign range 0–11 and degree-within-sign range `[0, 30)`;
+- longitude normalization is periodic on the zodiac circle within floating precision;
+- every generated partition remains within its sign/segment/fraction domains;
+- generated internal rational boundaries preserve previous/exact/next-float ownership;
+- whole-sign houses are invariant under a common zodiac rotation;
+- registered D9/D10 projection policies preserve valid segment/sign/longitude ranges and
+  periodicity.
+
+The first Hypothesis run exposed a real floating-point invariant violation. Python modulo
+can round an extremely small negative finite longitude to exactly `360.0`. RAVI's
+half-open contract forbids that value and downstream partition code could then observe
+sign index 12. The fix clamps only that rounded endpoint to
+`nextafter(360.0, 0.0)`, preserving the mathematical below-zero side instead of
+wrapping it to Aries. A deterministic regression test locks the discovered cases.
+
+The baseline parity corpus remains exact 5/5, so this correction fixes an uncovered
+floating edge without drifting trusted D1/D9/D10 results.
+
 ## Exception hierarchy
 
 `ravi_vedic.errors` is the single public source of RAVI-owned exception classes:
