@@ -6,6 +6,8 @@ from typing import Any
 
 from ravi_vedic.domain.models import CoreResult, Graha, VargaChart, VargaProjection
 
+_CORE_V1_CHART_IDS = frozenset({"D1", "D9", "D10"})
+
 _SIGN_NAMES = (
     "Aries",
     "Taurus",
@@ -95,10 +97,18 @@ def _varga_dict(chart: VargaChart) -> dict[str, Any]:
 
 
 def to_core_dict(result: CoreResult) -> dict[str, Any]:
+    if set(result.charts) != _CORE_V1_CHART_IDS:
+        raise ValueError(
+            "ravi-vedic-core-v1 projection requires exactly D1/D9/D10; "
+            f"actual={sorted(result.charts)}"
+        )
+
     time_context = result.time_context
     astronomy = result.astronomy
     provenance = astronomy.provenance
-    d1 = result.d1
+    d1 = result.charts.require_d1()
+    d9 = result.charts.require_varga("D9")
+    d10 = result.charts.require_varga("D10")
 
     return {
         "schema_version": "ravi-vedic-core-v1",
@@ -182,7 +192,7 @@ def to_core_dict(result: CoreResult) -> dict[str, Any]:
                     for body in _GRAHA_ORDER
                 ],
             },
-            "D9": _varga_dict(result.d9),
-            "D10": _varga_dict(result.d10),
+            "D9": _varga_dict(d9),
+            "D10": _varga_dict(d10),
         },
     }
