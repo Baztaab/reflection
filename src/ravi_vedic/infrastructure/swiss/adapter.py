@@ -217,7 +217,7 @@ class _SwissAstronomySession:
                         "astronomy.bodies.rahu",
                         "astronomy.bodies.ketu",
                     ),
-                    canonicality_impact=CanonicalityImpact.DEGRADED,
+                    canonicality_impact=CanonicalityImpact.NONE,
                     details={
                         "derivation": "tropical_true_node_minus_true_pushya_ayanamsha",
                     },
