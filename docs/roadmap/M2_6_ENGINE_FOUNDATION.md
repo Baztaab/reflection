@@ -409,6 +409,21 @@ Exit gate:
 - declared Python support equals CI-tested support;
 - dependency-direction violations fail CI.
 
+### M2.6.9 execution slices
+
+1. **9.1 Typed exception hierarchy** — public semantic error categories for input/time,
+   unsupported policy, runtime data, astronomy backend and invariant violations while
+   retaining ordinary `TypeError` for direct Python API misuse.
+2. **9.2 Static typing + Python support contract** — pin mypy, type-check production code
+   in CI and narrow declared Python support to the actually validated 3.11 minor line.
+3. **9.3 Property-based domain tests** — pin Hypothesis and exercise geometry/domain
+   invariants without pretending Swiss backend numerics are pure mathematical properties.
+4. **9.4 Quality acceptance** — require lint + typing + unit/contract/property tests +
+   exact historical parity and retain the separate canonical Swiss integration lane.
+
+Each slice is independently reviewed and green before the next begins. M2.6.9 changes
+engineering failure detection only; D1/D9/D10 calculations remain unchanged.
+
 ## M2.6.10 — Architecture acceptance
 
 M2.6 is complete only when all of the following are true:
