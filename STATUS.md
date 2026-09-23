@@ -6,8 +6,8 @@ Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition +
 Completed phases: **M2.6.7 complete calculation identity and typed diagnostics — COMPLETE**;
 **M2.6.8 contract/schema hardening — COMPLETE**.
 Current phase: **M2.6.9 errors, typing and broader quality gates — IN PROGRESS**.
-Completed slices: **9.1 error taxonomy + 9.2 static typing**. Next slice:
-**9.3 Python support contract**.
+Completed slices: **9.1 error taxonomy + 9.2 static typing + 9.3 Python support contract**.
+Next slice: **9.4 property tests + acceptance**.
 
 M2.6.5 verified calculation baseline: `8cf1c22baebd27a5663362f06d9d090335d02fee`.
 Later documentation-only cleanup commits do not redefine this calculation baseline.
@@ -400,6 +400,28 @@ M2.6.9.2 verification on implementation head
 - canonical Swiss run `35870556078` — success; pinned dataset manifest verified;
   strict canonical integration **1 passed**.
 
+## What M2.6.9.3 now enforces
+
+- Package metadata declares exactly `requires-python = ">=3.11,<3.15"`.
+- Quality CI explicitly tests CPython **3.11, 3.12, 3.13 and 3.14**.
+- Canonical Swiss-file CI independently tests the same four-minor matrix.
+- The support contract is executable: a contract test requires package metadata, mypy's
+  minimum target, Ruff's minimum target and both workflow matrices to stay aligned.
+- Every supported minor installs the pinned `pyswisseph==2.10.3.2` and `tzdata==2026.4`
+  dependencies successfully in the actual workflow.
+- On every minor, quality passes Ruff, strict mypy, pytest **207 passed, 1 skipped** and
+  exact zero-tolerance calculation parity **5/5**.
+- On every minor, canonical integration verifies the pinned two-file Swiss dataset and
+  passes **1/1**.
+- Python 3.15 and later are deliberately outside the package contract until separately
+  added to both matrices and verified.
+
+M2.6.9.3 verification on implementation head
+`73892854ba420c5160c0323621ab8140bef7f418`:
+- quality matrix run `35871379313` — success on Python 3.11 / 3.12 / 3.13 / 3.14;
+- canonical Swiss matrix run `35871379439` — success on Python 3.11 / 3.12 / 3.13 /
+  3.14.
+
 ## Why M3 is still blocked
 
 The current core is numerically useful but still has foundation debt that should not be
@@ -407,9 +429,9 @@ copied into Nakshatra/lordship/dispositor work:
 
 - M2.6.7 calculation identity/diagnostics and M2.6.8 executable contract hardening are
   complete;
-- M2.6.9.1 typed exceptions and M2.6.9.2 strict static typing are complete;
-- M2.6.9 still needs declared/tested Python support alignment and property-based domain
-  tests.
+- M2.6.9.1 typed exceptions, M2.6.9.2 strict static typing and M2.6.9.3 tested Python
+  support alignment are complete;
+- M2.6.9 still needs property-based domain/geometry testing and final acceptance.
 
 These remaining quality gates are M2.6 work, not M3 work.
 
@@ -433,9 +455,9 @@ These remaining quality gates are M2.6 work, not M3 work.
 
 ## Next action
 
-Implement **M2.6.9.3 Python support contract only**: decide the supported Python minor
-range, make `requires-python` express exactly that range, and run the appropriate CI
-matrix so declared support equals tested support. Do not start Hypothesis, M2.6.10 or M3
-in that slice.
+Implement **M2.6.9.4 property tests + acceptance only**: pin Hypothesis, add focused
+property tests for the shared geometry/domain invariants, confirm dependency-direction
+contract tests remain active, and close every M2.6.9 gate. Do not start M2.6.10 or M3 in
+that slice.
 
 Only after all M2.6 acceptance gates pass may M3 begin with Nakshatra/Pada.
