@@ -407,8 +407,9 @@ copied into Nakshatra/lordship/dispositor work:
 
 - M2.6.7 calculation identity/diagnostics and M2.6.8 executable contract hardening are
   complete;
-- M2.6.9 still needs the typed exception hierarchy, static typing gate, declared/tested
-  Python support alignment and property-based domain tests.
+- M2.6.9.1 typed exceptions and M2.6.9.2 strict static typing are complete;
+- M2.6.9 still needs declared/tested Python support alignment and property-based domain
+  tests.
 
 These remaining quality gates are M2.6 work, not M3 work.
 
