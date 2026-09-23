@@ -1,11 +1,12 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from importlib import metadata, resources
 from zoneinfo import ZoneInfo
 
 from ravi_vedic.astronomy.port import AstronomySessionPort
+from ravi_vedic.domain.identity import TimezoneRuntimeIdentity
 from ravi_vedic.domain.models import BirthInput, TimeContext
 
 PINNED_TZDATA_VERSION = "2026.4"
@@ -58,11 +59,22 @@ def _tzdb_identity() -> tuple[str, str]:
 
 @dataclass(frozen=True, slots=True)
 class PinnedTimezoneProvider:
-    """Stateless time port, validated at composition and on each calculation."""
+    """Stateless time port with a composition-time identity snapshot."""
+
+    _runtime_identity: TimezoneRuntimeIdentity = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
-        _tzdb_identity()
+        provider, version = _tzdb_identity()
         _load_pinned_zone("Etc/UTC")
+        object.__setattr__(
+            self,
+            "_runtime_identity",
+            TimezoneRuntimeIdentity(provider=provider, version=version),
+        )
+
+    @property
+    def runtime_identity(self) -> TimezoneRuntimeIdentity:
+        return self._runtime_identity
 
     def build(self, birth: BirthInput, astronomy: AstronomySessionPort) -> TimeContext:
         return build_time_context(birth, astronomy)
