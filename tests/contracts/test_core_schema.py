@@ -50,6 +50,55 @@ def test_executable_schema_vocabulary_matches_projection_contract() -> None:
     assert tuple(charts["properties"]) == CORE_CHART_IDS
 
 
+def test_exact_graha_array_contract_matches_runtime_vocabulary() -> None:
+    schema = _schema()
+    exact = schema["$defs"]["exactGrahaArray"]
+
+    assert exact["minItems"] == len(CORE_GRAHA_NAMES)
+    assert exact["maxItems"] == len(CORE_GRAHA_NAMES)
+    assert [
+        rule["contains"]["properties"]["body"]["const"]
+        for rule in exact["allOf"]
+    ] == list(CORE_GRAHA_NAMES)
+    assert all(rule["minContains"] == 1 for rule in exact["allOf"])
+    assert all(rule["maxContains"] == 1 for rule in exact["allOf"])
+
+
+def _graha_arrays(payload: dict) -> dict[str, list[dict]]:
+    return {
+        "astronomy": payload["astronomy"]["bodies"],
+        "D1": payload["charts"]["D1"]["grahas"],
+        "D9": payload["charts"]["D9"]["grahas"],
+        "D10": payload["charts"]["D10"]["grahas"],
+    }
+
+
+@pytest.mark.parametrize("array_name", ["astronomy", "D1", "D9", "D10"])
+def test_schema_rejects_duplicate_graha_identity(array_name: str) -> None:
+    schema = _schema()
+    payload = to_core_dict(_development_result())
+    malformed = deepcopy(payload)
+    grahas = _graha_arrays(malformed)[array_name]
+
+    grahas[1]["body"] = grahas[0]["body"]
+
+    with pytest.raises(ValidationError):
+        Draft202012Validator(schema).validate(malformed)
+
+
+@pytest.mark.parametrize("array_name", ["astronomy", "D1", "D9", "D10"])
+def test_schema_rejects_missing_graha_identity(array_name: str) -> None:
+    schema = _schema()
+    payload = to_core_dict(_development_result())
+    malformed = deepcopy(payload)
+    grahas = _graha_arrays(malformed)[array_name]
+
+    grahas.pop()
+
+    with pytest.raises(ValidationError):
+        Draft202012Validator(schema).validate(malformed)
+
+
 def test_core_projection_validates_against_executable_schema() -> None:
     schema = _schema()
     result = _development_result()
