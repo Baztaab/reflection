@@ -9,6 +9,7 @@ from typing import Protocol
 
 from ravi_vedic.domain.diagnostics import CalculationStatus, Diagnostic
 from ravi_vedic.domain.identity import RuntimeIdentity
+from ravi_vedic.errors import InputError, InvariantViolationError
 
 
 def _require_sha256(value: str, *, field_name: str) -> None:
@@ -44,17 +45,17 @@ class BirthInput:
 
     def __post_init__(self) -> None:
         if self.local_datetime.tzinfo is not None:
-            raise ValueError("local_datetime must be timezone-naive; timezone_id is canonical")
+            raise InputError("local_datetime must be timezone-naive; timezone_id is canonical")
         if self.calendar != "gregorian":
-            raise ValueError("MVP v1 supports gregorian calendar only")
+            raise InputError("MVP v1 supports gregorian calendar only")
         if not -90.0 <= self.latitude_deg <= 90.0:
-            raise ValueError("latitude_deg must be in [-90, 90]")
+            raise InputError("latitude_deg must be in [-90, 90]")
         if not -180.0 <= self.longitude_deg < 180.0:
-            raise ValueError("longitude_deg must be in [-180, 180)")
+            raise InputError("longitude_deg must be in [-180, 180)")
         if self.time_uncertainty_seconds < 0:
-            raise ValueError("time_uncertainty_seconds must be non-negative")
+            raise InputError("time_uncertainty_seconds must be non-negative")
         if self.fold not in (None, 0, 1):
-            raise ValueError("fold must be None, 0, or 1")
+            raise InputError("fold must be None, 0, or 1")
 
     @classmethod
     def from_iso(
@@ -152,7 +153,7 @@ class AstronomicalSnapshot:
         detached = dict(self.bodies)
         for body, position in detached.items():
             if position.body != body:
-                raise ValueError("astronomy body mapping key must match BodyPosition.body")
+                raise InvariantViolationError("astronomy body mapping key must match BodyPosition.body")
         object.__setattr__(self, "bodies", MappingProxyType(detached))
 
 
@@ -180,9 +181,9 @@ class D1Chart:
         detached = dict(self.placements)
         for body, placement in detached.items():
             if placement.body != body:
-                raise ValueError("D1 placement mapping key must match D1Placement.body")
+                raise InvariantViolationError("D1 placement mapping key must match D1Placement.body")
             if placement.mapping_policy_id != self.mapping_policy_id:
-                raise ValueError("D1 placement policy must match chart mapping_policy_id")
+                raise InvariantViolationError("D1 placement policy must match chart mapping_policy_id")
         object.__setattr__(self, "placements", MappingProxyType(detached))
 
     @property
@@ -218,13 +219,13 @@ class VargaChart:
 
     def __post_init__(self) -> None:
         if self.ascendant.mapping_policy_id != self.mapping_policy_id:
-            raise ValueError("Varga ascendant policy must match chart mapping_policy_id")
+            raise InvariantViolationError("Varga ascendant policy must match chart mapping_policy_id")
         detached = dict(self.placements)
         for body, placement in detached.items():
             if placement.body != body:
-                raise ValueError("Varga placement mapping key must match VargaPlacement.body")
+                raise InvariantViolationError("Varga placement mapping key must match VargaPlacement.body")
             if placement.projection.mapping_policy_id != self.mapping_policy_id:
-                raise ValueError("Varga placement policy must match chart mapping_policy_id")
+                raise InvariantViolationError("Varga placement policy must match chart mapping_policy_id")
         object.__setattr__(self, "placements", MappingProxyType(detached))
 
     @property
@@ -263,11 +264,13 @@ class ChartCollection(Mapping[str, ChartFrameType]):
         detached: dict[str, ChartFrameType] = {}
         for chart_id, frame in self.frames.items():
             if not isinstance(chart_id, str) or not chart_id or chart_id.strip() != chart_id:
-                raise ValueError("chart ids must be non-empty canonical strings")
+                raise InvariantViolationError("chart ids must be non-empty canonical strings")
             if not isinstance(frame, (D1Chart, VargaChart)):
-                raise TypeError(f"unsupported chart frame type for {chart_id}: {type(frame)!r}")
+                raise InvariantViolationError(
+                    f"unsupported chart frame type for {chart_id}: {type(frame)!r}"
+                )
             if frame.chart_id != chart_id:
-                raise ValueError(
+                raise InvariantViolationError(
                     f"chart collection key/frame mismatch: key={chart_id}, frame={frame.chart_id}"
                 )
             detached[chart_id] = frame
@@ -286,18 +289,18 @@ class ChartCollection(Mapping[str, ChartFrameType]):
         try:
             frame = self.frames["D1"]
         except KeyError as exc:
-            raise ValueError("chart collection requires D1") from exc
+            raise InvariantViolationError("chart collection requires D1") from exc
         if not isinstance(frame, D1Chart):
-            raise TypeError("D1 must be a D1Chart")
+            raise InvariantViolationError("D1 must be a D1Chart")
         return frame
 
     def require_varga(self, chart_id: str) -> VargaChart:
         try:
             frame = self.frames[chart_id]
         except KeyError as exc:
-            raise ValueError(f"chart collection is missing {chart_id}") from exc
+            raise InvariantViolationError(f"chart collection is missing {chart_id}") from exc
         if not isinstance(frame, VargaChart):
-            raise TypeError(f"{chart_id} must be a VargaChart")
+            raise InvariantViolationError(f"{chart_id} must be a VargaChart")
         return frame
 
 
@@ -317,10 +320,10 @@ class CoreResult:
 
     def __post_init__(self) -> None:
         if not isinstance(self.charts, ChartCollection):
-            raise TypeError("charts must be a ChartCollection")
+            raise InvariantViolationError("charts must be a ChartCollection")
         self.charts.require_d1()
         if not isinstance(self.runtime_identity, RuntimeIdentity):
-            raise TypeError("runtime_identity must be a RuntimeIdentity")
+            raise InvariantViolationError("runtime_identity must be a RuntimeIdentity")
         _require_sha256(
             self.policy_manifest_sha256,
             field_name="policy_manifest_sha256",
@@ -332,7 +335,7 @@ class CoreResult:
         )
         diagnostics = tuple(self.diagnostics)
         if any(not isinstance(item, Diagnostic) for item in diagnostics):
-            raise TypeError("diagnostics must contain Diagnostic values")
+            raise InvariantViolationError("diagnostics must contain Diagnostic values")
         object.__setattr__(self, "diagnostics", diagnostics)
         object.__setattr__(
             self,
