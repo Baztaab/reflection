@@ -214,8 +214,8 @@ class _SwissAstronomySession:
                     severity=DiagnosticSeverity.WARNING,
                     layer=DiagnosticLayer.ASTRONOMY,
                     affected_fields=(
-                        "astronomy.bodies.Rahu",
-                        "astronomy.bodies.Ketu",
+                        "astronomy.bodies.rahu",
+                        "astronomy.bodies.ketu",
                     ),
                     canonicality_impact=CanonicalityImpact.DEGRADED,
                     details={
