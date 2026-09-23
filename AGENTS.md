@@ -32,6 +32,8 @@ Non-negotiable rules:
 - Do not erase D1/Varga coordinate semantics behind a generic longitude field: D1 is observed sidereal longitude, Vargas are mathematical projections.
 - The production `RaviEngine` stays locked to the pinned RAVI Canon; test-only registry injection belongs on the explicit low-level integration seam, not a plugin surface.
 - A compatibility projection must reject domain data it cannot represent rather than silently dropping it.
+- Feature-branch CI runs through pull requests targeting `main`; direct push CI is reserved for `main` after merge. Open a draft PR after the first branch commit so subsequent commits are verified without duplicate push/PR runs.
+- Workflow concurrency cancels superseded runs for the same PR or main branch; do not remove this just to preserve stale CI history.
 - Prefer small, dependency-ordered changes over speculative infrastructure.
 
 When finishing a meaningful implementation step, update `STATUS.md` with what is now
