@@ -1,12 +1,10 @@
 # Project status
 
-Current milestone: **M2.6 — Engine Foundation IN PROGRESS**
+Current milestone: **M2.6 — Engine Foundation COMPLETE**
 
-Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon + M2.6.5 shared angular/boundary kernel + M2.6.6 generic chart collection**.
-Completed phases: **M2.6.7 complete calculation identity and typed diagnostics — COMPLETE**;
-**M2.6.8 contract/schema hardening — COMPLETE**;
-**M2.6.9 errors, typing and broader quality gates — COMPLETE**.
-Next phase: **M2.6.10 architecture acceptance — NOT STARTED**.
+Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon + M2.6.5 shared angular/boundary kernel + M2.6.6 generic chart collection + M2.6.7 calculation identity/diagnostics + M2.6.8 executable contract hardening + M2.6.9 quality gates + M2.6.10 architecture acceptance**.
+
+All twelve architecture-acceptance gates are **PASS**. M3 has **not started**.
 
 M2.6.5 verified calculation baseline: `8cf1c22baebd27a5663362f06d9d090335d02fee`.
 Later documentation-only cleanup commits do not redefine this calculation baseline.
@@ -451,6 +449,25 @@ M2.6.9.4 verification on implementation head
 - canonical Swiss matrix run `35873441748` — success on Python 3.11 / 3.12 / 3.13 /
   3.14; pinned dataset verified and strict canonical integration **1/1** per minor.
 
+## M2.6.10 final architecture acceptance
+
+All twelve foundation gates pass with executable evidence. The complete gate-by-gate
+matrix is recorded in `docs/roadmap/M2_6_10_ACCEPTANCE.md`.
+
+Final accepted implementation baseline:
+`be2f7824a3fa37fe264308b5a2a6acbd961b3699`.
+
+Post-merge verification:
+- quality run `35874252807` — success on Python 3.11 / 3.12 / 3.13 / 3.14;
+  representative 3.11 job: Ruff passed, strict mypy clean, **211 passed, 1 skipped**
+  deterministic tests, **8 passed** property tests, exact calculation parity **5/5**;
+- canonical Swiss run `35874252831` — success on Python 3.11 / 3.12 / 3.13 / 3.14;
+  pinned two-file Swiss dataset verified and strict canonical integration **1/1** per minor.
+
+No calculation policy, Jyotish technique or serialized payload was added in M2.6.10.
+GitHub currently reports `main` as unprotected; that is a separate non-blocking
+repository-governance follow-up, not an engine-architecture acceptance failure.
+
 ## Why M3 is still blocked
 
 The current core is numerically useful but still has foundation debt that should not be
@@ -483,9 +500,7 @@ That acceptance audit is M2.6 work, not M3 work.
 
 ## Next action
 
-Implement **M2.6.10 architecture acceptance only**: audit all twelve foundation gates
-against executable code/tests/CI, fix only genuine acceptance blockers, record the final
-evidence, and declare M2.6 complete only if every gate passes. Do not start Nakshatra/Pada
-or any other M3 technique before that acceptance is merged.
+M2.6 is complete. **Stop here.** The next separate milestone, when explicitly started,
+is M3 Structural Jyotish beginning with Nakshatra/Pada.
 
 Only after all M2.6 acceptance gates pass may M3 begin with Nakshatra/Pada.
