@@ -5,7 +5,7 @@ Current milestone: **M2.6 — Engine Foundation IN PROGRESS**
 Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon + M2.6.5 shared angular/boundary kernel + M2.6.6 generic chart collection**.
 Completed phase: **M2.6.7 complete calculation identity and typed diagnostics — COMPLETE**.
 Current phase: **M2.6.8 contract/schema hardening — IN PROGRESS**.
-Completed slice: **8.1 contract vocabulary**. Next slice: **8.2 Graha cardinality**.
+Completed slices: **8.1 contract vocabulary + 8.2 Graha cardinality**. Next slice: **8.3 Varga discriminators**.
 
 M2.6.5 verified calculation baseline: `8cf1c22baebd27a5663362f06d9d090335d02fee`.
 Later documentation-only cleanup commits do not redefine this calculation baseline.
@@ -283,6 +283,25 @@ M2.6.8.1 verification on implementation head
 - canonical Swiss run `35865731939` — success; pinned dataset manifest verified;
   strict canonical integration **1 passed**.
 
+## What M2.6.8.2 now enforces
+
+- The executable schema has one shared `exactGrahaArray` constraint.
+- Astronomy bodies, D1 grahas and every projected Varga frame must each contain exactly
+  nine entries and exactly one occurrence of every required Graha.
+- Duplicate identities are rejected even when array length remains nine.
+- Missing Graha identities are rejected.
+- The exact-Graha constraint vocabulary is locked to the same Core Graha names introduced
+  in M2.6.8.1.
+- The serialized engine output itself is unchanged; this slice only rejects impossible
+  external payloads that the previous schema would accept.
+
+M2.6.8.2 verification on implementation head
+`3a5e307e07ffbeb2de0e31f7b6eb96d88531ddf9`:
+- quality run `35866168414` — success; Ruff passed; pytest **177 passed, 1 skipped**;
+  exact zero-tolerance calculation-payload parity **5/5**;
+- canonical Swiss run `35866168421` — success; pinned dataset manifest verified;
+  strict canonical integration **1 passed**.
+
 ## Why M3 is still blocked
 
 The current core is numerically useful but still has foundation debt that should not be
@@ -315,9 +334,8 @@ These are M2.6 tasks, not M3 tasks.
 
 ## Next action
 
-Implement **M2.6.8.2 Graha cardinality only**: make the executable schema require
-exactly one occurrence of every required Graha in astronomy, D1 and each projected Varga
-frame, with negative contract tests for duplicate/missing identities. Do not start Varga
-discriminators, retflag projection, M2.6.9 or any M3 technique in that slice.
+Implement **M2.6.8.3 Varga discriminators only**: make the executable schema reject
+D9/D10 payloads whose chart ID, factor and mapping policy do not belong together. Do not
+start retflag projection, M2.6.9 or any M3 technique in that slice.
 
 Only after all M2.6 acceptance gates pass may M3 begin with Nakshatra/Pada.
