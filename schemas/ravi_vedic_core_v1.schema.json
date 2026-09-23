@@ -438,12 +438,10 @@
           }
         },
         "bodies": {
-          "type": "array",
-          "minItems": 9,
-          "maxItems": 9,
           "items": {
             "$ref": "#/$defs/astronomyBody"
-          }
+          },
+          "$ref": "#/$defs/exactGrahaArray"
         }
       }
     },
@@ -536,12 +534,10 @@
           }
         },
         "grahas": {
-          "type": "array",
-          "minItems": 9,
-          "maxItems": 9,
           "items": {
             "$ref": "#/$defs/d1Placement"
-          }
+          },
+          "$ref": "#/$defs/exactGrahaArray"
         }
       }
     },
@@ -668,12 +664,10 @@
           "$ref": "#/$defs/vargaProjection"
         },
         "grahas": {
-          "type": "array",
-          "minItems": 9,
-          "maxItems": 9,
           "items": {
             "$ref": "#/$defs/vargaGraha"
-          }
+          },
+          "$ref": "#/$defs/exactGrahaArray"
         }
       }
     },
@@ -858,6 +852,148 @@
           ]
         }
       }
+    },
+    "exactGrahaArray": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "allOf": [
+        {
+          "contains": {
+            "type": "object",
+            "properties": {
+              "body": {
+                "const": "Sun"
+              }
+            },
+            "required": [
+              "body"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "type": "object",
+            "properties": {
+              "body": {
+                "const": "Moon"
+              }
+            },
+            "required": [
+              "body"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "type": "object",
+            "properties": {
+              "body": {
+                "const": "Mars"
+              }
+            },
+            "required": [
+              "body"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "type": "object",
+            "properties": {
+              "body": {
+                "const": "Mercury"
+              }
+            },
+            "required": [
+              "body"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "type": "object",
+            "properties": {
+              "body": {
+                "const": "Jupiter"
+              }
+            },
+            "required": [
+              "body"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "type": "object",
+            "properties": {
+              "body": {
+                "const": "Venus"
+              }
+            },
+            "required": [
+              "body"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "type": "object",
+            "properties": {
+              "body": {
+                "const": "Saturn"
+              }
+            },
+            "required": [
+              "body"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "type": "object",
+            "properties": {
+              "body": {
+                "const": "Rahu"
+              }
+            },
+            "required": [
+              "body"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        },
+        {
+          "contains": {
+            "type": "object",
+            "properties": {
+              "body": {
+                "const": "Ketu"
+              }
+            },
+            "required": [
+              "body"
+            ]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        }
+      ]
     }
   },
   "allOf": [
