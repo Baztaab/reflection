@@ -5,7 +5,6 @@ from hashlib import sha256
 from pathlib import Path
 
 from ravi_vedic.errors import RuntimeDataError
-
 from ravi_vedic.infrastructure.swiss.manifest import (
     EphemerisDataIdentity,
     build_ephemeris_data_identity,
