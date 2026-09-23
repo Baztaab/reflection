@@ -3,11 +3,16 @@ from pathlib import Path
 
 import pytest
 
-from ravi_vedic import BirthInput, RuntimeConfig, SourceProfile, create_engine
+from ravi_vedic import (
+    BirthInput,
+    RuntimeConfig,
+    RuntimeDataError,
+    SourceProfile,
+    create_engine,
+)
 from ravi_vedic.domain.diagnostics import CalculationStatus
 from ravi_vedic.domain.models import Graha
-from ravi_vedic import RuntimeDataError
-from ravi_vedic.infrastructure.swiss import EphemerisSourceError, SwissEphemerisAdapter
+from ravi_vedic.infrastructure.swiss import SwissEphemerisAdapter
 from ravi_vedic.projection import to_core_dict
 
 FIXTURE = Path(__file__).parents[1] / "fixtures" / "reference_chart_001_true_pushya.json"
