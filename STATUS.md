@@ -4,7 +4,7 @@ Current milestone: **M2.6 — Engine Foundation IN PROGRESS**
 
 Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon + M2.6.5 shared angular/boundary kernel + M2.6.6 generic chart collection**.
 Current phase: **M2.6.7 complete calculation identity and typed diagnostics — IN PROGRESS**.
-Completed slices: **7.1 identity contract + 7.2 runtime identity snapshot + 7.3 calculation fingerprint**. Next slice: **7.4 typed diagnostics and status**.
+Completed slices: **7.1 identity contract + 7.2 runtime identity snapshot + 7.3 calculation fingerprint + 7.4 typed diagnostics and status**. Next slice: **7.5 projection and acceptance**.
 
 M2.6.5 verified calculation baseline: `8cf1c22baebd27a5663362f06d9d090335d02fee`.
 Later documentation-only cleanup commits do not redefine this calculation baseline.
@@ -191,7 +191,7 @@ Verification on implementation head `d474159497b82e72f1d77a1b516938d86adbc5d4`:
 
 Evidence: ADR-0009 and `docs/research/M2_6_6_CHART_COLLECTION_REVIEW.md`.
 
-## What M2.6.7.1–3 now enforce
+## What M2.6.7.1–4 now enforce
 
 - ADR-0010 fixes the difference between input identity and complete calculation identity and
   keeps diagnostics separate from fingerprint semantics.
@@ -215,8 +215,17 @@ Evidence: ADR-0009 and `docs/research/M2_6_6_CHART_COLLECTION_REVIEW.md`.
   methods/flags; absolute filesystem paths and display-only `source_note` are excluded.
 - Equivalent display metadata or redundant unambiguous fold notation does not change the
   identity, while input, policy, RAVI build/runtime or actual astronomy source changes do.
-- Core JSON v1 and schema remain unchanged; fingerprint projection is deliberately deferred
-  to slice 7.5.
+- Internal warning semantics are now immutable typed diagnostics with code, severity, layer,
+  affected fields, canonicality impact and structured details.
+- Every completed result derives an explicit `canonical | development | degraded` status.
+- The development profile permits only the explicitly named Moshier fallback; arbitrary
+  JPL/unknown fallback is rejected rather than mislabeled as development.
+- Exact True-Node sidereal derivation from tropical True Rahu minus True Pushya ayanamsha is
+  diagnostic provenance but is not treated as a loss of canonicality.
+- Core-v1 temporarily reconstructs its legacy warning strings from typed diagnostics so the
+  serialized contract remains unchanged until slice 7.5.
+- Core JSON v1 and schema remain unchanged; identity/diagnostic/status projection is
+  deliberately deferred to slice 7.5.
 - D1/D9/D10 numerical behavior remains unchanged.
 
 Verification on implementation head `9064fb196cf4516dbc3cc306b6faa16f7c4ed991`:
@@ -232,13 +241,20 @@ M2.6.7.3 verification on implementation head
 - canonical Swiss run `35860595770` — success; pinned dataset manifest verified;
   strict canonical integration **1 passed**.
 
+M2.6.7.4 verification on implementation head
+`ce84db945301139618785725c6bee76e60d12fb1`:
+- quality run `35862314374` — success; Ruff passed; pytest **162 passed, 1 skipped**;
+  exact full-payload parity **5/5**;
+- canonical Swiss run `35862314403` — success; pinned dataset manifest verified;
+  strict canonical integration **1 passed**.
+
 ## Why M3 is still blocked
 
 The current core is numerically useful but still has foundation debt that should not be
 copied into Nakshatra/lordship/dispositor work:
 
-- calculation identity exists internally but typed diagnostics/status and external
-  projection are not complete;
+- calculation identity, typed diagnostics and status exist internally but external
+  projection/acceptance is not complete;
 - current schema validation does not encode every semantic invariant.
 
 These are M2.6 tasks, not M3 tasks.
@@ -263,9 +279,9 @@ These are M2.6 tasks, not M3 tasks.
 
 ## Next action
 
-Implement **M2.6.7.4 typed diagnostics and status only**: replace encoded string-warning
-semantics with immutable structured diagnostics and derive `canonical | development |
-degraded` status from runtime/source facts. Do not expose the new identity/diagnostic
-fields through Core JSON yet; projection remains slice 7.5.
+Implement **M2.6.7.5 projection and acceptance only**: expose calculation identity,
+typed diagnostics and explicit status through the executable Core JSON contract, update the
+schema in lockstep, and close every M2.6.7 exit gate. Do not start broader M2.6.8 schema
+hardening or any M3 technique in that slice.
 
 Only after all M2.6 acceptance gates pass may M3 begin with Nakshatra/Pada.
