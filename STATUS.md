@@ -200,6 +200,17 @@ copied into Nakshatra/lordship/dispositor work:
 
 These are M2.6 tasks, not M3 tasks.
 
+## CI execution contract after cleanup
+
+- Feature branches are verified through pull requests targeting `main`; feature-branch
+  pushes do not run a duplicate copy of the same workflows.
+- `main` push verification still runs after merge, so the integrated commit is checked
+  independently from the PR merge ref.
+- `quality` and `canonical-swiss` remain separate gates because they test different
+  failure modes.
+- Each workflow cancels a superseded run for the same PR or `main` ref instead of burning
+  CI on stale commits.
+
 ## Repository contract after cleanup
 
 - `schemas/ravi_vedic_core_v1.schema.json` is the only executable machine schema.
