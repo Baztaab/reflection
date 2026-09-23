@@ -7,6 +7,15 @@ from enum import StrEnum
 from types import MappingProxyType
 from typing import Protocol
 
+from ravi_vedic.domain.identity import RuntimeIdentity
+
+
+def _require_sha256(value: str, *, field_name: str) -> None:
+    if not isinstance(value, str):
+        raise TypeError(f"{field_name} must be a SHA-256 string")
+    if len(value) != 64 or any(char not in "0123456789abcdef" for char in value):
+        raise ValueError(f"{field_name} must be a lowercase SHA-256 hex digest")
+
 
 class Graha(StrEnum):
     SUN = "sun"
@@ -296,14 +305,25 @@ class CoreResult:
     astronomy: AstronomicalSnapshot
     charts: ChartCollection
     policy_manifest_sha256: str
+    runtime_identity: RuntimeIdentity
+    input_sha256: str
+    calculation_fingerprint: str
 
     def __post_init__(self) -> None:
         if not isinstance(self.charts, ChartCollection):
             raise TypeError("charts must be a ChartCollection")
         self.charts.require_d1()
-        value = self.policy_manifest_sha256
-        if len(value) != 64 or any(char not in "0123456789abcdef" for char in value):
-            raise ValueError("policy_manifest_sha256 must be a lowercase SHA-256 hex digest")
+        if not isinstance(self.runtime_identity, RuntimeIdentity):
+            raise TypeError("runtime_identity must be a RuntimeIdentity")
+        _require_sha256(
+            self.policy_manifest_sha256,
+            field_name="policy_manifest_sha256",
+        )
+        _require_sha256(self.input_sha256, field_name="input_sha256")
+        _require_sha256(
+            self.calculation_fingerprint,
+            field_name="calculation_fingerprint",
+        )
 
     @property
     def d1(self) -> D1Chart:

@@ -13,8 +13,17 @@ from ravi_vedic.domain.identity import (
 
 def _identity() -> RuntimeIdentity:
     return RuntimeIdentity(
-        ravi=RaviBuildIdentity(distribution_name="ravi-vedic", package_version="0.1.0"),
-        python=PythonRuntimeIdentity(implementation="CPython", version="3.11.0"),
+        ravi=RaviBuildIdentity(
+            distribution_name="ravi-vedic",
+            package_version="0.1.0",
+            source_sha256="a" * 64,
+        ),
+        python=PythonRuntimeIdentity(
+            implementation="CPython",
+            version="3.11.0",
+            system="Linux",
+            machine="x86_64",
+        ),
         astronomy=AstronomyRuntimeIdentity(
             implementation="pyswisseph",
             binding_version="2.10.3.2",
@@ -58,9 +67,22 @@ def test_astronomy_identity_requires_manifest_and_file_count_to_agree():
         )
 
 
+def test_ravi_build_identity_requires_exact_source_digest():
+    with pytest.raises(ValueError, match="SHA-256"):
+        RaviBuildIdentity(
+            distribution_name="ravi-vedic",
+            package_version="0.1.0",
+            source_sha256="not-a-digest",
+        )
+
+
 def test_runtime_identity_rejects_noncanonical_text_and_digest():
     with pytest.raises(ValueError, match="canonical string"):
-        RaviBuildIdentity(distribution_name=" ravi-vedic", package_version="0.1.0")
+        RaviBuildIdentity(
+            distribution_name=" ravi-vedic",
+            package_version="0.1.0",
+            source_sha256="a" * 64,
+        )
 
     with pytest.raises(ValueError, match="SHA-256"):
         AstronomyRuntimeIdentity(

@@ -105,8 +105,17 @@ class FakeTime:
 
 def fake_runtime_identity() -> RuntimeIdentity:
     return RuntimeIdentity(
-        ravi=RaviBuildIdentity(distribution_name="ravi-vedic", package_version="test"),
-        python=PythonRuntimeIdentity(implementation="test-python", version="test"),
+        ravi=RaviBuildIdentity(
+            distribution_name="ravi-vedic",
+            package_version="test",
+            source_sha256="0" * 64,
+        ),
+        python=PythonRuntimeIdentity(
+            implementation="test-python",
+            version="test",
+            system="test-system",
+            machine="test-machine",
+        ),
         astronomy=AstronomyRuntimeIdentity(
             implementation="fake",
             binding_version="test",
@@ -284,6 +293,7 @@ def test_synthetic_chart_extends_collection_without_pipeline_or_core_result_edit
         birth,
         astronomy=FakeAstronomy(),
         time_context_provider=FakeTime(),
+        runtime_identity=fake_runtime_identity(),
         canon=canon,
         chart_builders=registry,
     )
@@ -293,6 +303,111 @@ def test_synthetic_chart_extends_collection_without_pipeline_or_core_result_edit
     assert result.d9 is result.charts["D9"]
     with pytest.raises(ValueError, match="requires exactly D1/D9/D10"):
         to_core_dict(result)
+
+
+def test_effective_input_identity_ignores_display_note_and_redundant_fold(birth):
+    engine = RaviEngine(
+        astronomy=FakeAstronomy(),
+        time_context_provider=FakeTime(),
+        runtime_identity=fake_runtime_identity(),
+    )
+    baseline = engine.calculate(birth)
+    equivalent = engine.calculate(replace(birth, source_note="display only", fold=0))
+
+    assert baseline.input_sha256 == equivalent.input_sha256
+    assert baseline.calculation_fingerprint == equivalent.calculation_fingerprint
+
+
+def test_runtime_identity_change_changes_fingerprint_without_changing_chart(birth):
+    baseline_identity = fake_runtime_identity()
+    changed_identity = replace(
+        baseline_identity,
+        timezone=replace(baseline_identity.timezone, version="different-runtime"),
+    )
+    baseline = RaviEngine(
+        astronomy=FakeAstronomy(),
+        time_context_provider=FakeTime(),
+        runtime_identity=baseline_identity,
+    ).calculate(birth)
+    changed = RaviEngine(
+        astronomy=FakeAstronomy(),
+        time_context_provider=FakeTime(),
+        runtime_identity=changed_identity,
+    ).calculate(birth)
+
+    assert baseline.d1 == changed.d1
+    assert baseline.input_sha256 == changed.input_sha256
+    assert baseline.calculation_fingerprint != changed.calculation_fingerprint
+
+
+def test_build_identity_change_changes_fingerprint_without_changing_chart(birth):
+    baseline_identity = fake_runtime_identity()
+    changed_identity = replace(
+        baseline_identity,
+        ravi=replace(baseline_identity.ravi, source_sha256="1" * 64),
+    )
+    baseline = RaviEngine(
+        astronomy=FakeAstronomy(),
+        time_context_provider=FakeTime(),
+        runtime_identity=baseline_identity,
+    ).calculate(birth)
+    changed = RaviEngine(
+        astronomy=FakeAstronomy(),
+        time_context_provider=FakeTime(),
+        runtime_identity=changed_identity,
+    ).calculate(birth)
+
+    assert baseline.d1 == changed.d1
+    assert baseline.calculation_fingerprint != changed.calculation_fingerprint
+
+
+def test_actual_astronomy_source_change_changes_fingerprint(birth):
+    class AlternateSourceAstronomy(FakeAstronomy):
+        def snapshot(self, **kwargs):
+            snapshot = super().snapshot(**kwargs)
+            return replace(
+                snapshot,
+                provenance=replace(snapshot.provenance, actual_sources=("alternate-source",)),
+            )
+
+    runtime_identity = fake_runtime_identity()
+    baseline = RaviEngine(
+        astronomy=FakeAstronomy(),
+        time_context_provider=FakeTime(),
+        runtime_identity=runtime_identity,
+    ).calculate(birth)
+    changed = RaviEngine(
+        astronomy=AlternateSourceAstronomy(),
+        time_context_provider=FakeTime(),
+        runtime_identity=runtime_identity,
+    ).calculate(birth)
+
+    assert baseline.d1 == changed.d1
+    assert baseline.calculation_fingerprint != changed.calculation_fingerprint
+
+
+def test_policy_manifest_change_changes_fingerprint_without_changing_chart(birth):
+    runtime_identity = fake_runtime_identity()
+    baseline = calculate_core(
+        birth,
+        astronomy=FakeAstronomy(),
+        time_context_provider=FakeTime(),
+        runtime_identity=runtime_identity,
+        canon=RAVI_VEDIC_MVP_V1,
+    )
+    renamed_canon = replace(RAVI_VEDIC_MVP_V1, canon_id="ravi-vedic-mvp-v1-renamed")
+    changed = calculate_core(
+        birth,
+        astronomy=FakeAstronomy(),
+        time_context_provider=FakeTime(),
+        runtime_identity=runtime_identity,
+        canon=renamed_canon,
+    )
+
+    assert baseline.d1 == changed.d1
+    assert baseline.input_sha256 == changed.input_sha256
+    assert baseline.policy_manifest_sha256 != changed.policy_manifest_sha256
+    assert baseline.calculation_fingerprint != changed.calculation_fingerprint
 
 
 def test_completed_result_retains_its_policy_identity_when_other_canons_exist(birth):
@@ -321,16 +436,23 @@ def test_completed_result_retains_its_policy_identity_when_other_canons_exist(bi
         completed.policy_manifest_sha256 = changed_canon.policy_manifest_sha256
 
 
-def test_low_level_facade_requires_both_ports(birth):
+def test_low_level_facade_requires_ports_and_runtime_identity(birth):
     with pytest.raises(TypeError, match="astronomy"):
         calculate_core(birth)
     with pytest.raises(TypeError, match="time_context_provider"):
         calculate_core(birth, astronomy=FakeAstronomy())
+    with pytest.raises(TypeError, match="runtime_identity"):
+        calculate_core(
+            birth,
+            astronomy=FakeAstronomy(),
+            time_context_provider=FakeTime(),
+        )
     assert (
         calculate_core(
             birth,
             astronomy=FakeAstronomy(),
             time_context_provider=FakeTime(),
+            runtime_identity=fake_runtime_identity(),
         ).d9.varga
         == "D9"
     )

@@ -4,7 +4,7 @@ Current milestone: **M2.6 — Engine Foundation IN PROGRESS**
 
 Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon + M2.6.5 shared angular/boundary kernel + M2.6.6 generic chart collection**.
 Current phase: **M2.6.7 complete calculation identity and typed diagnostics — IN PROGRESS**.
-Completed slices: **7.1 identity contract + 7.2 runtime identity snapshot**. Next slice: **7.3 calculation fingerprint**.
+Completed slices: **7.1 identity contract + 7.2 runtime identity snapshot + 7.3 calculation fingerprint**. Next slice: **7.4 typed diagnostics and status**.
 
 M2.6.5 verified calculation baseline: `8cf1c22baebd27a5663362f06d9d090335d02fee`.
 Later documentation-only cleanup commits do not redefine this calculation baseline.
@@ -191,7 +191,7 @@ Verification on implementation head `d474159497b82e72f1d77a1b516938d86adbc5d4`:
 
 Evidence: ADR-0009 and `docs/research/M2_6_6_CHART_COLLECTION_REVIEW.md`.
 
-## What M2.6.7.1–2 now enforce
+## What M2.6.7.1–3 now enforce
 
 - ADR-0010 fixes the difference between input identity and complete calculation identity and
   keeps diagnostics separate from fingerprint semantics.
@@ -206,7 +206,18 @@ Evidence: ADR-0009 and `docs/research/M2_6_6_CHART_COLLECTION_REVIEW.md`.
   rediscovering version/data identity during each calculation.
 - Direct `RaviEngine` construction requires an explicit identity snapshot; application
   and domain layers do not discover installed packages or runtime infrastructure.
-- CoreResult, Core JSON v1, schema and D1/D9/D10 numerical behavior remain unchanged.
+- Runtime identity now includes an exact installed-RAVI source manifest hash plus stable
+  Python implementation/version, OS family and machine architecture.
+- Every completed `CoreResult` retains `input_sha256`, its immutable runtime identity and
+  a versioned `calculation_fingerprint`.
+- The fingerprint covers normalized effective input, policy manifest identity, exact
+  RAVI/runtime identity, resolved time facts and actual astronomy provenance/source
+  methods/flags; absolute filesystem paths and display-only `source_note` are excluded.
+- Equivalent display metadata or redundant unambiguous fold notation does not change the
+  identity, while input, policy, RAVI build/runtime or actual astronomy source changes do.
+- Core JSON v1 and schema remain unchanged; fingerprint projection is deliberately deferred
+  to slice 7.5.
+- D1/D9/D10 numerical behavior remains unchanged.
 
 Verification on implementation head `9064fb196cf4516dbc3cc306b6faa16f7c4ed991`:
 - quality run `35859308970` — success; Ruff passed; pytest **139 passed, 1 skipped**;
@@ -214,12 +225,20 @@ Verification on implementation head `9064fb196cf4516dbc3cc306b6faa16f7c4ed991`:
 - canonical Swiss run `35859308975` — success; pinned dataset manifest verified;
   strict canonical integration **1 passed**.
 
+M2.6.7.3 verification on implementation head
+`07291106f118e6e6f23394e8a98baadf2a1f75db`:
+- quality run `35860595813` — success; Ruff passed; pytest **148 passed, 1 skipped**;
+  exact full-payload parity **5/5**;
+- canonical Swiss run `35860595770` — success; pinned dataset manifest verified;
+  strict canonical integration **1 passed**.
+
 ## Why M3 is still blocked
 
 The current core is numerically useful but still has foundation debt that should not be
 copied into Nakshatra/lordship/dispositor work:
 
-- whole-calculation fingerprinting is incomplete;
+- calculation identity exists internally but typed diagnostics/status and external
+  projection are not complete;
 - current schema validation does not encode every semantic invariant.
 
 These are M2.6 tasks, not M3 tasks.
@@ -244,10 +263,9 @@ These are M2.6 tasks, not M3 tasks.
 
 ## Next action
 
-Implement **M2.6.7.3 calculation fingerprint only**: build the deterministic versioned
-calculation-identity manifest from normalized input + policy + captured runtime identity +
-actual calculation source facts, then attach its SHA-256 fingerprint to the completed
-result. Do not start typed diagnostics/status, JSON/schema projection changes, new Vargas,
-or any M3 technique in that slice.
+Implement **M2.6.7.4 typed diagnostics and status only**: replace encoded string-warning
+semantics with immutable structured diagnostics and derive `canonical | development |
+degraded` status from runtime/source facts. Do not expose the new identity/diagnostic
+fields through Core JSON yet; projection remains slice 7.5.
 
 Only after all M2.6 acceptance gates pass may M3 begin with Nakshatra/Pada.

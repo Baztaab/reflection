@@ -6,8 +6,8 @@ The project is optimized for auditable Jyotish research rather than feature coun
 Astronomy, Jyotish policy, derived structure, evidence and interpretation are kept as
 separate concerns.
 
-Current milestone: **M2.6 Engine Foundation**. M2.6.0–6 are implemented and CI verified;
-**M2.6.7 complete calculation identity and typed diagnostics is next**.
+Current milestone: **M2.6 Engine Foundation**. M2.6.0–6 and M2.6.7 slices 7.1–7.3 are
+implemented and CI verified; **M2.6.7.4 typed diagnostics and calculation status is next**.
 
 ## Current executable core
 
@@ -78,9 +78,9 @@ dataset. The actual numerical source remains visible in result provenance.
 The supported package-level calculation entry points are `create_engine(...)` and
 `RaviEngine.calculate(...)`. `create_engine(...)` captures one immutable
 `RuntimeIdentity` snapshot at composition time: RAVI package version, Python runtime,
-pyswisseph/Swiss versions, ephemeris dataset identity, pinned timezone-data identity and
-source profile. Absolute ephemeris paths are provenance only and are not part of that
-identity.
+pyswisseph/Swiss versions, ephemeris dataset identity, pinned timezone-data identity,
+source profile, stable platform identity and an exact hash of the installed RAVI Python
+sources. Absolute ephemeris paths are provenance only and are not part of that identity.
 
 Tests and trusted integrations may construct `RaviEngine` with fake ports, but must also
 supply an explicit fake `RuntimeIdentity`; there is no hidden runtime-identity discovery in
@@ -88,6 +88,16 @@ the application/domain layers. The low-level
 `ravi_vedic.application.pipeline.calculate_core` function remains available only as an
 explicit integration seam and is intentionally not re-exported from the package root.
 The serialized Core v1 schema is unchanged.
+
+Each completed `CoreResult` now retains two internal identities:
+
+- `input_sha256`: normalized effective birth input only, excluding display metadata;
+- `calculation_fingerprint`: a versioned SHA-256 over normalized input, Canon policy
+  identity, exact RAVI/runtime identity, resolved time facts and actual astronomy
+  provenance/source methods.
+
+These fields are intentionally **not serialized yet**. M2.6.7.5 owns projection changes;
+this keeps fingerprint construction independent from external contract migration.
 
 ## Current machine contract
 
