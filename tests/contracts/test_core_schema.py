@@ -9,6 +9,12 @@ from jsonschema import Draft202012Validator, ValidationError
 from ravi_vedic import BirthInput, RuntimeConfig, SourceProfile, create_engine
 from ravi_vedic.domain.calculation_identity import CALCULATION_FINGERPRINT_MANIFEST_VERSION
 from ravi_vedic.projection import to_core_dict
+from ravi_vedic.projection.contract import (
+    CORE_CHART_IDS,
+    CORE_GRAHA_NAMES,
+    CORE_SCHEMA_VERSION,
+    CORE_SIGN_NAMES,
+)
 
 ROOT = Path(__file__).parents[2]
 SCHEMA = ROOT / "schemas" / "ravi_vedic_core_v1.schema.json"
@@ -30,6 +36,18 @@ def _schema() -> dict:
     schema = json.loads(SCHEMA.read_text())
     Draft202012Validator.check_schema(schema)
     return schema
+
+
+def test_executable_schema_vocabulary_matches_projection_contract() -> None:
+    schema = _schema()
+
+    assert schema["properties"]["schema_version"]["const"] == CORE_SCHEMA_VERSION
+    assert schema["$defs"]["bodyName"]["enum"] == list(CORE_GRAHA_NAMES)
+    assert schema["$defs"]["signName"]["enum"] == list(CORE_SIGN_NAMES)
+
+    charts = schema["properties"]["charts"]
+    assert tuple(charts["required"]) == CORE_CHART_IDS
+    assert tuple(charts["properties"]) == CORE_CHART_IDS
 
 
 def test_core_projection_validates_against_executable_schema() -> None:
