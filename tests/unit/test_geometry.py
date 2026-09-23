@@ -27,6 +27,18 @@ def test_longitude_periodicity_property(value):
         )
 
 
+@pytest.mark.parametrize(
+    "value",
+    [-5e-324, -2.220446049250313e-16],
+)
+def test_tiny_negative_longitudes_stay_on_the_final_half_open_sign(value):
+    longitude = Longitude(value)
+
+    assert 0.0 <= longitude.degrees < 360.0
+    assert longitude.sign_index == 11
+    assert 0.0 <= longitude.degree_in_sign < 30.0
+
+
 def test_exact_sign_boundaries_enter_new_half_open_owner():
     for boundary_number in range(13):
         longitude = boundary_number * 30.0
