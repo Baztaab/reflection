@@ -19,6 +19,7 @@ from ravi_vedic.domain.diagnostics import (
     DiagnosticSeverity,
 )
 from ravi_vedic.domain.geometry import normalize_longitude
+from ravi_vedic.errors import AstronomyBackendError, RuntimeDataError, UnsupportedPolicyError
 from ravi_vedic.domain.identity import AstronomyRuntimeIdentity
 from ravi_vedic.domain.models import (
     AscendantPosition,
@@ -57,7 +58,7 @@ def _source_from_flags(flags: int) -> str:
     return "unknown"
 
 
-class EphemerisSourceError(RuntimeError):
+class EphemerisSourceError(AstronomyBackendError):
     pass
 
 
@@ -74,9 +75,9 @@ class _SwissAstronomySession:
 
     def _require_active(self) -> None:
         if not self._active:
-            raise RuntimeError("astronomy session is no longer active")
+            raise AstronomyBackendError("astronomy session is no longer active")
         if get_ident() != self.owner_thread_id:
-            raise RuntimeError("astronomy session cannot be used from another thread")
+            raise AstronomyBackendError("astronomy session cannot be used from another thread")
 
     def _deactivate(self) -> None:
         self._active = False
@@ -127,11 +128,13 @@ class _SwissAstronomySession:
     ) -> AstronomicalSnapshot:
         self._require_active()
         if canon.astronomy.ayanamsha_policy_id != "ayanamsha.true-pushya.swiss-v1":
-            raise ValueError(
+            raise UnsupportedPolicyError(
                 f"unsupported ayanamsha policy: {canon.astronomy.ayanamsha_policy_id}"
             )
         if canon.astronomy.node_policy_id != "nodes.true-rahu-opposite-ketu-v1":
-            raise ValueError(f"unsupported node policy: {canon.astronomy.node_policy_id}")
+            raise UnsupportedPolicyError(
+                f"unsupported node policy: {canon.astronomy.node_policy_id}"
+            )
 
         diagnostics: list[Diagnostic] = []
         fallback_sources: set[str] = set()
@@ -314,9 +317,9 @@ class SwissEphemerisAdapter:
                     require_planetary_data_files(self._data_identity.root_path)
             except ValueError as exc:
                 if not allow_moshier_fallback:
-                    raise EphemerisSourceError(str(exc)) from exc
+                    raise RuntimeDataError(str(exc)) from exc
         elif not allow_moshier_fallback:
-            raise EphemerisSourceError(
+            raise RuntimeDataError(
                 "canonical profile requires an explicit ephemeris_path containing .se1 files"
             )
 
