@@ -5,6 +5,7 @@ from types import MappingProxyType
 from ravi_vedic.domain.canon import RAVI_VEDIC_MVP_V1
 from ravi_vedic.domain.models import Graha
 from ravi_vedic.domain.varga.registry import get_varga_policy
+from ravi_vedic.errors import InvariantViolationError
 
 CORE_SCHEMA_VERSION = "ravi-vedic-core-v1"
 CORE_CHART_IDS = ("D1", "D9", "D10")
@@ -41,8 +42,8 @@ CORE_SIGN_NAMES = (
 )
 
 if len(CORE_GRAHA_ORDER) != len(set(CORE_GRAHA_ORDER)):
-    raise RuntimeError("Core contract Graha order must not contain duplicates")
+    raise InvariantViolationError("Core contract Graha order must not contain duplicates")
 if len(CORE_GRAHA_NAMES) != len(set(CORE_GRAHA_NAMES)):
-    raise RuntimeError("Core contract Graha names must not contain duplicates")
+    raise InvariantViolationError("Core contract Graha names must not contain duplicates")
 if len(CORE_SIGN_NAMES) != 12 or len(CORE_SIGN_NAMES) != len(set(CORE_SIGN_NAMES)):
-    raise RuntimeError("Core contract must define exactly twelve unique signs")
+    raise InvariantViolationError("Core contract must define exactly twelve unique signs")
