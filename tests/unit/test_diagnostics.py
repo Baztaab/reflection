@@ -106,6 +106,17 @@ def test_status_is_canonical_only_for_strict_profile_without_degradation():
     )
 
 
+def test_nonimpacting_diagnostic_does_not_downgrade_canonical_status():
+    diagnostic = _diagnostic(impact=CanonicalityImpact.NONE)
+    assert (
+        derive_calculation_status(
+            _runtime("canonical-strict-swiss-files"),
+            (diagnostic,),
+        )
+        == CalculationStatus.CANONICAL
+    )
+
+
 def test_development_profile_is_explicit_even_without_diagnostics():
     assert (
         derive_calculation_status(_runtime("development-allow-moshier"), ())
