@@ -3,7 +3,7 @@
 Current milestone: **M2.6 — Engine Foundation IN PROGRESS**
 
 Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon + M2.6.5 shared angular/boundary kernel + M2.6.6 generic chart collection**.
-Next phase: **M2.6.7 complete calculation identity and typed diagnostics — NOT STARTED**.
+Current phase: **M2.6.7 complete calculation identity and typed diagnostics — IN PROGRESS**.\nCompleted slice: **7.1 identity contract**. Next slice: **7.2 runtime identity snapshot**.
 
 M2.6.5 verified calculation baseline: `8cf1c22baebd27a5663362f06d9d090335d02fee`.
 Later documentation-only cleanup commits do not redefine this calculation baseline.
