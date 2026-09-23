@@ -179,7 +179,7 @@ def test_chart_builder_registry_is_detached_and_cannot_override_existing_policy(
     assert set(registry.builders) == set(RAVI_CHART_BUILDERS.builders)
     with pytest.raises(TypeError):
         registry.builders["test"] = lambda snapshot, canon, chart_id: None
-    with pytest.raises(ValueError, match="already registered"):
+    with pytest.raises(InvariantViolationError, match="already registered"):
         RAVI_CHART_BUILDERS.extended(
             {"varga.rasi-v1": RAVI_CHART_BUILDERS.builders["varga.rasi-v1"]}
         )
