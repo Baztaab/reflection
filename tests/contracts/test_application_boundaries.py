@@ -44,7 +44,9 @@ sys.meta_path.insert(0, BlockRuntime())
 from ravi_vedic import BirthInput, RaviEngine
 helpers = runpy.run_path("tests/unit/test_engine.py")
 engine = RaviEngine(
-    astronomy=helpers["FakeAstronomy"](), time_context_provider=helpers["FakeTime"](),
+    astronomy=helpers["FakeAstronomy"](),
+    time_context_provider=helpers["FakeTime"](),
+    runtime_identity=helpers["fake_runtime_identity"](),
 )
 birth = BirthInput.from_iso(
     local_datetime="2000-01-01T12:00:00", timezone_id="Etc/UTC",
