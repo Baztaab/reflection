@@ -2,6 +2,7 @@ from hashlib import sha256
 
 import pytest
 
+from ravi_vedic.errors import RuntimeDataError
 from ravi_vedic.infrastructure.swiss.canonical_dataset import (
     SWISS_REFERENCE_COMMIT,
     SWISS_REFERENCE_FILES,
@@ -30,7 +31,7 @@ def test_reference_download_urls_are_commit_pinned():
 
 
 def test_reference_dataset_rejects_missing_files(tmp_path):
-    with pytest.raises(ValueError, match="file set mismatch"):
+    with pytest.raises(RuntimeDataError, match="file set mismatch"):
         verify_canonical_reference_dataset(tmp_path)
 
 
@@ -38,5 +39,5 @@ def test_reference_dataset_rejects_wrong_file_bytes(tmp_path):
     for file in SWISS_REFERENCE_FILES:
         (tmp_path / file.name).write_bytes(b"not canonical")
 
-    with pytest.raises(ValueError, match="size mismatch"):
+    with pytest.raises(RuntimeDataError, match="size mismatch"):
         verify_canonical_reference_dataset(tmp_path)
