@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 import swisseph as swe
 
-from ravi_vedic import BirthInput, RuntimeConfig, SourceProfile, create_engine
+from ravi_vedic import BirthInput, RuntimeConfig, RuntimeDataError, SourceProfile, create_engine
 from ravi_vedic.infrastructure.swiss import EphemerisSourceError
 from ravi_vedic.infrastructure.timezone import PINNED_TZDATA_VERSION, TimeResolutionError
 from ravi_vedic.projection import to_core_dict
@@ -38,13 +38,13 @@ def test_unknown_source_profile_never_enables_fallback(profile):
 
 
 def test_canonical_engine_fails_at_construction_without_data():
-    with pytest.raises(EphemerisSourceError, match="explicit ephemeris_path"):
+    with pytest.raises(RuntimeDataError, match="explicit ephemeris_path"):
         create_engine(RuntimeConfig(source_profile=SourceProfile.CANONICAL))
 
 
 def test_canonical_engine_rejects_missing_and_empty_directories(tmp_path):
     for path in (tmp_path, tmp_path / "missing"):
-        with pytest.raises(EphemerisSourceError):
+        with pytest.raises(RuntimeDataError):
             create_engine(
                 RuntimeConfig(source_profile=SourceProfile.CANONICAL, ephemeris_path=path)
             )
@@ -87,7 +87,7 @@ def test_canonical_engine_rejects_incomplete_file_families_at_startup(tmp_path, 
         path = tmp_path / name
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(content)
-    with pytest.raises(EphemerisSourceError, match="requires non-empty"):
+    with pytest.raises(RuntimeDataError, match="requires non-empty"):
         create_engine(
             RuntimeConfig(
                 source_profile=SourceProfile.CANONICAL,
@@ -107,12 +107,12 @@ def test_runtime_is_frozen_and_path_is_bound_before_cwd_changes(tmp_path, monkey
 
 @pytest.mark.parametrize("path", ["", "  "])
 def test_blank_path_is_not_current_directory(path):
-    with pytest.raises(ValueError, match="blank"):
+    with pytest.raises(RuntimeDataError, match="blank"):
         RuntimeConfig(source_profile=SourceProfile.CANONICAL, ephemeris_path=path)
 
 
 def test_system_timezone_provider_is_not_accepted():
-    with pytest.raises(ValueError, match="pinned python-tzdata"):
+    with pytest.raises(RuntimeDataError, match="pinned python-tzdata"):
         RuntimeConfig(source_profile=SourceProfile.CANONICAL, timezone_provider="system")
 
 
