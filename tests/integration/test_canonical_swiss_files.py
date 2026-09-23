@@ -5,6 +5,7 @@ import pytest
 import swisseph as swe
 
 from ravi_vedic import BirthInput, RuntimeConfig, SourceProfile, create_engine
+from ravi_vedic.domain.diagnostics import CalculationStatus
 from ravi_vedic.domain.models import Graha
 from ravi_vedic.infrastructure.swiss.canonical_dataset import (
     SWISS_REFERENCE_FILES,
@@ -51,7 +52,9 @@ def test_tehran_reference_chart_uses_verified_swiss_files_end_to_end():
         "swiss-true-node-analytical",
         "swisseph-files",
     )
-    assert provenance.warnings == ()
+    assert provenance.diagnostics == ()
+    assert result.diagnostics == ()
+    assert result.calculation_status == CalculationStatus.CANONICAL
 
     file_backed_bodies = (
         Graha.SUN,
