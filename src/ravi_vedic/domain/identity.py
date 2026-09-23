@@ -9,12 +9,18 @@ def _canonical_text(value: str, *, field_name: str) -> str:
     return value
 
 
-def _sha256_or_none(value: str | None, *, field_name: str) -> str | None:
-    if value is None:
-        return None
+def _sha256(value: str, *, field_name: str) -> str:
+    if not isinstance(value, str):
+        raise TypeError(f"{field_name} must be a SHA-256 string")
     if len(value) != 64 or any(char not in "0123456789abcdef" for char in value):
         raise ValueError(f"{field_name} must be a lowercase SHA-256 hex digest")
     return value
+
+
+def _sha256_or_none(value: str | None, *, field_name: str) -> str | None:
+    if value is None:
+        return None
+    return _sha256(value, field_name=field_name)
 
 
 @dataclass(frozen=True, slots=True)
@@ -26,7 +32,7 @@ class RaviBuildIdentity:
     def __post_init__(self) -> None:
         _canonical_text(self.distribution_name, field_name="distribution_name")
         _canonical_text(self.package_version, field_name="package_version")
-        _sha256_or_none(self.source_sha256, field_name="source_sha256")
+        _sha256(self.source_sha256, field_name="source_sha256")
 
 
 @dataclass(frozen=True, slots=True)
