@@ -328,6 +328,22 @@ Exit gate:
 - development output cannot be mistaken for canonical output;
 - diagnostics survive JSON projection.
 
+### M2.6.7 execution slices
+
+To keep implementation reviewable and continuation-safe, M2.6.7 is split into five
+independent slices:
+
+1. **7.1 Identity contract** — lock semantics and dependency boundaries in ADR-0010.
+2. **7.2 Runtime identity snapshot** — typed immutable build/runtime identity only.
+3. **7.3 Calculation fingerprint** — deterministic versioned manifest and SHA-256.
+4. **7.4 Typed diagnostics and status** — structured diagnostics plus derived calculation
+   status.
+5. **7.5 Projection and acceptance** — project the new fields and close every M2.6.7 exit
+   gate.
+
+Each slice uses its own branch/PR, must preserve numerical D1/D9/D10 behavior, and must be
+green before the next slice begins.
+
 ## M2.6.8 — Contract/schema hardening
 
 Purpose: make the external contract reject semantically impossible payloads.
