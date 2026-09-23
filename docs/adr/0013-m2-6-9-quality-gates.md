@@ -65,6 +65,25 @@ The upper bound is intentional: a future Python minor is unsupported until it is
 both CI matrices and passes the same gates. Mypy and Ruff continue to target Python 3.11,
 the minimum supported language/runtime contract.
 
+## Python support contract
+
+M2.6.9.3 declares support for CPython **3.11–3.14**:
+
+- package metadata is `>=3.11,<3.15`;
+- both `quality` and `canonical-swiss` run explicit 3.11/3.12/3.13/3.14 matrices;
+- mypy and Ruff intentionally target the minimum supported language level, 3.11;
+- a contract test keeps `requires-python`, classifiers and both CI matrices aligned.
+
+The initial conservative branch narrowed support to 3.11 because
+`pyswisseph==2.10.3.2` publishes CPython wheels only through 3.11. That limitation was
+not accepted without execution evidence. CI then proved that the pinned source
+distribution builds and passes RAVI's full quality/parity and strict canonical-Swiss
+lanes on 3.12, 3.13 and 3.14 as well.
+
+Python 3.15 is not included because it is still prerelease during this milestone.
+Future support expansion is a reviewed CI-contract change, not an implication of an
+open-ended `>=3.11` marker.
+
 ## Exception hierarchy
 
 `ravi_vedic.errors` is the single public source of RAVI-owned exception classes:
