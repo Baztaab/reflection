@@ -8,7 +8,15 @@ from pathlib import Path
 import pytest
 import swisseph as swe
 
-from ravi_vedic import BirthInput, RuntimeConfig, SourceProfile, create_engine
+from ravi_vedic import (
+    BirthInput,
+    InputValidationError,
+    RuntimeConfig,
+    SourceProfile,
+    TimezoneDataError,
+    UnsupportedPolicyError,
+    create_engine,
+)
 from ravi_vedic.infrastructure.swiss import EphemerisSourceError
 from ravi_vedic.infrastructure.timezone import PINNED_TZDATA_VERSION, TimeResolutionError
 from ravi_vedic.projection import to_core_dict
@@ -33,7 +41,7 @@ def test_runtime_and_source_profile_are_required():
 
 @pytest.mark.parametrize("profile", ["auto", "canonical", "", None, True])
 def test_unknown_source_profile_never_enables_fallback(profile):
-    with pytest.raises(ValueError):
+    with pytest.raises(InputValidationError):
         RuntimeConfig(source_profile=profile)
 
 
@@ -107,12 +115,12 @@ def test_runtime_is_frozen_and_path_is_bound_before_cwd_changes(tmp_path, monkey
 
 @pytest.mark.parametrize("path", ["", "  "])
 def test_blank_path_is_not_current_directory(path):
-    with pytest.raises(ValueError, match="blank"):
+    with pytest.raises(InputValidationError, match="blank"):
         RuntimeConfig(source_profile=SourceProfile.CANONICAL, ephemeris_path=path)
 
 
 def test_system_timezone_provider_is_not_accepted():
-    with pytest.raises(ValueError, match="pinned python-tzdata"):
+    with pytest.raises(UnsupportedPolicyError, match="pinned python-tzdata"):
         RuntimeConfig(source_profile=SourceProfile.CANONICAL, timezone_provider="system")
 
 
@@ -189,11 +197,8 @@ def test_missing_or_wrong_tzdata_fails_at_engine_construction(monkeypatch, insta
         return installed
 
     monkeypatch.setattr(metadata, "version", version)
-    with pytest.raises(TimeResolutionError) as caught:
+    with pytest.raises(TimezoneDataError, match="tzdata"):
         create_engine(RuntimeConfig(source_profile=SourceProfile.DEVELOPMENT))
-    assert caught.value.code == (
-        "TZDATA_UNAVAILABLE" if installed is None else "TZDATA_VERSION_MISMATCH"
-    )
 
 
 def test_same_engine_calculates_a_b_a_without_drift(birth):
