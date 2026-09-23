@@ -6,9 +6,9 @@ The project is optimized for auditable Jyotish research rather than feature coun
 Astronomy, Jyotish policy, derived structure, evidence and interpretation are kept as
 separate concerns.
 
-Current milestone: **M2.6 Engine Foundation**. M2.6.0–8 and **M2.6.9.1–2 typed errors +
-strict static typing** are implemented and CI verified; **M2.6.9.3 Python support contract
-is next**.
+Current milestone: **M2.6 Engine Foundation**. M2.6.0–8 and **M2.6.9.1–3 typed errors,
+strict static typing and tested Python support** are implemented and CI verified;
+**M2.6.9.4 property tests + acceptance is next**.
 
 ## Current executable core
 
@@ -102,6 +102,13 @@ The executable schema rejects duplicate/missing Grahas and impossible D9/D10
 chart-factor-policy combinations. The obsolete mixed `deterministic_input_hash` and
 encoded string `warnings` fields were retired at the explicit M2.6.7.5 contract
 migration recorded by ADR-0011.
+
+## Python support contract
+
+RAVI currently supports **CPython 3.11, 3.12, 3.13 and 3.14**, expressed as
+`requires-python = ">=3.11,<3.15"`. Both normal quality/parity tests and the strict
+canonical Swiss-file integration run across all four minors in CI. New Python minors are
+not implicitly supported until they enter those matrices and pass.
 
 ## Static typing contract
 
