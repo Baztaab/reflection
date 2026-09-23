@@ -201,8 +201,16 @@ def test_same_engine_calculates_a_b_a_without_drift(birth):
     first = engine.calculate(birth)
     frozen_payload = to_core_dict(first)
     other = engine.calculate(replace(birth, longitude_deg=15.0, latitude_deg=70.0))
+    repeated = engine.calculate(birth)
+
+    assert len(first.input_sha256) == 64
+    assert len(first.calculation_fingerprint) == 64
     assert other.d1.ascendant_sidereal_longitude_deg != first.d1.ascendant_sidereal_longitude_deg
-    assert to_core_dict(engine.calculate(birth)) == frozen_payload
+    assert other.input_sha256 != first.input_sha256
+    assert other.calculation_fingerprint != first.calculation_fingerprint
+    assert repeated.input_sha256 == first.input_sha256
+    assert repeated.calculation_fingerprint == first.calculation_fingerprint
+    assert to_core_dict(repeated) == frozen_payload
     assert to_core_dict(first) == frozen_payload
     assert first.astronomy.provenance.source_profile == SourceProfile.DEVELOPMENT
 
