@@ -157,7 +157,7 @@ does not keep a speculative "full future schema" beside the executable contract.
 ## Project documents
 
 - [MVP calculation specification](docs/spec/RAVI_VEDIC_MVP_v1.md)
-- [M2.6 Engine Foundation roadmap](docs/roadmap/M2_6_ENGINE_FOUNDATION.md)
+- [Completed M2.6 Engine Foundation roadmap](docs/roadmap/M2_6_ENGINE_FOUNDATION.md)
 - [Schema lifecycle notes](schemas/README.md)
 - [Architecture decisions](docs/adr/)
 - [Pinned Kerykeion / Immanuel review](docs/research/M2_6_1_REFERENCE_REVIEW.md)
@@ -169,8 +169,9 @@ does not keep a speculative "full future schema" beside the executable contract.
 - [Frozen M2.6 baseline](docs/roadmap/M2_6_0_BASELINE.md)
 - [M2.6 architecture acceptance](docs/roadmap/M2_6_10_ACCEPTANCE.md)
 
-M3 Structural Jyotish is intentionally blocked until M2.6 Engine Foundation passes its
-acceptance gates.
+M2.6 Engine Foundation has passed its acceptance gates. M3 implementation has not started;
+the next bounded step is an M3.1 Nakshatra/Pada policy/contract audit and design before any
+new calculation code is added.
 
 ## Development
 
@@ -182,5 +183,6 @@ pytest --ignore=tests/property
 pytest tests/property
 ```
 
-Before changing calculation code, read `AGENTS.md`, `STATUS.md`, and the active
-milestone roadmap.
+Before changing calculation code, read `AGENTS.md`, `STATUS.md`, and the roadmap or
+pre-implementation audit named there. Do not infer an active milestone from a completed
+roadmap.
