@@ -12,6 +12,12 @@ import swisseph as swe
 
 from ravi_vedic.astronomy.port import AstronomySessionPort
 from ravi_vedic.domain.canon import CalculationCanon
+from ravi_vedic.domain.diagnostics import (
+    CanonicalityImpact,
+    Diagnostic,
+    DiagnosticLayer,
+    DiagnosticSeverity,
+)
 from ravi_vedic.domain.geometry import normalize_longitude
 from ravi_vedic.domain.identity import AstronomyRuntimeIdentity
 from ravi_vedic.domain.models import (
@@ -102,10 +108,14 @@ class _SwissAstronomySession:
     def _require_source(self, source: str) -> None:
         if source == "swisseph-files":
             return
-        if not self.allow_moshier_fallback:
-            raise EphemerisSourceError(
-                f"canonical profile requires Swiss .se1 files; actual source={source}"
-            )
+        if self.allow_moshier_fallback and source == "moshier":
+            return
+        profile = (
+            "development profile permits only Moshier fallback"
+            if self.allow_moshier_fallback
+            else "canonical profile requires Swiss .se1 files"
+        )
+        raise EphemerisSourceError(f"{profile}; actual source={source}")
 
     def snapshot(
         self,
@@ -123,7 +133,8 @@ class _SwissAstronomySession:
         if canon.astronomy.node_policy_id != "nodes.true-rahu-opposite-ketu-v1":
             raise ValueError(f"unsupported node policy: {canon.astronomy.node_policy_id}")
 
-        warnings: list[str] = []
+        diagnostics: list[Diagnostic] = []
+        fallback_sources: set[str] = set()
         actual_sources: set[str] = set()
         bodies: dict[Graha, BodyPosition] = {}
         sidereal_flags = self.requested_flags | swe.FLG_SIDEREAL
@@ -144,10 +155,21 @@ class _SwissAstronomySession:
             source = _source_from_flags(sidereal_retflags)
             self._require_source(source)
             actual_sources.add(source)
-            if source != "swisseph-files":
-                warning = f"EPHEMERIS_SOURCE_FALLBACK:{source}"
-                if warning not in warnings:
-                    warnings.append(warning)
+            if source != "swisseph-files" and source not in fallback_sources:
+                fallback_sources.add(source)
+                diagnostics.append(
+                    Diagnostic(
+                        code="EPHEMERIS_SOURCE_FALLBACK",
+                        severity=DiagnosticSeverity.WARNING,
+                        layer=DiagnosticLayer.ASTRONOMY,
+                        affected_fields=(
+                            "astronomy.bodies",
+                            "provenance.astronomy.actual_sources",
+                        ),
+                        canonicality_impact=CanonicalityImpact.DEVELOPMENT,
+                        details={"source": source},
+                    )
+                )
             bodies[body] = BodyPosition(
                 body=body,
                 tropical_longitude_deg=normalize_longitude(tropical[0]),
@@ -186,7 +208,21 @@ class _SwissAstronomySession:
             rahu_distance = rahu_tropical[2]
             rahu_speed = rahu_tropical[3]
             rahu_method = "derived:swiss-true-node-minus-true-pushya"
-            warnings.append("TRUE_NODE_SIDEREAL_DERIVED_FROM_TROPICAL_AND_AYANAMSHA")
+            diagnostics.append(
+                Diagnostic(
+                    code="TRUE_NODE_SIDEREAL_DERIVED_FROM_TROPICAL_AND_AYANAMSHA",
+                    severity=DiagnosticSeverity.WARNING,
+                    layer=DiagnosticLayer.ASTRONOMY,
+                    affected_fields=(
+                        "astronomy.bodies.Rahu",
+                        "astronomy.bodies.Ketu",
+                    ),
+                    canonicality_impact=CanonicalityImpact.DEGRADED,
+                    details={
+                        "derivation": "tropical_true_node_minus_true_pushya_ayanamsha",
+                    },
+                )
+            )
 
         rahu = BodyPosition(
             body=Graha.RAHU,
@@ -254,7 +290,7 @@ class _SwissAstronomySession:
                     else "canonical-strict-swiss-files"
                 ),
                 actual_sources=tuple(sorted(actual_sources)),
-                warnings=tuple(warnings),
+                diagnostics=tuple(diagnostics),
             ),
         )
 
