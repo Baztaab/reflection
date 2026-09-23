@@ -7,6 +7,7 @@ from ravi_vedic.domain.varga.policies import (
     ParasariDashamsaV1,
     ParasariNavamsaV1,
 )
+from ravi_vedic.errors import UnsupportedPolicyError
 
 _POLICIES = MappingProxyType(
     {
