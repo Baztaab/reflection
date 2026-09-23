@@ -31,6 +31,7 @@ from ravi_vedic.domain.models import (
     JulianTime,
     TimeContext,
 )
+from ravi_vedic.errors import InvariantViolationError, UnsupportedPolicyError
 from ravi_vedic.projection import to_core_dict
 
 
@@ -308,7 +309,7 @@ def test_synthetic_chart_extends_collection_without_pipeline_or_core_result_edit
     assert set(result.charts) == {"D1", "D9", "D10", "DTEST"}
     assert result.charts.require_varga("DTEST").factor == 2
     assert result.d9 is result.charts["D9"]
-    with pytest.raises(ValueError, match="requires exactly D1/D9/D10"):
+    with pytest.raises(InvariantViolationError, match="requires exactly D1/D9/D10"):
         to_core_dict(result)
 
 
