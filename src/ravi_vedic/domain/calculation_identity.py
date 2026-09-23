@@ -90,9 +90,23 @@ def calculation_identity_manifest(
         "input": normalized_birth_input(birth, time_context),
         "policy_manifest_sha256": policy_manifest_sha256,
         "runtime": _runtime_manifest(runtime_identity),
+        "time_execution": {
+            "tzdb_provider": time_context.tzdb_provider,
+            "tzdb_version": time_context.tzdb_version,
+            "utc_datetime": time_context.utc_datetime.isoformat(),
+            "utc_offset_seconds": time_context.utc_offset_seconds,
+            "resolution_status": time_context.resolution_status,
+        },
         "astronomy_execution": {
+            "implementation": provenance.implementation,
+            "implementation_version": provenance.implementation_version,
+            "library_version": provenance.library_version,
+            "ephemeris_manifest_sha256": provenance.ephemeris_manifest_sha256,
+            "ephemeris_file_count": provenance.ephemeris_file_count,
+            "source_profile": provenance.source_profile,
             "requested_flags": provenance.requested_flags,
             "sidereal_mode": provenance.sidereal_mode,
+            "ayanamsha_policy_id": provenance.ayanamsha_policy_id,
             "actual_sources": sorted(provenance.actual_sources),
             "ascendant_source_method": astronomy.ascendant.source_method,
             "bodies": [
