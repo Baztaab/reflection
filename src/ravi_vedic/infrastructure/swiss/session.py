@@ -8,11 +8,13 @@ from threading import RLock, local
 
 import swisseph as swe
 
+from ravi_vedic.errors import AstronomyBackendError
+
 _SWISS_LOCK = RLock()
 _THREAD_STATE = local()
 
 
-class SwissSessionError(RuntimeError):
+class SwissSessionError(AstronomyBackendError):
     """Raised when Swiss global-state lifecycle rules are violated."""
 
 
