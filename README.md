@@ -6,8 +6,9 @@ The project is optimized for auditable Jyotish research rather than feature coun
 Astronomy, Jyotish policy, derived structure, evidence and interpretation are kept as
 separate concerns.
 
-Current milestone: **M2.6 Engine Foundation**. M2.6.0–6 and M2.6.7 slices 7.1–7.4 are
-implemented and CI verified; **M2.6.7.5 projection and acceptance is next**.
+Current milestone: **M2.6 Engine Foundation**. M2.6.0–6 and **M2.6.7 complete calculation
+identity and typed diagnostics** are implemented and CI verified; **M2.6.8 contract/schema
+hardening is next**.
 
 ## Current executable core
 
@@ -22,7 +23,7 @@ BirthInput
  -> policy-driven chart builders
  -> immutable ChartCollection (D1 / D9 / D10)
  -> CoreResult
- -> Core JSON v1 compatibility projection
+ -> Core JSON v1 executable projection
 ```
 
 Canonical choices currently implemented include True Pushya, True Rahu with derived
@@ -87,23 +88,18 @@ supply an explicit fake `RuntimeIdentity`; there is no hidden runtime-identity d
 the application/domain layers. The low-level
 `ravi_vedic.application.pipeline.calculate_core` function remains available only as an
 explicit integration seam and is intentionally not re-exported from the package root.
-The serialized Core v1 schema is unchanged.
-
-Each completed `CoreResult` now retains two internal identities:
+Each completed `CoreResult` retains and serializes two distinct identities:
 
 - `input_sha256`: normalized effective birth input only, excluding display metadata;
 - `calculation_fingerprint`: a versioned SHA-256 over normalized input, Canon policy
   identity, exact RAVI/runtime identity, resolved time facts and actual astronomy
   provenance/source methods.
 
-These fields are intentionally **not serialized yet**. M2.6.7.5 owns projection changes;
-this keeps fingerprint construction independent from external contract migration.
-
-Internally, warnings are now typed immutable diagnostics carrying code, severity, layer,
-affected fields, canonicality impact and structured details. Every completed result also
-has an explicit `canonical | development | degraded` status. Core-v1 still renders the
-legacy warning strings for byte-compatible output until slice 7.5 migrates the external
-contract.
+Core JSON v1 now also serializes `policy_manifest_sha256`, the immutable runtime identity,
+top-level `canonical | development | degraded` calculation status, and typed diagnostics
+with code, severity, layer, affected fields, canonicality impact and structured details.
+The obsolete mixed `deterministic_input_hash` and encoded string `warnings` fields were
+retired at the explicit M2.6.7.5 contract migration recorded by ADR-0011.
 
 ## Current machine contract
 
