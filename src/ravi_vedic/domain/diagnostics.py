@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import StrEnum
+from math import isfinite
 from types import MappingProxyType
 from typing import TypeAlias
 
@@ -72,12 +73,16 @@ class Diagnostic:
             raise ValueError("diagnostic affected_fields must not contain duplicates")
         object.__setattr__(self, "affected_fields", fields)
 
+        if not isinstance(self.details, Mapping):
+            raise TypeError("diagnostic details must be a mapping")
         detached: dict[str, DiagnosticDetailValue] = {}
         for key, value in self.details.items():
             if not isinstance(key, str) or not key or key.strip() != key:
                 raise ValueError("diagnostic detail keys must be canonical strings")
             if value is not None and not isinstance(value, (str, int, float, bool)):
                 raise TypeError("diagnostic detail values must be JSON scalars or null")
+            if isinstance(value, float) and not isfinite(value):
+                raise ValueError("diagnostic float details must be finite")
             detached[key] = value
         object.__setattr__(self, "details", MappingProxyType(detached))
 
@@ -87,7 +92,8 @@ def derive_calculation_status(
     diagnostics: tuple[Diagnostic, ...],
 ) -> CalculationStatus:
     if any(
-        diagnostic.canonicality_impact == CanonicalityImpact.DEGRADED
+        diagnostic.severity == DiagnosticSeverity.ERROR
+        or diagnostic.canonicality_impact == CanonicalityImpact.DEGRADED
         for diagnostic in diagnostics
     ):
         return CalculationStatus.DEGRADED
