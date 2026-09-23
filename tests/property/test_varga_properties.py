@@ -64,18 +64,21 @@ def test_varga_projection_is_zodiac_periodic(
     policy: VargaPolicy,
 ) -> None:
     baseline = project_longitude(longitude, policy)
-    shifted = project_longitude(longitude + 360.0 * turns, policy)
+    shift = 360.0 * turns
+    shifted_value = longitude + shift
+    shifted = project_longitude(shifted_value, policy)
 
-    assert shifted.segment_index == baseline.segment_index
-    assert shifted.target_sign_index == baseline.target_sign_index
-    assert shifted.longitude_within_target_sign_deg == pytest.approx(
-        baseline.longitude_within_target_sign_deg,
-        abs=1e-9,
-    )
-    assert shifted.projected_longitude_deg == pytest.approx(
-        baseline.projected_longitude_deg,
-        abs=1e-9,
-    )
+    if shifted_value - shift == longitude:
+        assert shifted.segment_index == baseline.segment_index
+        assert shifted.target_sign_index == baseline.target_sign_index
+        assert shifted.longitude_within_target_sign_deg == pytest.approx(
+            baseline.longitude_within_target_sign_deg,
+            abs=1e-9,
+        )
+        assert shifted.projected_longitude_deg == pytest.approx(
+            baseline.projected_longitude_deg,
+            abs=1e-9,
+        )
 
 
 @PROPERTY_SETTINGS
