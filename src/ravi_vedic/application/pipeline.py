@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from ravi_vedic.application.ports import TimeContextPort
 from ravi_vedic.astronomy.port import AstronomyPort
-from ravi_vedic.domain.canon import RAVI_VEDIC_MVP_V1, CalculationCanon
 from ravi_vedic.domain.calculation_identity import calculation_fingerprint, input_sha256
+from ravi_vedic.domain.canon import RAVI_VEDIC_MVP_V1, CalculationCanon
 from ravi_vedic.domain.chart_builders import (
     RAVI_CHART_BUILDERS,
     ChartBuilderRegistry,
