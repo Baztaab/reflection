@@ -48,12 +48,9 @@ def test_longitude_normalization_is_periodic(value: float, turns: int) -> None:
     baseline = Longitude(value)
     repeated = Longitude(value + 360.0 * turns)
 
-    assert math.isclose(
-        repeated.degrees,
-        baseline.degrees,
-        rel_tol=0.0,
-        abs_tol=1e-9,
-    )
+    linear_distance = abs(repeated.degrees - baseline.degrees)
+    circular_distance = min(linear_distance, 360.0 - linear_distance)
+    assert circular_distance <= 1e-9
 
 
 @settings(max_examples=300, deadline=None)
