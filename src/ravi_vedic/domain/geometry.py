@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from fractions import Fraction
-from math import isfinite
+from math import isfinite, nextafter
 
 from ravi_vedic.errors import InputValidationError
 
@@ -27,7 +27,12 @@ class Longitude:
         if not isfinite(value):
             raise InputValidationError("longitude must be finite")
         normalized = value % _ZODIAC_DEGREES
-        if normalized == 0.0:
+        if normalized >= _ZODIAC_DEGREES:
+            # Tiny negative floats can round modulo to exactly 360.0 even though
+            # the canonical interval is half-open. Preserve the below-zero side
+            # with the greatest representable longitude below 360.
+            normalized = nextafter(_ZODIAC_DEGREES, 0.0)
+        elif normalized == 0.0:
             normalized = 0.0
         object.__setattr__(self, "degrees", normalized)
 
