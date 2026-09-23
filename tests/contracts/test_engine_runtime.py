@@ -53,7 +53,7 @@ def test_canonical_engine_rejects_missing_and_empty_directories(tmp_path):
 def test_canonical_factory_does_not_discover_an_environment_path(tmp_path, monkeypatch):
     monkeypatch.setenv("SE_EPHE_PATH", str(tmp_path))
     monkeypatch.setenv("KERYKEION_EPHE_PATH", str(tmp_path))
-    with pytest.raises(EphemerisSourceError, match="explicit ephemeris_path"):
+    with pytest.raises(RuntimeDataError, match="explicit ephemeris_path"):
         create_engine(RuntimeConfig(source_profile=SourceProfile.CANONICAL))
 
 
