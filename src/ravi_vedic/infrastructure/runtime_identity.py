@@ -27,7 +27,7 @@ def _package_source_sha256() -> str:
         relative = path.relative_to(package_root).as_posix().encode("utf-8")
         digest.update(relative)
         digest.update(b"\0")
-        digest.update(path.read_bytes())
+        digest.update(sha256(path.read_bytes()).digest())
     return digest.hexdigest()
 
 
