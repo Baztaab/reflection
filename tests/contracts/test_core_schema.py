@@ -40,6 +40,14 @@ def _schema() -> dict:
     return schema
 
 
+def test_only_one_executable_machine_schema_exists() -> None:
+    schemas = sorted(
+        path.relative_to(ROOT).as_posix()
+        for path in (ROOT / "schemas").glob("*.schema.json")
+    )
+    assert schemas == ["schemas/ravi_vedic_core_v1.schema.json"]
+
+
 def test_executable_schema_vocabulary_matches_projection_contract() -> None:
     schema = _schema()
 
