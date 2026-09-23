@@ -231,7 +231,7 @@ def test_engine_owns_a_detached_immutable_policy_snapshot(birth):
 )
 def test_engine_rejects_unsupported_policies_before_calculation(canon):
     astronomy = FakeAstronomy()
-    with pytest.raises(ValueError, match="unsupported"):
+    with pytest.raises(UnsupportedPolicyError, match="unsupported"):
         RaviEngine(
             astronomy=astronomy,
             time_context_provider=FakeTime(),
@@ -256,7 +256,7 @@ def test_engine_rejects_unsupported_policies_before_calculation(canon):
     ],
 )
 def test_engine_rejects_noncanonical_chart_policy_map(mapping, message):
-    with pytest.raises(ValueError, match=message):
+    with pytest.raises(UnsupportedPolicyError, match=message):
         RaviEngine(
             astronomy=FakeAstronomy(),
             time_context_provider=FakeTime(),
