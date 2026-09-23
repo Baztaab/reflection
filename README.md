@@ -121,6 +121,20 @@ The production package is checked with pinned **mypy 2.3.1** in strict mode. CI 
 `mypy src/ravi_vedic` before pytest. The only missing-import exception is scoped to the
 third-party `swisseph` module; RAVI production modules do not use a blanket ignore policy.
 
+## Property-testing contract
+
+Pinned **Hypothesis 6.168.1** exercises pure geometry and Varga invariants on every
+supported Python minor. CI has a dedicated `pytest tests/property` step before the full
+suite. Properties cover canonical half-open longitude normalization, generated rational
+partition boundaries and neighbors, whole-sign rotational invariance, and D9/D10
+projection ranges/periodicity.
+
+The first property run found a real IEEE-754 edge case: extremely small negative
+longitudes could normalize to exactly `360.0`, violating the engine's `[0, 360)`
+contract and producing sign index 12. `Longitude` now preserves that below-zero side as
+the greatest representable longitude below 360.0. The regression is explicitly locked by
+unit and property tests; trusted D1/D9/D10 parity remains unchanged.
+
 ## Error contract
 
 RAVI-owned semantic failures share one public root: `RaviVedicError`. Stable categories
