@@ -6,6 +6,7 @@ import pytest
 from ravi_vedic import BirthInput, RuntimeConfig, SourceProfile, create_engine
 from ravi_vedic.domain.diagnostics import CalculationStatus
 from ravi_vedic.domain.models import Graha
+from ravi_vedic import RuntimeDataError
 from ravi_vedic.infrastructure.swiss import EphemerisSourceError, SwissEphemerisAdapter
 from ravi_vedic.projection import to_core_dict
 
@@ -93,7 +94,7 @@ def test_ketu_is_exactly_opposite_true_rahu() -> None:
 
 
 def test_canonical_profile_requires_explicit_ephemeris_path() -> None:
-    with pytest.raises(EphemerisSourceError, match="explicit ephemeris_path"):
+    with pytest.raises(RuntimeDataError, match="explicit ephemeris_path"):
         SwissEphemerisAdapter()
 
 
