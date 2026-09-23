@@ -1,8 +1,10 @@
+import json
 import os
 from pathlib import Path
 
 import pytest
 import swisseph as swe
+from jsonschema import Draft202012Validator
 
 from ravi_vedic import BirthInput, RuntimeConfig, SourceProfile, create_engine
 from ravi_vedic.domain.diagnostics import CalculationStatus
@@ -39,8 +41,15 @@ def test_tehran_reference_chart_uses_verified_swiss_files_end_to_end():
         )
     )
 
+    payload = to_core_dict(result)
+    Draft202012Validator(json.loads(SCHEMA.read_text())).validate(payload)
+
     provenance = result.astronomy.provenance
     runtime_identity = engine.runtime_identity
+    assert payload["calculation_status"] == "canonical"
+    assert payload["diagnostics"] == []
+    assert payload["provenance"]["calculation_fingerprint"] == result.calculation_fingerprint
+    assert payload["provenance"]["runtime"]["source_profile"] == SourceProfile.CANONICAL.value
     assert identity.manifest_sha256 == SWISS_REFERENCE_MANIFEST_SHA256
     assert runtime_identity.astronomy.ephemeris_manifest_sha256 == SWISS_REFERENCE_MANIFEST_SHA256
     assert runtime_identity.astronomy.ephemeris_file_count == len(SWISS_REFERENCE_FILES)
