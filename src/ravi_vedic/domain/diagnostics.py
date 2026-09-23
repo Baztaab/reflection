@@ -112,10 +112,3 @@ def derive_calculation_status(
 
     return CalculationStatus.CANONICAL
 
-
-def legacy_warning_string(diagnostic: Diagnostic) -> str:
-    """Temporary Core-v1 compatibility encoding; removed from domain semantics."""
-    if diagnostic.code == "EPHEMERIS_SOURCE_FALLBACK":
-        source = diagnostic.details.get("source")
-        return f"EPHEMERIS_SOURCE_FALLBACK:{source}"
-    return diagnostic.code

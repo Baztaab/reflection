@@ -344,6 +344,13 @@ independent slices:
 Each slice uses its own branch/PR, must preserve numerical D1/D9/D10 behavior, and must be
 green before the next slice begins.
 
+**M2.6.7 status: COMPLETE.** The executable Core-v1 projection now exposes input identity,
+versioned calculation fingerprint, policy/runtime identity, typed diagnostics and explicit
+calculation status. Development-profile payloads cannot validate as canonical. The
+cross-version baseline still requires exact zero-tolerance equality for calculation,
+time, astronomy/provenance and D1/D9/D10 data; ADR-0011 records the intentional envelope
+migration.
+
 ## M2.6.8 — Contract/schema hardening
 
 Purpose: make the external contract reject semantically impossible payloads.

@@ -9,7 +9,6 @@ from ravi_vedic.domain.diagnostics import (
     DiagnosticLayer,
     DiagnosticSeverity,
     derive_calculation_status,
-    legacy_warning_string,
 )
 from ravi_vedic.domain.identity import (
     AstronomyRuntimeIdentity,
@@ -151,15 +150,3 @@ def test_error_severity_is_always_degraded():
 
 def test_unknown_source_profile_cannot_be_mistaken_for_canonical():
     assert derive_calculation_status(_runtime("test-only"), ()) == CalculationStatus.DEGRADED
-
-
-def test_legacy_warning_encoding_is_projection_compatibility_only():
-    diagnostic = Diagnostic(
-        code="EPHEMERIS_SOURCE_FALLBACK",
-        severity=DiagnosticSeverity.WARNING,
-        layer=DiagnosticLayer.ASTRONOMY,
-        affected_fields=("astronomy.bodies",),
-        canonicality_impact=CanonicalityImpact.DEVELOPMENT,
-        details={"source": "moshier"},
-    )
-    assert legacy_warning_string(diagnostic) == "EPHEMERIS_SOURCE_FALLBACK:moshier"

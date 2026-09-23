@@ -1,4 +1,8 @@
-"""Verify M2.6 full-payload compatibility against a separate frozen checkout.
+"""Verify exact M2.6 calculation compatibility against a frozen checkout.
+
+M2.6.7.5 deliberately migrates the identity/diagnostic JSON envelope. This verifier
+therefore compares the complete calculation payload and astronomy provenance exactly,
+while leaving the versioned contract envelope to executable-schema tests.
 
 Usage: python scripts/verify_foundation_parity.py BASELINE_TREE CURRENT_TREE
 The frozen checkout must be the commit in the M2.6 baseline manifest.
@@ -37,7 +41,22 @@ if sys.argv[2] == "old":
 else:
     from ravi_vedic import RuntimeConfig, SourceProfile, create_engine
     calculate = create_engine(RuntimeConfig(source_profile=SourceProfile.DEVELOPMENT)).calculate
-print(json.dumps([to_core_dict(calculate(BirthInput.from_iso(**case))) for case in cases], sort_keys=True))
+def calculation_payload(payload):
+    astronomy_provenance = dict(payload["provenance"]["astronomy"])
+    astronomy_provenance.pop("warnings", None)
+    return {
+        "canon_id": payload["canon_id"],
+        "input": payload["input"],
+        "time_context": payload["time_context"],
+        "astronomy_provenance": astronomy_provenance,
+        "astronomy": payload["astronomy"],
+        "charts": payload["charts"],
+    }
+
+print(json.dumps([
+    calculation_payload(to_core_dict(calculate(BirthInput.from_iso(**case))))
+    for case in cases
+], sort_keys=True))
 """
 
 if len(sys.argv) != 3:
@@ -54,8 +73,12 @@ for tree, mode in [(sys.argv[1], "old"), (sys.argv[2], "new")]:
     )
     results.append(json.loads(process.stdout))
 if results[0] != results[1]:
-    raise SystemExit("pre/post-refactor payload mismatch")
+    raise SystemExit("pre/post-refactor calculation payload mismatch")
 print(
-    "Exact full-payload parity: 5/5 (Tehran, both DST folds, polar latitude, southern hemisphere)"
+    "Exact calculation-payload parity: 5/5 "
+    "(Tehran, both DST folds, polar latitude, southern hemisphere)"
 )
-print("No fields stripped and no numerical tolerance used.")
+print(
+    "No numerical tolerance used; only the intentionally migrated "
+    "identity/status/diagnostic contract envelope is excluded."
+)
