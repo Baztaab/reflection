@@ -14,7 +14,7 @@ from ravi_vedic.projection.contract import (
 
 
 def _body_name(body: Graha) -> str:
-    return body.value.capitalize()
+    return CORE_GRAHA_NAME_BY_BODY[body]
 
 
 def _input_dict(result: CoreResult) -> dict[str, Any]:
@@ -106,7 +106,7 @@ def _varga_dict(chart: VargaChart) -> dict[str, Any]:
 
 
 def to_core_dict(result: CoreResult) -> dict[str, Any]:
-    if set(result.charts) != frozenset(CORE_CHART_IDS):
+    if set(result.charts) != CORE_CHART_ID_SET:
         raise ValueError(
             "ravi-vedic-core-v1 projection requires exactly D1/D9/D10; "
             f"actual={sorted(result.charts)}"
