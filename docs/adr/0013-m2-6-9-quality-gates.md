@@ -48,6 +48,23 @@ Reasons:
 No blanket `# type: ignore` policy is introduced. A local ignore would require a
 specific documented incompatibility and is not part of this slice.
 
+## Python support contract
+
+M2.6.9.3 declares **CPython 3.11 through 3.14** as the supported minor range and encodes
+that as `requires-python = ">=3.11,<3.15"`.
+
+This range was chosen from execution evidence, not metadata optimism:
+
+- quality CI installs the pinned dependencies and runs Ruff, strict mypy, the complete
+  pytest suite and frozen calculation parity on 3.11, 3.12, 3.13 and 3.14;
+- canonical CI independently downloads/verifies the pinned Swiss dataset and runs the
+  strict Swiss-file integration on the same four minors;
+- all four minors passed before the support declaration was accepted.
+
+The upper bound is intentional: a future Python minor is unsupported until it is added to
+both CI matrices and passes the same gates. Mypy and Ruff continue to target Python 3.11,
+the minimum supported language/runtime contract.
+
 ## Exception hierarchy
 
 `ravi_vedic.errors` is the single public source of RAVI-owned exception classes:
