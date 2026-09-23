@@ -14,6 +14,10 @@ from ravi_vedic.infrastructure.swiss.canonical_dataset import (
     SWISS_REFERENCE_MANIFEST_SHA256,
     verify_canonical_reference_dataset,
 )
+from ravi_vedic.projection import to_core_dict
+
+ROOT = Path(__file__).parents[2]
+SCHEMA = ROOT / "schemas" / "ravi_vedic_core_v1.schema.json"
 
 _EPHE_PATH = os.environ.get("RAVI_CANONICAL_EPHE_PATH")
 pytestmark = pytest.mark.skipif(
