@@ -33,6 +33,7 @@ from ravi_vedic.errors import (
     AstronomyBackendError,
     EphemerisSourceError,
     InputValidationError,
+    RuntimeDataError,
     UnsupportedPolicyError,
 )
 from ravi_vedic.infrastructure.swiss.manifest import (
@@ -316,7 +317,7 @@ class SwissEphemerisAdapter:
                 self._data_identity = build_ephemeris_data_identity(ephemeris_path)
                 if not allow_moshier_fallback:
                     require_planetary_data_files(self._data_identity.root_path)
-            except ValueError as exc:
+            except RuntimeDataError as exc:
                 if not allow_moshier_fallback:
                     raise EphemerisSourceError(str(exc)) from exc
         elif not allow_moshier_fallback:
