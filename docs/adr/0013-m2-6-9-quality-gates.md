@@ -29,6 +29,25 @@ M2.6.9 is split dependency-first:
 
 Every slice gets its own branch/PR and must be green before the next starts.
 
+## Static checker choice
+
+M2.6.9.2 uses **mypy 2.3.1** in strict mode over `src/ravi_vedic`.
+
+Reasons:
+
+- RAVI is a Python-only package, so the checker can remain inside the existing Python
+  toolchain and editable-install workflow;
+- Kerykeion, one of the reference projects used during foundation review, also enforces
+  mypy on its production package;
+- strict mypy exposed actual contract issues in RAVI (an over-broad `Any`, untyped
+  collection, ambiguous `**kwargs`, implicit re-exports, and a mutable-vs-read-only
+  Protocol mismatch) rather than requiring a type-system redesign;
+- third-party typing suppression is **not** global. Only the untyped `swisseph` module is
+  granted a module-scoped `ignore_missing_imports` override.
+
+No blanket `# type: ignore` policy is introduced. A local ignore would require a
+specific documented incompatibility and is not part of this slice.
+
 ## Exception hierarchy
 
 `ravi_vedic.errors` is the single public source of RAVI-owned exception classes:

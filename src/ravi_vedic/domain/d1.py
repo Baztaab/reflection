@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from ravi_vedic.domain.canon import CalculationCanon
 from ravi_vedic.domain.geometry import Longitude, whole_sign_house
-from ravi_vedic.domain.models import AstronomicalSnapshot, D1Chart, D1Placement
+from ravi_vedic.domain.models import AstronomicalSnapshot, D1Chart, D1Placement, Graha
 
 
 def build_d1(snapshot: AstronomicalSnapshot, canon: CalculationCanon) -> D1Chart:
     ascendant = Longitude(snapshot.ascendant.sidereal_longitude_deg)
     mapping_policy_id = canon.charts.varga_policy_ids["D1"]
 
-    placements: dict = {}
+    placements: dict[Graha, D1Placement] = {}
     for body, position in snapshot.bodies.items():
         longitude = Longitude(position.sidereal_longitude_deg)
         placements[body] = D1Placement(

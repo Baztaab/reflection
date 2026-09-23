@@ -6,8 +6,9 @@ The project is optimized for auditable Jyotish research rather than feature coun
 Astronomy, Jyotish policy, derived structure, evidence and interpretation are kept as
 separate concerns.
 
-Current milestone: **M2.6 Engine Foundation**. M2.6.0–8 and **M2.6.9.1 typed error
-taxonomy** are implemented and CI verified; **M2.6.9.2 static typing is next**.
+Current milestone: **M2.6 Engine Foundation**. M2.6.0–8 and **M2.6.9.1–2 typed errors +
+strict static typing** are implemented and CI verified; **M2.6.9.3 Python support contract
+is next**.
 
 ## Current executable core
 
@@ -101,6 +102,12 @@ The executable schema rejects duplicate/missing Grahas and impossible D9/D10
 chart-factor-policy combinations. The obsolete mixed `deterministic_input_hash` and
 encoded string `warnings` fields were retired at the explicit M2.6.7.5 contract
 migration recorded by ADR-0011.
+
+## Static typing contract
+
+The production package is checked with pinned **mypy 2.3.1** in strict mode. CI runs
+`mypy src/ravi_vedic` before pytest. The only missing-import exception is scoped to the
+third-party `swisseph` module; RAVI production modules do not use a blanket ignore policy.
 
 ## Error contract
 

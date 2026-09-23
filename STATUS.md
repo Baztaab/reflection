@@ -6,7 +6,8 @@ Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition +
 Completed phases: **M2.6.7 complete calculation identity and typed diagnostics — COMPLETE**;
 **M2.6.8 contract/schema hardening — COMPLETE**.
 Current phase: **M2.6.9 errors, typing and broader quality gates — IN PROGRESS**.
-Completed slice: **9.1 error taxonomy**. Next slice: **9.2 static typing**.
+Completed slices: **9.1 error taxonomy + 9.2 static typing**. Next slice:
+**9.3 Python support contract**.
 
 M2.6.5 verified calculation baseline: `8cf1c22baebd27a5663362f06d9d090335d02fee`.
 Later documentation-only cleanup commits do not redefine this calculation baseline.
@@ -377,6 +378,28 @@ M2.6.9.1 verification on implementation head
 - canonical Swiss run `35869502596` — success; pinned dataset manifest verified;
   strict canonical integration **1 passed**.
 
+## What M2.6.9.2 now enforces
+
+- `mypy==2.3.1` is pinned in development dependencies.
+- Production `src/ravi_vedic` runs under `strict = true`.
+- The quality workflow runs mypy as an explicit gate between Ruff and pytest.
+- Missing-import suppression is module-scoped to third-party `swisseph`; there is no
+  global `ignore_missing_imports` and no production `# type: ignore` workaround in this
+  slice.
+- The first strict run exposed **10 errors across 5 files**. They were resolved by typing
+  the policy manifest freeze, explicitly typing the Varga registry and D1 placements,
+  making `BirthInput.from_iso` keyword arguments explicit, making historical Swiss error
+  re-exports explicit, and correcting `VargaPolicy` to a read-only Protocol.
+- The final checker reports **Success: no issues found in 36 source files**.
+- Runtime behavior, canonical integration and exact D1/D9/D10 parity remain unchanged.
+
+M2.6.9.2 verification on implementation head
+`7f3347830edad634e8160d95a06b363276e5bac8`:
+- quality run `35870556112` — success; Ruff passed; mypy strict passed; pytest
+  **205 passed, 1 skipped**; exact zero-tolerance calculation-payload parity **5/5**;
+- canonical Swiss run `35870556078` — success; pinned dataset manifest verified;
+  strict canonical integration **1 passed**.
+
 ## Why M3 is still blocked
 
 The current core is numerically useful but still has foundation debt that should not be
@@ -384,8 +407,9 @@ copied into Nakshatra/lordship/dispositor work:
 
 - M2.6.7 calculation identity/diagnostics and M2.6.8 executable contract hardening are
   complete;
-- M2.6.9 still needs the typed exception hierarchy, static typing gate, declared/tested
-  Python support alignment and property-based domain tests.
+- M2.6.9.1 typed exceptions and M2.6.9.2 strict static typing are complete;
+- M2.6.9 still needs declared/tested Python support alignment and property-based domain
+  tests.
 
 These remaining quality gates are M2.6 work, not M3 work.
 
@@ -409,9 +433,9 @@ These remaining quality gates are M2.6 work, not M3 work.
 
 ## Next action
 
-Implement **M2.6.9.2 static typing only**: choose and pin the checker, make the
-production `src/ravi_vedic` package pass without blanket ignores, and add the type check
-as an explicit CI gate. Do not start Python-version matrix work, Hypothesis, M2.6.10 or M3
+Implement **M2.6.9.3 Python support contract only**: decide the supported Python minor
+range, make `requires-python` express exactly that range, and run the appropriate CI
+matrix so declared support equals tested support. Do not start Hypothesis, M2.6.10 or M3
 in that slice.
 
 Only after all M2.6 acceptance gates pass may M3 begin with Nakshatra/Pada.

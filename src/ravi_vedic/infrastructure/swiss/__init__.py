@@ -1,5 +1,7 @@
-from .adapter import EphemerisSourceError, SwissEphemerisAdapter
-from .session import SwissSession, SwissSessionError
+from ravi_vedic.errors import EphemerisSourceError, SwissSessionError
+
+from .adapter import SwissEphemerisAdapter
+from .session import SwissSession
 
 __all__ = [
     "EphemerisSourceError",
