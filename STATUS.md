@@ -25,7 +25,8 @@ Historical milestone anchors:
 - M2.6.5 merged-main quality/canonical runs: `35792895282` / `35792895252`.
 
 Canonical specification: `docs/spec/RAVI_VEDIC_MVP_v1.md`
-Active roadmap: `docs/roadmap/M2_6_ENGINE_FOUNDATION.md`
+Completed roadmap: `docs/roadmap/M2_6_ENGINE_FOUNDATION.md`
+Next milestone: **M3 — Structural Jyotish**. Implementation has not started; the next bounded action is M3.1 Nakshatra/Pada policy/contract audit and design only.
 Executable schema: `schemas/ravi_vedic_core_v1.schema.json`
 
 ## What is trusted today
@@ -494,8 +495,9 @@ new Jyotish technique remain outside M2.6.10.
 
 ## Next action
 
-M2.6 is complete. **Stop here.** The next separate milestone, when explicitly started,
-is M3 Structural Jyotish beginning with Nakshatra/Pada.
+M2.6 is complete and frozen as the accepted foundation. The next bounded action is
+**M3.1 Nakshatra/Pada design/audit only**: define the policy, boundary ownership,
+provenance/contract surface, reference sources and acceptance tests before implementation.
 
-All M2.6 acceptance gates now pass. M3 begins only in a separate explicitly started
-milestone.
+Do not add M3 calculation code until that design/audit is recorded and reviewed. Trusted
+D1/D9/D10 behavior remains a regression boundary unless an explicit policy decision changes it.
