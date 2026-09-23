@@ -9,6 +9,7 @@ from ravi_vedic.domain.chart_builders import (
     ChartBuilderRegistry,
     build_enabled_charts,
 )
+from ravi_vedic.domain.diagnostics import derive_calculation_status
 from ravi_vedic.domain.identity import RuntimeIdentity
 from ravi_vedic.domain.models import BirthInput, CoreResult
 
@@ -36,6 +37,8 @@ def calculate_core(
         )
 
     charts = build_enabled_charts(snapshot, canon, chart_builders)
+    diagnostics = snapshot.provenance.diagnostics
+    calculation_status = derive_calculation_status(runtime_identity, diagnostics)
     input_identity = input_sha256(birth, time_context)
     fingerprint = calculation_fingerprint(
         birth=birth,
@@ -54,4 +57,6 @@ def calculate_core(
         runtime_identity=runtime_identity,
         input_sha256=input_identity,
         calculation_fingerprint=fingerprint,
+        diagnostics=diagnostics,
+        calculation_status=calculation_status,
     )
