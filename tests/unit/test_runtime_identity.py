@@ -18,7 +18,12 @@ def _identity() -> RuntimeIdentity:
             package_version="0.1.0",
             source_sha256="a" * 64,
         ),
-        python=PythonRuntimeIdentity(implementation="CPython", version="3.11.0"),
+        python=PythonRuntimeIdentity(
+            implementation="CPython",
+            version="3.11.0",
+            system="Linux",
+            machine="x86_64",
+        ),
         astronomy=AstronomyRuntimeIdentity(
             implementation="pyswisseph",
             binding_version="2.10.3.2",
