@@ -40,6 +40,12 @@ def _schema() -> dict:
     return schema
 
 
+def test_repository_has_one_unambiguous_executable_schema() -> None:
+    executable_schemas = sorted((ROOT / "schemas").glob("*.schema.json"))
+
+    assert executable_schemas == [SCHEMA]
+
+
 def test_executable_schema_vocabulary_matches_projection_contract() -> None:
     schema = _schema()
 
