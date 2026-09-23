@@ -420,6 +420,12 @@ Exit gate:
 
 Each slice is independently reviewed and green before the next begins.
 
+**M2.6.9 status: COMPLETE.** The engine now has a public typed error taxonomy, strict
+mypy enforcement, an executable CPython 3.11–3.14 support matrix, and pinned Hypothesis
+property tests for geometry/Varga invariants. Property testing found and fixed a genuine
+half-open-longitude floating edge while the trusted D1/D9/D10 parity corpus remained
+exactly unchanged.
+
 ## M2.6.10 — Architecture acceptance
 
 M2.6 is complete only when all of the following are true:
