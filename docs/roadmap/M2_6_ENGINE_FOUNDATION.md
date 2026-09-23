@@ -443,6 +443,9 @@ M2.6 is complete only when all of the following are true:
 11. CI includes import boundaries, typing, properties and canonical integration.
 12. Existing trusted D1/D9/D10 results have not drifted without an explicit policy decision.
 
+**M2.6.10 status: ACCEPTED.** All twelve gates pass. The exact evidence matrix is recorded
+in `docs/roadmap/M2_6_10_ACCEPTANCE.md`. M2.6 Engine Foundation is **COMPLETE**.
+
 Only then may **M3 Structural Jyotish** begin with Nakshatra/Pada.
 
 ---

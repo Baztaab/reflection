@@ -6,8 +6,8 @@ The project is optimized for auditable Jyotish research rather than feature coun
 Astronomy, Jyotish policy, derived structure, evidence and interpretation are kept as
 separate concerns.
 
-Current milestone: **M2.6 Engine Foundation**. M2.6.0–9 are implemented and CI verified;
-**M2.6.10 architecture acceptance is next**.
+Current milestone: **M2.6 Engine Foundation — COMPLETE**. All twelve M2.6.10
+architecture-acceptance gates are satisfied by executable code/tests/CI. M3 is not started.
 
 ## Current executable core
 
@@ -167,6 +167,7 @@ does not keep a speculative "full future schema" beside the executable contract.
 - [Angular/boundary kernel review](docs/research/M2_6_5_ANGLE_KERNEL_REVIEW.md)
 - [Generic chart collection review](docs/research/M2_6_6_CHART_COLLECTION_REVIEW.md)
 - [Frozen M2.6 baseline](docs/roadmap/M2_6_0_BASELINE.md)
+- [M2.6 architecture acceptance](docs/roadmap/M2_6_10_ACCEPTANCE.md)
 
 M3 Structural Jyotish is intentionally blocked until M2.6 Engine Foundation passes its
 acceptance gates.
