@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from hashlib import sha256
 from pathlib import Path
 
+from ravi_vedic.errors import RuntimeDataError
 from ravi_vedic.infrastructure.swiss.manifest import (
     EphemerisDataIdentity,
     build_ephemeris_data_identity,
@@ -56,7 +57,7 @@ def verify_canonical_reference_dataset(path: str | Path) -> EphemerisDataIdentit
     """Verify the exact two-file dataset used by RAVI's canonical reference CI lane."""
     root = Path(path).expanduser().resolve()
     if not root.is_dir():
-        raise ValueError(f"canonical reference ephemeris path is not a directory: {root}")
+        raise RuntimeDataError(f"canonical reference ephemeris path is not a directory: {root}")
 
     expected_names = tuple(sorted(file.name for file in SWISS_REFERENCE_FILES))
     actual_names = tuple(
@@ -67,7 +68,7 @@ def verify_canonical_reference_dataset(path: str | Path) -> EphemerisDataIdentit
         )
     )
     if actual_names != expected_names:
-        raise ValueError(
+        raise RuntimeDataError(
             "canonical reference ephemeris file set mismatch: "
             f"expected={expected_names}, actual={actual_names}"
         )
@@ -76,23 +77,23 @@ def verify_canonical_reference_dataset(path: str | Path) -> EphemerisDataIdentit
         item = root / file.name
         actual_size = item.stat().st_size
         if actual_size != file.size_bytes:
-            raise ValueError(
+            raise RuntimeDataError(
                 f"{file.name} size mismatch: expected={file.size_bytes}, actual={actual_size}"
             )
         actual_sha256 = sha256_file(item)
         if actual_sha256 != file.sha256:
-            raise ValueError(
+            raise RuntimeDataError(
                 f"{file.name} sha256 mismatch: expected={file.sha256}, actual={actual_sha256}"
             )
 
     identity = build_ephemeris_data_identity(root)
     if identity.file_count != len(SWISS_REFERENCE_FILES):
-        raise ValueError(
+        raise RuntimeDataError(
             "canonical reference ephemeris file count mismatch: "
             f"expected={len(SWISS_REFERENCE_FILES)}, actual={identity.file_count}"
         )
     if identity.manifest_sha256 != SWISS_REFERENCE_MANIFEST_SHA256:
-        raise ValueError(
+        raise RuntimeDataError(
             "canonical reference ephemeris manifest mismatch: "
             f"expected={SWISS_REFERENCE_MANIFEST_SHA256}, "
             f"actual={identity.manifest_sha256}"

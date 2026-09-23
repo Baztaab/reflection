@@ -8,12 +8,10 @@ from threading import RLock, local
 
 import swisseph as swe
 
+from ravi_vedic.errors import SwissSessionError
+
 _SWISS_LOCK = RLock()
 _THREAD_STATE = local()
-
-
-class SwissSessionError(RuntimeError):
-    """Raised when Swiss global-state lifecycle rules are violated."""
 
 
 @dataclass(frozen=True, slots=True)

@@ -29,6 +29,13 @@ from ravi_vedic.domain.models import (
     JulianTime,
     TimeContext,
 )
+from ravi_vedic.errors import (
+    AstronomyBackendError,
+    EphemerisSourceError,
+    InputValidationError,
+    RuntimeDataError,
+    UnsupportedPolicyError,
+)
 from ravi_vedic.infrastructure.swiss.manifest import (
     EphemerisDataIdentity,
     build_ephemeris_data_identity,
@@ -57,10 +64,6 @@ def _source_from_flags(flags: int) -> str:
     return "unknown"
 
 
-class EphemerisSourceError(RuntimeError):
-    pass
-
-
 @dataclass(slots=True)
 class _SwissAstronomySession:
     """Active Swiss handle. Native calls are invalid after the owning context exits."""
@@ -74,9 +77,9 @@ class _SwissAstronomySession:
 
     def _require_active(self) -> None:
         if not self._active:
-            raise RuntimeError("astronomy session is no longer active")
+            raise AstronomyBackendError("astronomy session is no longer active")
         if get_ident() != self.owner_thread_id:
-            raise RuntimeError("astronomy session cannot be used from another thread")
+            raise AstronomyBackendError("astronomy session cannot be used from another thread")
 
     def _deactivate(self) -> None:
         self._active = False
@@ -87,7 +90,7 @@ class _SwissAstronomySession:
             utc_datetime.tzinfo is None
             or utc_datetime.utcoffset() != UTC.utcoffset(utc_datetime)
         ):
-            raise ValueError("utc_datetime must be timezone-aware UTC")
+            raise InputValidationError("utc_datetime must be timezone-aware UTC")
 
         seconds = utc_datetime.second + utc_datetime.microsecond / 1_000_000.0
         jd_tt, jd_ut = swe.utc_to_jd(
@@ -127,11 +130,13 @@ class _SwissAstronomySession:
     ) -> AstronomicalSnapshot:
         self._require_active()
         if canon.astronomy.ayanamsha_policy_id != "ayanamsha.true-pushya.swiss-v1":
-            raise ValueError(
+            raise UnsupportedPolicyError(
                 f"unsupported ayanamsha policy: {canon.astronomy.ayanamsha_policy_id}"
             )
         if canon.astronomy.node_policy_id != "nodes.true-rahu-opposite-ketu-v1":
-            raise ValueError(f"unsupported node policy: {canon.astronomy.node_policy_id}")
+            raise UnsupportedPolicyError(
+                f"unsupported node policy: {canon.astronomy.node_policy_id}"
+            )
 
         diagnostics: list[Diagnostic] = []
         fallback_sources: set[str] = set()
@@ -312,7 +317,7 @@ class SwissEphemerisAdapter:
                 self._data_identity = build_ephemeris_data_identity(ephemeris_path)
                 if not allow_moshier_fallback:
                     require_planetary_data_files(self._data_identity.root_path)
-            except ValueError as exc:
+            except RuntimeDataError as exc:
                 if not allow_moshier_fallback:
                     raise EphemerisSourceError(str(exc)) from exc
         elif not allow_moshier_fallback:

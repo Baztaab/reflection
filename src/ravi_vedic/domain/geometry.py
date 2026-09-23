@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from fractions import Fraction
 from math import isfinite
 
+from ravi_vedic.errors import InputValidationError
+
 _ZODIAC_DEGREES = 360.0
 _SIGN_DEGREES = 30
 _SIGN_COUNT = 12
@@ -11,7 +13,7 @@ _SIGN_COUNT = 12
 
 def _require_factor(factor: int) -> None:
     if isinstance(factor, bool) or not isinstance(factor, int) or factor < 1:
-        raise ValueError("partition factor must be a positive integer")
+        raise InputValidationError("partition factor must be a positive integer")
 
 
 @dataclass(frozen=True, slots=True)
@@ -23,7 +25,7 @@ class Longitude:
     def __post_init__(self) -> None:
         value = float(self.degrees)
         if not isfinite(value):
-            raise ValueError("longitude must be finite")
+            raise InputValidationError("longitude must be finite")
         normalized = value % _ZODIAC_DEGREES
         if normalized == 0.0:
             normalized = 0.0
@@ -58,9 +60,9 @@ def partition_boundary_float(
     """Nearest IEEE-754 representative of an exact internal rational boundary."""
     _require_factor(factor)
     if not 0 <= sign_index_value < _SIGN_COUNT:
-        raise ValueError("sign_index must be in 0..11")
+        raise InputValidationError("sign_index must be in 0..11")
     if not 1 <= boundary_index < factor:
-        raise ValueError(f"boundary_index must be in 1..{factor - 1}")
+        raise InputValidationError(f"boundary_index must be in 1..{factor - 1}")
 
     exact_boundary = (
         Fraction(sign_index_value * _SIGN_DEGREES, 1)

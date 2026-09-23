@@ -6,8 +6,8 @@ The project is optimized for auditable Jyotish research rather than feature coun
 Astronomy, Jyotish policy, derived structure, evidence and interpretation are kept as
 separate concerns.
 
-Current milestone: **M2.6 Engine Foundation**. M2.6.0–8 are implemented and CI verified;
-**M2.6.9 errors, typing and broader quality gates is next**.
+Current milestone: **M2.6 Engine Foundation**. M2.6.0–8 and **M2.6.9.1 typed error
+taxonomy** are implemented and CI verified; **M2.6.9.2 static typing is next**.
 
 ## Current executable core
 
@@ -101,6 +101,17 @@ The executable schema rejects duplicate/missing Grahas and impossible D9/D10
 chart-factor-policy combinations. The obsolete mixed `deterministic_input_hash` and
 encoded string `warnings` fields were retired at the explicit M2.6.7.5 contract
 migration recorded by ADR-0011.
+
+## Error contract
+
+RAVI-owned semantic failures share one public root: `RaviVedicError`. Stable categories
+separate input/time, unsupported policy, runtime data, astronomy backend and invariant
+violations. Existing named errors such as `TimeResolutionError`,
+`EphemerisSourceError` and `SwissSessionError` remain available through their previous
+module paths and the package root.
+
+Plain `TypeError` is still used for Python API misuse such as omitting required injected
+ports; the RAVI hierarchy is not a replacement for Python's own programming errors.
 
 ## Current machine contract
 

@@ -8,14 +8,9 @@ from zoneinfo import ZoneInfo
 from ravi_vedic.astronomy.port import AstronomySessionPort
 from ravi_vedic.domain.identity import TimezoneRuntimeIdentity
 from ravi_vedic.domain.models import BirthInput, TimeContext
+from ravi_vedic.errors import TimeResolutionError, TimezoneDataError
 
 PINNED_TZDATA_VERSION = "2026.4"
-
-
-class TimeResolutionError(ValueError):
-    def __init__(self, code: str, message: str) -> None:
-        super().__init__(message)
-        self.code = code
 
 
 @dataclass(frozen=True, slots=True)
@@ -45,14 +40,12 @@ def _tzdb_identity() -> tuple[str, str]:
     try:
         version = metadata.version("tzdata")
     except metadata.PackageNotFoundError as exc:
-        raise TimeResolutionError(
-            "TZDATA_UNAVAILABLE",
-            "canonical timezone resolution requires the pinned tzdata package",
+        raise TimezoneDataError(
+            "canonical timezone resolution requires the pinned tzdata package"
         ) from exc
     if version != PINNED_TZDATA_VERSION:
-        raise TimeResolutionError(
-            "TZDATA_VERSION_MISMATCH",
-            f"requires tzdata=={PINNED_TZDATA_VERSION}; installed {version}",
+        raise TimezoneDataError(
+            f"requires tzdata=={PINNED_TZDATA_VERSION}; installed {version}"
         )
     return "python-tzdata", version
 

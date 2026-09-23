@@ -9,6 +9,7 @@ from ravi_vedic.domain.models import (
     Graha,
 )
 from ravi_vedic.domain.varga import build_varga, get_varga_policy, project_longitude
+from ravi_vedic.errors import UnsupportedPolicyError
 
 
 def _body(body: Graha, lon: float) -> BodyPosition:
@@ -96,5 +97,5 @@ def test_varga_houses_are_relative_to_varga_ascendant() -> None:
 
 
 def test_registry_rejects_unknown_policy() -> None:
-    with pytest.raises(ValueError, match="unknown varga policy"):
+    with pytest.raises(UnsupportedPolicyError, match="unknown varga policy"):
         get_varga_policy("varga.unknown-v1")

@@ -5,6 +5,7 @@ from typing import Any
 from ravi_vedic.domain.calculation_identity import CALCULATION_FINGERPRINT_MANIFEST_VERSION
 from ravi_vedic.domain.diagnostics import Diagnostic
 from ravi_vedic.domain.models import CoreResult, Graha, VargaChart, VargaProjection
+from ravi_vedic.errors import InvariantViolationError
 from ravi_vedic.projection.contract import (
     CORE_CHART_ID_SET,
     CORE_GRAHA_NAME_BY_BODY,
@@ -108,7 +109,7 @@ def _varga_dict(chart: VargaChart) -> dict[str, Any]:
 
 def to_core_dict(result: CoreResult) -> dict[str, Any]:
     if set(result.charts) != CORE_CHART_ID_SET:
-        raise ValueError(
+        raise InvariantViolationError(
             "ravi-vedic-core-v1 projection requires exactly D1/D9/D10; "
             f"actual={sorted(result.charts)}"
         )

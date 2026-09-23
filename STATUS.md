@@ -5,7 +5,8 @@ Current milestone: **M2.6 — Engine Foundation IN PROGRESS**
 Completed scope: **M2.6.0 baseline freeze + M2.6.1 explicit engine composition + M2.6.2 hardened SwissSession + M2.6.3 canonical Swiss-file integration lane + M2.6.4 deep-frozen hierarchical Canon + M2.6.5 shared angular/boundary kernel + M2.6.6 generic chart collection**.
 Completed phases: **M2.6.7 complete calculation identity and typed diagnostics — COMPLETE**;
 **M2.6.8 contract/schema hardening — COMPLETE**.
-Next phase: **M2.6.9 errors, typing and broader quality gates — NOT STARTED**.
+Current phase: **M2.6.9 errors, typing and broader quality gates — IN PROGRESS**.
+Completed slice: **9.1 error taxonomy**. Next slice: **9.2 static typing**.
 
 M2.6.5 verified calculation baseline: `8cf1c22baebd27a5663362f06d9d090335d02fee`.
 Later documentation-only cleanup commits do not redefine this calculation baseline.
@@ -350,6 +351,32 @@ M2.6.8.4 final semantic-acceptance verification on implementation head
 - canonical Swiss run `35868078195` — success; pinned dataset manifest verified;
   strict canonical projection/integration **1 passed**.
 
+## What M2.6.9.1 now enforces
+
+- `ravi_vedic.errors` is the single public source of RAVI-owned semantic exceptions.
+- `RaviVedicError` is the common root, with typed categories for input/time,
+  unsupported policy, runtime data, astronomy backend and invariant violations.
+- `InputValidationError` / `UnsupportedPolicyError` remain `ValueError`-compatible;
+  runtime-data/backend categories remain `RuntimeError`-compatible.
+- Existing `TimeResolutionError`, `EphemerisSourceError` and `SwissSessionError`
+  imports remain identity-preserving through their historical module paths.
+- Missing/wrong pinned tzdata is now `TimezoneDataError`, not a civil-time resolution
+  error.
+- Ephemeris manifest/dataset failures are typed runtime-data errors, while the canonical
+  adapter boundary preserves the more specific `EphemerisSourceError`.
+- Unsupported engine/Varga policies are distinguishable from malformed input.
+- Impossible chart/projection relationships use `InvariantViolationError` rather than
+  pretending to be caller input errors.
+- Plain `TypeError` remains reserved for Python API misuse.
+- Numerical calculations and serialized output are unchanged.
+
+M2.6.9.1 verification on implementation head
+`87e4ddc41a6049f650e9faf54b4c95dbc948e364`:
+- quality run `35869502681` — success; Ruff passed; pytest **205 passed, 1 skipped**;
+  exact zero-tolerance calculation-payload parity **5/5**;
+- canonical Swiss run `35869502596` — success; pinned dataset manifest verified;
+  strict canonical integration **1 passed**.
+
 ## Why M3 is still blocked
 
 The current core is numerically useful but still has foundation debt that should not be
@@ -382,8 +409,9 @@ These remaining quality gates are M2.6 work, not M3 work.
 
 ## Next action
 
-Implement **M2.6.9 only**, beginning with a bounded design/audit of the exception
-hierarchy, static type-checker choice, supported Python-version contract and property-test
-surface. Do not start M2.6.10 acceptance or any M3 technique until those gates are green.
+Implement **M2.6.9.2 static typing only**: choose and pin the checker, make the
+production `src/ravi_vedic` package pass without blanket ignores, and add the type check
+as an explicit CI gate. Do not start Python-version matrix work, Hypothesis, M2.6.10 or M3
+in that slice.
 
 Only after all M2.6 acceptance gates pass may M3 begin with Nakshatra/Pada.
