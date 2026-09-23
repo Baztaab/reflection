@@ -5,7 +5,6 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from hashlib import sha256
 from types import MappingProxyType
-from typing import Any
 
 POLICY_MANIFEST_VERSION = "ravi-vedic-policy-manifest-v1"
 
@@ -16,7 +15,7 @@ def _policy_id(value: str, *, field_name: str) -> str:
     return value
 
 
-def _deep_freeze(value: Any) -> Any:
+def _deep_freeze(value: object) -> object:
     if isinstance(value, Mapping):
         return MappingProxyType({key: _deep_freeze(item) for key, item in value.items()})
     if isinstance(value, (list, tuple)):
@@ -78,7 +77,7 @@ class CalculationCanon:
             sha256(self._policy_manifest_bytes()).hexdigest(),
         )
 
-    def _policy_manifest_dict(self) -> dict[str, Any]:
+    def _policy_manifest_dict(self) -> dict[str, object]:
         return {
             "manifest_version": POLICY_MANIFEST_VERSION,
             "canon_id": self.canon_id,
@@ -101,9 +100,12 @@ class CalculationCanon:
         ).encode("utf-8")
 
     @property
-    def policy_manifest(self) -> Mapping[str, Any]:
+    def policy_manifest(self) -> Mapping[str, object]:
         """Detached recursively immutable representation used for policy identity."""
-        return _deep_freeze(self._policy_manifest_dict())
+        frozen = _deep_freeze(self._policy_manifest_dict())
+        if not isinstance(frozen, Mapping):
+            raise RuntimeError("policy manifest freeze must preserve mapping shape")
+        return frozen
 
     def snapshot(self) -> CalculationCanon:
         """Return a detached immutable copy safe for one engine to own."""
