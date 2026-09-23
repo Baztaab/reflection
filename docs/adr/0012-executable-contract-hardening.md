@@ -59,6 +59,18 @@ Immanuel uses stable object identifiers/constants and regression tests. RAVI kee
 lighter dataclass + JSON-Schema architecture, but adopts the same principle: public
 identifiers have one runtime vocabulary and executable tests that prevent drift.
 
+## Acceptance
+
+M2.6.8 is accepted only when:
+
+- the executable schema rejects duplicate/missing required Grahas;
+- D9/D10 chart ID, factor and policy lineage cannot be mismatched;
+- projected astronomy preserves each body's existing source method and tropical/sidereal
+  return flags with derived-null semantics where no Swiss call produced a flag;
+- real development and canonical outputs validate;
+- the repository contains exactly one executable `*.schema.json` machine contract;
+- exact zero-tolerance parity still holds for every pre-existing calculation field.
+
 ## Consequences
 
 - M2.6.8 remains contract hardening, not a chart-model redesign.
