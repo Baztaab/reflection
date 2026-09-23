@@ -10,7 +10,7 @@ from ravi_vedic.domain.models import BirthInput, TimeContext
 
 
 def _time_context(*, fold: int = 0) -> TimeContext:
-    local = datetime(2000, 1, 1, 12, 0, 0)
+    local = datetime.fromisoformat("2000-01-01T12:00:00")
     return TimeContext(
         local_datetime=local,
         timezone_id="Etc/UTC",
@@ -28,7 +28,7 @@ def _time_context(*, fold: int = 0) -> TimeContext:
 
 def _birth(**kwargs) -> BirthInput:
     values = {
-        "local_datetime": datetime(2000, 1, 1, 12, 0, 0),
+        "local_datetime": datetime.fromisoformat("2000-01-01T12:00:00"),
         "timezone_id": "Etc/UTC",
         "latitude_deg": -0.0,
         "longitude_deg": 0,
