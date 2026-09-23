@@ -105,22 +105,15 @@ migration recorded by ADR-0011.
 
 ## Python support contract
 
-RAVI currently supports **CPython 3.11, 3.12, 3.13 and 3.14**, expressed as
-`requires-python = ">=3.11,<3.15"`. Both normal quality/parity tests and the strict
-canonical Swiss-file integration run across all four minors in CI. New Python minors are
-not implicitly supported until they enter those matrices and pass.
-
-## Python support contract
-
-The package supports CPython **3.11, 3.12, 3.13 and 3.14** and declares
-`requires-python = ">=3.11,<3.15"`. Both the normal quality lane and the strict
+RAVI supports **CPython 3.11, 3.12, 3.13 and 3.14**, expressed as
+`requires-python = ">=3.11,<3.15"`. Both the normal quality/parity lane and the strict
 canonical-Swiss lane run that exact four-minor matrix. Support is therefore based on
-executed RAVI tests, not on dependency metadata alone.
+executed RAVI tests, not dependency metadata alone.
 
-The pinned `pyswisseph==2.10.3.2` publishes prebuilt wheels only through CPython 3.11,
-but RAVI CI also verifies successful source installation and canonical execution on
-3.12–3.14. Expansion to a future Python minor requires the same explicit green matrix
-change before package metadata is widened.
+The pinned `pyswisseph==2.10.3.2` publishes prebuilt wheels through CPython 3.11, while
+RAVI CI also verifies successful source installation and canonical execution on 3.12–3.14.
+A future Python minor is unsupported until package metadata and both CI matrices are
+expanded together and pass.
 
 ## Static typing contract
 
@@ -170,6 +163,7 @@ acceptance gates.
 ```bash
 python -m pip install -e ".[dev]"
 ruff check src tests scripts
+mypy src/ravi_vedic
 pytest
 ```
 
