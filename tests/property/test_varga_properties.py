@@ -2,7 +2,7 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from ravi_vedic.domain.geometry import Longitude, sign_index
+from ravi_vedic.domain.geometry import Longitude, partition_longitude, sign_index
 from ravi_vedic.domain.varga.base import VargaPolicy
 from ravi_vedic.domain.varga.policies import ParasariDashamsaV1, ParasariNavamsaV1
 from ravi_vedic.domain.varga.projector import project_longitude
@@ -32,13 +32,24 @@ def test_varga_projection_preserves_policy_and_coordinate_bounds(
 ) -> None:
     projection = project_longitude(longitude, policy)
 
+    partition = partition_longitude(longitude, policy.factor)
+
     assert projection.mapping_policy_id == policy.policy_id
     assert projection.source_longitude_deg == Longitude(longitude).degrees
+    assert projection.segment_index == partition.segment_index
     assert 0 <= projection.segment_index < policy.factor
     assert 0 <= projection.target_sign_index < 12
     assert 0.0 <= projection.longitude_within_target_sign_deg < 30.0
     assert 0.0 <= projection.projected_longitude_deg < 360.0
     assert sign_index(projection.projected_longitude_deg) == projection.target_sign_index
+    reconstructed = (
+        projection.target_sign_index * 30.0
+        + projection.longitude_within_target_sign_deg
+    )
+    assert projection.projected_longitude_deg == pytest.approx(
+        Longitude(reconstructed).degrees,
+        abs=1e-12,
+    )
 
 
 @PROPERTY_SETTINGS
