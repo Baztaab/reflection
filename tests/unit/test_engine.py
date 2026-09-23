@@ -198,14 +198,14 @@ def test_engine_rejects_unsupported_policies_before_calculation(canon):
 @pytest.mark.parametrize(
     ("mapping", "message"),
     [
-        ({}, "D1/D9/D10"),
-        ({"D1": "unapproved-rule"}, "D1/D9/D10"),
+        ({}, "pinned RAVI chart policy set"),
+        ({"D1": "unapproved-rule"}, "pinned RAVI chart policy set"),
         (
             {
                 **RAVI_VEDIC_MVP_V1.charts.varga_policy_ids,
                 "DTEST": "test.not-registered-v1",
             },
-            "D1/D9/D10",
+            "pinned RAVI chart policy set",
         ),
     ],
 )
