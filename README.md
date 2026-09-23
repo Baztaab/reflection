@@ -6,9 +6,8 @@ The project is optimized for auditable Jyotish research rather than feature coun
 Astronomy, Jyotish policy, derived structure, evidence and interpretation are kept as
 separate concerns.
 
-Current milestone: **M2.6 Engine Foundation**. M2.6.0–8 and **M2.6.9.1–3 typed errors,
-strict static typing and tested Python support** are implemented and CI verified;
-**M2.6.9.4 property tests + acceptance is next**.
+Current milestone: **M2.6 Engine Foundation**. M2.6.0–9 are implemented and CI verified;
+**M2.6.10 architecture acceptance is next**.
 
 ## Current executable core
 
@@ -121,6 +120,20 @@ The production package is checked with pinned **mypy 2.3.1** in strict mode. CI 
 `mypy src/ravi_vedic` before pytest. The only missing-import exception is scoped to the
 third-party `swisseph` module; RAVI production modules do not use a blanket ignore policy.
 
+## Property-testing contract
+
+RAVI pins **Hypothesis 6.168.1** and runs property tests as a distinct CI gate on every
+supported Python minor. Property tests stay on pure domain geometry rather than the
+process-global Swiss backend: longitude normalization, rational partition boundaries,
+whole-sign houses and D9/D10 projection invariants are exercised with generated inputs.
+
+The first property run exposed a real IEEE-754 edge case: an extremely small negative
+longitude could make Python's modulo round to exactly `360.0`, violating RAVI's
+half-open `[0, 360)` contract and producing sign index 12. The shared `Longitude`
+primitive now maps that overflow representative to the nearest valid float below 360,
+preserving Pisces ownership. A deterministic regression test locks the case in addition
+to the generated property coverage.
+
 ## Error contract
 
 RAVI-owned semantic failures share one public root: `RaviVedicError`. Stable categories
@@ -164,7 +177,8 @@ acceptance gates.
 python -m pip install -e ".[dev]"
 ruff check src tests scripts
 mypy src/ravi_vedic
-pytest
+pytest --ignore=tests/property
+pytest tests/property
 ```
 
 Before changing calculation code, read `AGENTS.md`, `STATUS.md`, and the active
