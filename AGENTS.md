@@ -3,7 +3,7 @@
 Read in this order before changing calculation code:
 
 1. `STATUS.md`
-2. the active roadmap referenced by STATUS
+2. the active roadmap or next pre-implementation audit referenced by STATUS
 3. `docs/spec/RAVI_VEDIC_MVP_v1.md`
 4. `docs/adr/`
 5. relevant tests
@@ -11,7 +11,7 @@ Read in this order before changing calculation code:
 Non-negotiable rules:
 
 - Do not introduce a new Jyotish method because a library defaults to it.
-- Do not start M3 Jyotish features while M2.6 Engine Foundation is incomplete.
+- M2.6 Engine Foundation is an accepted frozen baseline. Begin M3 only through the bounded next step named in STATUS; do not jump from a completed roadmap directly into feature code.
 - Do not import `swisseph` outside `src/ravi_vedic/infrastructure/swiss/`.
 - Canonical timezone resolution must use the exact-pinned Python `tzdata` package; do not fall back to host OS zoneinfo.
 - Canonical Swiss runs require an explicit `.se1` directory and recorded ephemeris manifest identity.
@@ -35,6 +35,7 @@ Non-negotiable rules:
 - Feature-branch CI runs through pull requests targeting `main`; direct push CI is reserved for `main` after merge. Open a draft PR after the first branch commit so subsequent commits are verified without duplicate push/PR runs.
 - Workflow concurrency cancels superseded runs for the same PR or main branch; do not remove this just to preserve stale CI history.
 - Prefer small, dependency-ordered changes over speculative infrastructure.
+- When a milestone is complete, mark its roadmap as completed rather than active; continuation documents must name exactly one bounded next action so a new agent cannot resume stale work.
 
 When finishing a meaningful implementation step, update `STATUS.md` with what is now
 executable, which acceptance gate passed, and the exact next dependency.
