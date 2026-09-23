@@ -39,7 +39,11 @@ def test_tehran_reference_chart_uses_verified_swiss_files_end_to_end():
     )
 
     provenance = result.astronomy.provenance
+    runtime_identity = engine.runtime_identity
     assert identity.manifest_sha256 == SWISS_REFERENCE_MANIFEST_SHA256
+    assert runtime_identity.astronomy.ephemeris_manifest_sha256 == SWISS_REFERENCE_MANIFEST_SHA256
+    assert runtime_identity.astronomy.ephemeris_file_count == len(SWISS_REFERENCE_FILES)
+    assert runtime_identity.source_profile == SourceProfile.CANONICAL.value
     assert provenance.ephemeris_manifest_sha256 == SWISS_REFERENCE_MANIFEST_SHA256
     assert provenance.ephemeris_file_count == len(SWISS_REFERENCE_FILES)
     assert provenance.source_profile == "canonical-strict-swiss-files"
