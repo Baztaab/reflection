@@ -21,10 +21,12 @@ def _sha256_or_none(value: str | None, *, field_name: str) -> str | None:
 class RaviBuildIdentity:
     distribution_name: str
     package_version: str
+    source_sha256: str
 
     def __post_init__(self) -> None:
         _canonical_text(self.distribution_name, field_name="distribution_name")
         _canonical_text(self.package_version, field_name="package_version")
+        _sha256_or_none(self.source_sha256, field_name="source_sha256")
 
 
 @dataclass(frozen=True, slots=True)
