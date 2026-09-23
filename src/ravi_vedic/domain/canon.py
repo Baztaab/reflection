@@ -7,6 +7,8 @@ from hashlib import sha256
 from types import MappingProxyType
 from typing import Any
 
+from ravi_vedic.errors import InvariantViolationError
+
 POLICY_MANIFEST_VERSION = "ravi-vedic-policy-manifest-v1"
 
 
@@ -164,6 +166,6 @@ RAVI_VEDIC_MVP_V1_POLICY_MANIFEST_SHA256 = (
 )
 
 if RAVI_VEDIC_MVP_V1.policy_manifest_sha256 != RAVI_VEDIC_MVP_V1_POLICY_MANIFEST_SHA256:
-    raise RuntimeError(
+    raise InvariantViolationError(
         "ravi-vedic-mvp-v1 policy data changed without updating its pinned manifest identity"
     )
