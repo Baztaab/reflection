@@ -383,6 +383,12 @@ Exit gate:
 Each slice is independently reviewed and green before the next begins. Numerical
 D1/D9/D10 calculations remain unchanged throughout M2.6.8.
 
+**M2.6.8 status: COMPLETE.** The executable contract now shares one tested runtime
+vocabulary, requires exactly one of every Graha, discriminates D9/D10 signatures down to
+nested projection policy IDs, preserves source methods and tropical/sidereal Swiss
+retflags, validates real development/canonical output, and remains the repository's only
+executable machine schema.
+
 ## M2.6.9 — Errors, typing, and broader quality gates
 
 Purpose: catch architectural mistakes before they become runtime astrology mistakes.
