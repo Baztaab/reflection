@@ -124,9 +124,15 @@ def test_provenance_detaches_sequence_inputs():
     assert provenance.warnings == ("example",)
 
 
-def test_core_result_requires_policy_identity():
-    parameter = inspect.signature(CoreResult).parameters["policy_manifest_sha256"]
-    assert parameter.default is inspect.Parameter.empty
+def test_core_result_requires_complete_calculation_identity():
+    parameters = inspect.signature(CoreResult).parameters
+    for name in (
+        "policy_manifest_sha256",
+        "runtime_identity",
+        "input_sha256",
+        "calculation_fingerprint",
+    ):
+        assert parameters[name].default is inspect.Parameter.empty
 
 
 def test_chart_collection_detaches_mapping_and_validates_frame_identity():
