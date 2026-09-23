@@ -4,6 +4,7 @@ import json
 from hashlib import sha256
 from typing import Any
 
+from ravi_vedic.domain.diagnostics import legacy_warning_string
 from ravi_vedic.domain.models import CoreResult, Graha, VargaChart, VargaProjection
 
 _CORE_V1_CHART_IDS = frozenset({"D1", "D9", "D10"})
@@ -141,7 +142,7 @@ def to_core_dict(result: CoreResult) -> dict[str, Any]:
                 "ayanamsha_policy_id": provenance.ayanamsha_policy_id,
                 "source_profile": provenance.source_profile,
                 "actual_sources": list(provenance.actual_sources),
-                "warnings": list(provenance.warnings),
+                "warnings": [legacy_warning_string(item) for item in provenance.diagnostics],
             },
         },
         "astronomy": {
