@@ -643,22 +643,16 @@
       ],
       "properties": {
         "varga": {
-          "enum": [
-            "D9",
-            "D10"
-          ]
+          "type": "string",
+          "minLength": 1
         },
         "factor": {
-          "enum": [
-            9,
-            10
-          ]
+          "type": "integer",
+          "minimum": 1
         },
         "mapping_policy_id": {
-          "enum": [
-            "varga.parasari-navamsa-v1",
-            "varga.parasari-dashamsa-v1"
-          ]
+          "type": "string",
+          "minLength": 1
         },
         "ascendant": {
           "$ref": "#/$defs/vargaProjection"
@@ -669,7 +663,79 @@
           },
           "$ref": "#/$defs/exactGrahaArray"
         }
-      }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "varga": {
+              "const": "D9"
+            },
+            "factor": {
+              "const": 9
+            },
+            "mapping_policy_id": {
+              "const": "varga.parasari-navamsa-v1"
+            },
+            "ascendant": {
+              "properties": {
+                "mapping_policy_id": {
+                  "const": "varga.parasari-navamsa-v1"
+                }
+              },
+              "required": [
+                "mapping_policy_id"
+              ]
+            },
+            "grahas": {
+              "items": {
+                "properties": {
+                  "mapping_policy_id": {
+                    "const": "varga.parasari-navamsa-v1"
+                  }
+                },
+                "required": [
+                  "mapping_policy_id"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "varga": {
+              "const": "D10"
+            },
+            "factor": {
+              "const": 10
+            },
+            "mapping_policy_id": {
+              "const": "varga.parasari-dashamsa-v1"
+            },
+            "ascendant": {
+              "properties": {
+                "mapping_policy_id": {
+                  "const": "varga.parasari-dashamsa-v1"
+                }
+              },
+              "required": [
+                "mapping_policy_id"
+              ]
+            },
+            "grahas": {
+              "items": {
+                "properties": {
+                  "mapping_policy_id": {
+                    "const": "varga.parasari-dashamsa-v1"
+                  }
+                },
+                "required": [
+                  "mapping_policy_id"
+                ]
+              }
+            }
+          }
+        }
+      ]
     },
     "diagnostic": {
       "type": "object",
