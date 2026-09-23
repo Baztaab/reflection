@@ -39,10 +39,14 @@ class RaviBuildIdentity:
 class PythonRuntimeIdentity:
     implementation: str
     version: str
+    system: str
+    machine: str
 
     def __post_init__(self) -> None:
         _canonical_text(self.implementation, field_name="python.implementation")
         _canonical_text(self.version, field_name="python.version")
+        _canonical_text(self.system, field_name="python.system")
+        _canonical_text(self.machine, field_name="python.machine")
 
 
 @dataclass(frozen=True, slots=True)
