@@ -12,6 +12,7 @@ from ravi_vedic.projection import to_core_dict
 from ravi_vedic.projection.contract import (
     CORE_CHART_IDS,
     CORE_GRAHA_NAMES,
+    CORE_GRAHA_ORDER,
     CORE_SCHEMA_VERSION,
     CORE_SIGN_NAMES,
     CORE_VARGA_SIGNATURES,
@@ -186,6 +187,59 @@ def test_core_projection_validates_against_executable_schema() -> None:
     assert "evidence" not in payload
     assert "timing" not in payload
     assert "sensitivity_summary" not in payload
+
+
+def _astronomy_body(payload: dict, body_name: str) -> dict:
+    return next(
+        item
+        for item in payload["astronomy"]["bodies"]
+        if item["body"] == body_name
+    )
+
+
+def test_projection_preserves_body_execution_flags_and_source_methods() -> None:
+    result = _development_result()
+    payload = to_core_dict(result)
+
+    for body, body_name in zip(CORE_GRAHA_ORDER, CORE_GRAHA_NAMES, strict=True):
+        position = result.astronomy.bodies[body]
+        projected = _astronomy_body(payload, body_name)
+        assert projected["source_method"] == position.source_method
+        assert projected["retflags_tropical"] == position.retflags_tropical
+        assert projected["retflags_sidereal"] == position.retflags_sidereal
+
+
+@pytest.mark.parametrize(
+    ("body_name", "field", "invalid_value"),
+    [
+        ("Sun", "retflags_tropical", None),
+        ("Sun", "retflags_sidereal", None),
+        ("Rahu", "retflags_tropical", None),
+        ("Ketu", "retflags_tropical", 0),
+        ("Ketu", "retflags_sidereal", 0),
+    ],
+)
+def test_schema_rejects_impossible_body_retflag_shapes(
+    body_name: str,
+    field: str,
+    invalid_value: int | None,
+) -> None:
+    schema = _schema()
+    malformed = deepcopy(to_core_dict(_development_result()))
+    _astronomy_body(malformed, body_name)[field] = invalid_value
+
+    with pytest.raises(ValidationError):
+        Draft202012Validator(schema).validate(malformed)
+
+
+def test_schema_requires_body_retflags_even_when_null() -> None:
+    schema = _schema()
+    malformed = deepcopy(to_core_dict(_development_result()))
+    ketu = _astronomy_body(malformed, "Ketu")
+    del ketu["retflags_tropical"]
+
+    with pytest.raises(ValidationError):
+        Draft202012Validator(schema).validate(malformed)
 
 
 def test_projection_uses_completed_result_identity_without_rehashing() -> None:
