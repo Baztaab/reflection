@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import json
-from hashlib import sha256
 from typing import Any
 
-from ravi_vedic.domain.diagnostics import legacy_warning_string
+from ravi_vedic.domain.calculation_identity import CALCULATION_FINGERPRINT_MANIFEST_VERSION
+from ravi_vedic.domain.diagnostics import Diagnostic
 from ravi_vedic.domain.models import CoreResult, Graha, VargaChart, VargaProjection
 
 _CORE_V1_CHART_IDS = frozenset({"D1", "D9", "D10"})
@@ -56,15 +55,47 @@ def _input_dict(result: CoreResult) -> dict[str, Any]:
     }
 
 
-def _deterministic_input_hash(result: CoreResult) -> str:
-    data = _input_dict(result).copy()
-    data.pop("source_note", None)
-    payload = {
-        "canon_id": result.canon_id,
-        "input": data,
+def _runtime_identity_dict(result: CoreResult) -> dict[str, Any]:
+    identity = result.runtime_identity
+    return {
+        "ravi": {
+            "distribution_name": identity.ravi.distribution_name,
+            "package_version": identity.ravi.package_version,
+            "source_sha256": identity.ravi.source_sha256,
+        },
+        "python": {
+            "implementation": identity.python.implementation,
+            "version": identity.python.version,
+            "system": identity.python.system,
+            "machine": identity.python.machine,
+        },
+        "astronomy": {
+            "implementation": identity.astronomy.implementation,
+            "binding_version": identity.astronomy.binding_version,
+            "library_version": identity.astronomy.library_version,
+            "ephemeris_manifest_sha256": identity.astronomy.ephemeris_manifest_sha256,
+            "ephemeris_file_count": identity.astronomy.ephemeris_file_count,
+        },
+        "timezone": {
+            "provider": identity.timezone.provider,
+            "version": identity.timezone.version,
+        },
+        "source_profile": identity.source_profile,
     }
-    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    return sha256(encoded).hexdigest()
+
+
+def _diagnostic_dict(diagnostic: Diagnostic) -> dict[str, Any]:
+    return {
+        "code": diagnostic.code,
+        "severity": diagnostic.severity.value,
+        "layer": diagnostic.layer.value,
+        "affected_fields": list(diagnostic.affected_fields),
+        "canonicality_impact": diagnostic.canonicality_impact.value,
+        "details": {
+            key: diagnostic.details[key]
+            for key in sorted(diagnostic.details)
+        },
+    }
 
 
 def _projection_dict(projection: VargaProjection) -> dict[str, Any]:
@@ -114,6 +145,8 @@ def to_core_dict(result: CoreResult) -> dict[str, Any]:
     return {
         "schema_version": "ravi-vedic-core-v1",
         "canon_id": result.canon_id,
+        "calculation_status": result.calculation_status.value,
+        "diagnostics": [_diagnostic_dict(item) for item in result.diagnostics],
         "input": _input_dict(result),
         "time_context": {
             "local_datetime": time_context.local_datetime.isoformat(),
@@ -129,7 +162,11 @@ def to_core_dict(result: CoreResult) -> dict[str, Any]:
             "resolution_status": time_context.resolution_status,
         },
         "provenance": {
-            "deterministic_input_hash": _deterministic_input_hash(result),
+            "input_sha256": result.input_sha256,
+            "calculation_fingerprint": result.calculation_fingerprint,
+            "calculation_fingerprint_version": CALCULATION_FINGERPRINT_MANIFEST_VERSION,
+            "policy_manifest_sha256": result.policy_manifest_sha256,
+            "runtime": _runtime_identity_dict(result),
             "astronomy": {
                 "implementation": provenance.implementation,
                 "implementation_version": provenance.implementation_version,
@@ -142,7 +179,6 @@ def to_core_dict(result: CoreResult) -> dict[str, Any]:
                 "ayanamsha_policy_id": provenance.ayanamsha_policy_id,
                 "source_profile": provenance.source_profile,
                 "actual_sources": list(provenance.actual_sources),
-                "warnings": [legacy_warning_string(item) for item in provenance.diagnostics],
             },
         },
         "astronomy": {
