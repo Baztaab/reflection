@@ -8,14 +8,9 @@ from zoneinfo import ZoneInfo
 from ravi_vedic.astronomy.port import AstronomySessionPort
 from ravi_vedic.domain.identity import TimezoneRuntimeIdentity
 from ravi_vedic.domain.models import BirthInput, TimeContext
+from ravi_vedic.errors import TimeResolutionError
 
 PINNED_TZDATA_VERSION = "2026.4"
-
-
-class TimeResolutionError(ValueError):
-    def __init__(self, code: str, message: str) -> None:
-        super().__init__(message)
-        self.code = code
 
 
 @dataclass(frozen=True, slots=True)
