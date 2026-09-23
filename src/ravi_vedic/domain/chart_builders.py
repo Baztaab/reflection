@@ -10,6 +10,7 @@ from ravi_vedic.domain.models import AstronomicalSnapshot, ChartCollection, Char
 from ravi_vedic.domain.varga.base import VargaPolicy
 from ravi_vedic.domain.varga.chart import build_varga_from_policy
 from ravi_vedic.domain.varga.registry import get_varga_policy
+from ravi_vedic.errors import InvariantViolationError, UnsupportedPolicyError
 
 ChartBuilder = Callable[[AstronomicalSnapshot, CalculationCanon, str], ChartFrameType]
 
@@ -33,7 +34,7 @@ def _build_rasi(
     chart_id: str,
 ) -> ChartFrameType:
     if chart_id != "D1":
-        raise ValueError(f"rasi policy can only build D1, not {chart_id}")
+        raise InvariantViolationError(f"rasi policy can only build D1, not {chart_id}")
     return build_d1(snapshot, canon)
 
 
@@ -47,7 +48,9 @@ class ChartBuilderRegistry:
         detached: dict[str, ChartBuilder] = {}
         for policy_id, builder in self.builders.items():
             if not isinstance(policy_id, str) or not policy_id or policy_id.strip() != policy_id:
-                raise ValueError("chart builder policy ids must be non-empty canonical strings")
+                raise InvariantViolationError(
+                    "chart builder policy ids must be non-empty canonical strings"
+                )
             if not callable(builder):
                 raise TypeError(f"chart builder for {policy_id} must be callable")
             detached[policy_id] = builder
@@ -67,14 +70,14 @@ class ChartBuilderRegistry:
         try:
             builder = self.builders[policy_id]
         except KeyError as exc:
-            raise ValueError(f"unsupported chart policy: {policy_id}") from exc
+            raise UnsupportedPolicyError(f"unsupported chart policy: {policy_id}") from exc
         frame = builder(snapshot, canon, chart_id)
         if frame.chart_id != chart_id:
-            raise ValueError(
+            raise InvariantViolationError(
                 f"chart builder returned wrong frame: requested={chart_id}, actual={frame.chart_id}"
             )
         if frame.mapping_policy_id != policy_id:
-            raise ValueError(
+            raise InvariantViolationError(
                 f"chart builder returned wrong policy: requested={policy_id}, "
                 f"actual={frame.mapping_policy_id}"
             )
@@ -83,7 +86,9 @@ class ChartBuilderRegistry:
     def extended(self, extra: Mapping[str, ChartBuilder]) -> ChartBuilderRegistry:
         overlap = set(self.builders).intersection(extra)
         if overlap:
-            raise ValueError(f"chart builder policies already registered: {sorted(overlap)}")
+            raise InvariantViolationError(
+                f"chart builder policies already registered: {sorted(overlap)}"
+            )
         return ChartBuilderRegistry({**self.builders, **extra})
 
 
