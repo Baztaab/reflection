@@ -17,11 +17,16 @@ payloads for five births in isolated Python processes using
 `scripts/verify_foundation_parity.py`.
 
 Through M2.6.7.4 this was full-envelope equality. M2.6.7.5 is the explicit executable
-contract migration for calculation identity/status/diagnostics, so the cross-version gate
-now requires **exact zero-tolerance equality** for input, TimeContext, astronomy,
-astronomy provenance, canon id and D1/D9/D10 while excluding only the intentionally
-migrated contract envelope. The current envelope is independently enforced by the
-executable schema and projection contract tests. ADR-0011 records this boundary change.
+contract migration for calculation identity/status/diagnostics. M2.6.8.4 additionally
+projects per-body Swiss return flags that were already retained internally but do not exist
+in the frozen pre-M2.6 payload.
+
+The cross-version gate therefore still requires **exact zero-tolerance equality** for all
+pre-existing input, TimeContext, astronomy values/source methods, astronomy provenance,
+canon id and D1/D9/D10 fields. It excludes only the intentionally migrated
+identity/status/diagnostic envelope and the newly exposed retflag fields. The current
+envelope and retflag semantics are independently enforced by executable-schema, projection
+and canonical integration tests. ADR-0011 and ADR-0012 record these boundary changes.
 
 Foundation changes must not alter astrological results. A deliberate calculation-policy
 change needs a separately reviewed decision, new policy identity where applicable,
