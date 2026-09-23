@@ -376,7 +376,9 @@
         "distance_au",
         "longitude_speed_deg_per_day",
         "retrograde",
-        "source_method"
+        "source_method",
+        "retflags_tropical",
+        "retflags_sidereal"
       ],
       "properties": {
         "body": {
@@ -402,6 +404,18 @@
         },
         "source_method": {
           "type": "string"
+        },
+        "retflags_tropical": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "retflags_sidereal": {
+          "type": [
+            "integer",
+            "null"
+          ]
         }
       }
     },
