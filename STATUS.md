@@ -468,17 +468,11 @@ No calculation policy, Jyotish technique or serialized payload was added in M2.6
 GitHub currently reports `main` as unprotected; that is a separate non-blocking
 repository-governance follow-up, not an engine-architecture acceptance failure.
 
-## Why M3 is still blocked
+## M3 handoff boundary
 
-The current core is numerically useful but still has foundation debt that should not be
-copied into Nakshatra/lordship/dispositor work:
-
-- M2.6.7 calculation identity/diagnostics, M2.6.8 executable contract hardening and
-  M2.6.9 quality gates are complete;
-- M2.6.10 still needs one final architecture-acceptance audit against all twelve
-  foundation gates.
-
-That acceptance audit is M2.6 work, not M3 work.
+The foundation debt identified by M2.6 is closed. M3 may begin from this accepted
+baseline, but it has **not** started in this branch or PR. Nakshatra/Pada and every other
+new Jyotish technique remain outside M2.6.10.
 
 ## CI execution contract after cleanup
 
@@ -503,4 +497,5 @@ That acceptance audit is M2.6 work, not M3 work.
 M2.6 is complete. **Stop here.** The next separate milestone, when explicitly started,
 is M3 Structural Jyotish beginning with Nakshatra/Pada.
 
-Only after all M2.6 acceptance gates pass may M3 begin with Nakshatra/Pada.
+All M2.6 acceptance gates now pass. M3 begins only in a separate explicitly started
+milestone.
