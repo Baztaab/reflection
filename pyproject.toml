@@ -7,6 +7,13 @@ name = "ravi-vedic"
 version = "0.1.0"
 description = "Canonical calculation kernel for RAVI VEDIC"
 requires-python = ">=3.11,<3.15"
+classifiers = [
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+]
 dependencies = [
   "pyswisseph==2.10.3.2",
   "tzdata==2026.4",
