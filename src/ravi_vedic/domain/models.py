@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Iterator, Mapping
 from dataclasses import dataclass
 from datetime import datetime
 from enum import StrEnum
 from types import MappingProxyType
+from typing import Protocol
 
 
 class Graha(StrEnum):
@@ -171,6 +172,10 @@ class D1Chart:
                 raise ValueError("D1 placement policy must match chart mapping_policy_id")
         object.__setattr__(self, "placements", MappingProxyType(detached))
 
+    @property
+    def chart_id(self) -> str:
+        return "D1"
+
 
 @dataclass(frozen=True, slots=True)
 class VargaProjection:
@@ -209,6 +214,79 @@ class VargaChart:
                 raise ValueError("Varga placement policy must match chart mapping_policy_id")
         object.__setattr__(self, "placements", MappingProxyType(detached))
 
+    @property
+    def chart_id(self) -> str:
+        return self.varga
+
+
+class ChartPlacement(Protocol):
+    """Minimal common placement surface; coordinate semantics remain type-specific."""
+
+    body: Graha
+    house: int
+    retrograde: bool
+
+
+class ChartFrame(Protocol):
+    """Minimal common chart surface without inventing a shared longitude meaning."""
+
+    @property
+    def chart_id(self) -> str: ...
+
+    mapping_policy_id: str
+    placements: Mapping[Graha, ChartPlacement]
+
+
+ChartFrameType = D1Chart | VargaChart
+
+
+@dataclass(frozen=True, slots=True)
+class ChartCollection(Mapping[str, ChartFrameType]):
+    """Detached immutable collection that is the domain source of chart storage."""
+
+    frames: Mapping[str, ChartFrameType]
+
+    def __post_init__(self) -> None:
+        detached: dict[str, ChartFrameType] = {}
+        for chart_id, frame in self.frames.items():
+            if not isinstance(chart_id, str) or not chart_id or chart_id.strip() != chart_id:
+                raise ValueError("chart ids must be non-empty canonical strings")
+            if not isinstance(frame, (D1Chart, VargaChart)):
+                raise TypeError(f"unsupported chart frame type for {chart_id}: {type(frame)!r}")
+            if frame.chart_id != chart_id:
+                raise ValueError(
+                    f"chart collection key/frame mismatch: key={chart_id}, frame={frame.chart_id}"
+                )
+            detached[chart_id] = frame
+        object.__setattr__(self, "frames", MappingProxyType(detached))
+
+    def __getitem__(self, chart_id: str) -> ChartFrameType:
+        return self.frames[chart_id]
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self.frames)
+
+    def __len__(self) -> int:
+        return len(self.frames)
+
+    def require_d1(self) -> D1Chart:
+        try:
+            frame = self.frames["D1"]
+        except KeyError as exc:
+            raise ValueError("chart collection requires D1") from exc
+        if not isinstance(frame, D1Chart):
+            raise TypeError("D1 must be a D1Chart")
+        return frame
+
+    def require_varga(self, chart_id: str) -> VargaChart:
+        try:
+            frame = self.frames[chart_id]
+        except KeyError as exc:
+            raise ValueError(f"chart collection is missing {chart_id}") from exc
+        if not isinstance(frame, VargaChart):
+            raise TypeError(f"{chart_id} must be a VargaChart")
+        return frame
+
 
 @dataclass(frozen=True, slots=True)
 class CoreResult:
@@ -216,12 +294,28 @@ class CoreResult:
     birth_input: BirthInput
     time_context: TimeContext
     astronomy: AstronomicalSnapshot
-    d1: D1Chart
-    d9: VargaChart
-    d10: VargaChart
+    charts: ChartCollection
     policy_manifest_sha256: str
 
     def __post_init__(self) -> None:
+        if not isinstance(self.charts, ChartCollection):
+            raise TypeError("charts must be a ChartCollection")
+        self.charts.require_d1()
         value = self.policy_manifest_sha256
         if len(value) != 64 or any(char not in "0123456789abcdef" for char in value):
             raise ValueError("policy_manifest_sha256 must be a lowercase SHA-256 hex digest")
+
+    @property
+    def d1(self) -> D1Chart:
+        """Compatibility accessor backed by the generic collection."""
+        return self.charts.require_d1()
+
+    @property
+    def d9(self) -> VargaChart:
+        """Compatibility accessor backed by the generic collection."""
+        return self.charts.require_varga("D9")
+
+    @property
+    def d10(self) -> VargaChart:
+        """Compatibility accessor backed by the generic collection."""
+        return self.charts.require_varga("D10")

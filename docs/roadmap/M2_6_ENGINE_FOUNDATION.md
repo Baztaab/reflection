@@ -1,6 +1,6 @@
 # M2.6 — Engine Foundation Roadmap
 
-Status: In progress; M2.6.0–5 implemented and CI verified; M2.6.6 next
+Status: In progress; M2.6.0–6 implemented and CI verified; M2.6.7 next
 Date: 2026-09-22
 Goal: make the existing D1/D9/D10 core safe to extend before M3 Structural Jyotish.
 
@@ -261,6 +261,12 @@ Exit gate:
 - property tests cover normalization and partition invariants.
 
 ## M2.6.6 — Generic chart frame and chart collection
+
+Implemented and CI-verified on PR #10 implementation head
+`d474159497b82e72f1d77a1b516938d86adbc5d4`. Quality run `35804533184`:
+Ruff passed, **132 tests passed, 1 skipped**, and exact full-payload parity remained
+**5/5**. Canonical Swiss run `35804533202` also passed. See ADR-0009 and the
+[pinned chart-collection review](../research/M2_6_6_CHART_COLLECTION_REVIEW.md).
 
 Purpose: make "add a future chart" mean "add a policy", not "edit the engine everywhere".
 

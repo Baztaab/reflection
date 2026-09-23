@@ -7,6 +7,7 @@ from ravi_vedic.domain.models import (
     AstronomicalSnapshot,
     AstronomyProvenance,
     BodyPosition,
+    ChartCollection,
     CoreResult,
     D1Chart,
     D1Placement,
@@ -126,3 +127,49 @@ def test_provenance_detaches_sequence_inputs():
 def test_core_result_requires_policy_identity():
     parameter = inspect.signature(CoreResult).parameters["policy_manifest_sha256"]
     assert parameter.default is inspect.Parameter.empty
+
+
+def test_chart_collection_detaches_mapping_and_validates_frame_identity():
+    placement = D1Placement(
+        body=Graha.SUN,
+        sidereal_longitude_deg=9.0,
+        sign_index=0,
+        degree_in_sign=9.0,
+        house=1,
+        retrograde=False,
+        mapping_policy_id="varga.rasi-v1",
+    )
+    frame = D1Chart(
+        ascendant_sidereal_longitude_deg=1.0,
+        ascendant_sign_index=0,
+        ascendant_degree_in_sign=1.0,
+        placements={Graha.SUN: placement},
+        house_policy_id="houses.whole-sign-v1",
+        mapping_policy_id="varga.rasi-v1",
+    )
+    source = {"D1": frame}
+    charts = ChartCollection(source)
+    source.clear()
+
+    assert charts.require_d1() is frame
+    assert tuple(charts) == ("D1",)
+    with pytest.raises(TypeError):
+        charts.frames["D9"] = frame
+    with pytest.raises(ValueError, match="key/frame mismatch"):
+        ChartCollection({"D9": frame})
+
+
+def test_chart_builder_registry_is_detached_and_cannot_override_existing_policy():
+    from ravi_vedic.domain.chart_builders import RAVI_CHART_BUILDERS, ChartBuilderRegistry
+
+    source = dict(RAVI_CHART_BUILDERS.builders)
+    registry = ChartBuilderRegistry(source)
+    source.clear()
+
+    assert set(registry.builders) == set(RAVI_CHART_BUILDERS.builders)
+    with pytest.raises(TypeError):
+        registry.builders["test"] = lambda snapshot, canon, chart_id: None
+    with pytest.raises(ValueError, match="already registered"):
+        RAVI_CHART_BUILDERS.extended(
+            {"varga.rasi-v1": RAVI_CHART_BUILDERS.builders["varga.rasi-v1"]}
+        )

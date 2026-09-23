@@ -24,6 +24,7 @@ class RaviEngine:
     def __post_init__(self) -> None:
         if self.astronomy is None or self.time_context_provider is None:
             raise TypeError("RaviEngine requires astronomy and time_context_provider ports")
+
         snapshot = self.canon.snapshot()
         if snapshot.canon_id != RAVI_VEDIC_MVP_V1.canon_id:
             raise ValueError(f"unsupported canon_id: {snapshot.canon_id}")
@@ -39,9 +40,10 @@ class RaviEngine:
                 f"unsupported charts.house_policy_id: {snapshot.charts.house_policy_id}"
             )
         if snapshot.charts.varga_policy_ids != RAVI_VEDIC_MVP_V1.charts.varga_policy_ids:
-            raise ValueError("this engine requires the implemented D1/D9/D10 policies")
+            raise ValueError("this engine requires the pinned RAVI chart policy set")
         if snapshot.policy_manifest_sha256 != RAVI_VEDIC_MVP_V1.policy_manifest_sha256:
             raise ValueError("unsupported policy manifest")
+
         object.__setattr__(self, "canon", snapshot)
 
     def calculate(self, birth: BirthInput) -> CoreResult:

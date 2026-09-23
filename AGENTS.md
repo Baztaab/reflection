@@ -28,6 +28,10 @@ Non-negotiable rules:
 - One configured astronomy session must span Julian-time conversion and snapshot production for one chart calculation.
 - Domain immutability must be enforced by constructors; do not introduce alternate "safe" factory paths that callers must remember.
 - The package-level calculation API is `create_engine(...)` / `RaviEngine.calculate(...)`; do not re-export the low-level pipeline facade from the package root.
+- `CoreResult.charts` is the chart-storage source of truth; do not reintroduce stored D9/D10 result slots.
+- Do not erase D1/Varga coordinate semantics behind a generic longitude field: D1 is observed sidereal longitude, Vargas are mathematical projections.
+- The production `RaviEngine` stays locked to the pinned RAVI Canon; test-only registry injection belongs on the explicit low-level integration seam, not a plugin surface.
+- A compatibility projection must reject domain data it cannot represent rather than silently dropping it.
 - Prefer small, dependency-ordered changes over speculative infrastructure.
 
 When finishing a meaningful implementation step, update `STATUS.md` with what is now
