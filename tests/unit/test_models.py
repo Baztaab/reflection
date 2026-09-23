@@ -3,6 +3,7 @@ import inspect
 import pytest
 
 from ravi_vedic.domain.diagnostics import Diagnostic
+from ravi_vedic.errors import InvariantViolationError
 from ravi_vedic.domain.models import (
     AscendantPosition,
     AstronomicalSnapshot,
@@ -164,7 +165,7 @@ def test_chart_collection_detaches_mapping_and_validates_frame_identity():
     assert tuple(charts) == ("D1",)
     with pytest.raises(TypeError):
         charts.frames["D9"] = frame
-    with pytest.raises(ValueError, match="key/frame mismatch"):
+    with pytest.raises(InvariantViolationError, match="key/frame mismatch"):
         ChartCollection({"D9": frame})
 
 
@@ -178,7 +179,7 @@ def test_chart_builder_registry_is_detached_and_cannot_override_existing_policy(
     assert set(registry.builders) == set(RAVI_CHART_BUILDERS.builders)
     with pytest.raises(TypeError):
         registry.builders["test"] = lambda snapshot, canon, chart_id: None
-    with pytest.raises(ValueError, match="already registered"):
+    with pytest.raises(InvariantViolationError, match="already registered"):
         RAVI_CHART_BUILDERS.extended(
             {"varga.rasi-v1": RAVI_CHART_BUILDERS.builders["varga.rasi-v1"]}
         )
