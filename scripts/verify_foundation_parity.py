@@ -1,8 +1,9 @@
 """Verify exact M2.6 calculation compatibility against a frozen checkout.
 
-M2.6.7.5 deliberately migrates the identity/diagnostic JSON envelope. This verifier
-therefore compares the complete calculation payload and astronomy provenance exactly,
-while leaving the versioned contract envelope to executable-schema tests.
+M2.6.7.5 deliberately migrated the identity/diagnostic JSON envelope, and M2.6.8.4
+adds per-body Swiss return flags that did not exist in the frozen baseline. This verifier
+therefore compares all pre-existing calculation fields and astronomy provenance exactly,
+while leaving only those explicitly added contract fields to executable-schema tests.
 
 Usage: python scripts/verify_foundation_parity.py BASELINE_TREE CURRENT_TREE
 The frozen checkout must be the commit in the M2.6 baseline manifest.
@@ -44,12 +45,21 @@ else:
 def calculation_payload(payload):
     astronomy_provenance = dict(payload["provenance"]["astronomy"])
     astronomy_provenance.pop("warnings", None)
+
+    astronomy = dict(payload["astronomy"])
+    astronomy["bodies"] = []
+    for body in payload["astronomy"]["bodies"]:
+        comparable_body = dict(body)
+        comparable_body.pop("retflags_tropical", None)
+        comparable_body.pop("retflags_sidereal", None)
+        astronomy["bodies"].append(comparable_body)
+
     return {
         "canon_id": payload["canon_id"],
         "input": payload["input"],
         "time_context": payload["time_context"],
         "astronomy_provenance": astronomy_provenance,
-        "astronomy": payload["astronomy"],
+        "astronomy": astronomy,
         "charts": payload["charts"],
     }
 
@@ -79,6 +89,6 @@ print(
     "(Tehran, both DST folds, polar latitude, southern hemisphere)"
 )
 print(
-    "No numerical tolerance used; only the intentionally migrated "
-    "identity/status/diagnostic contract envelope is excluded."
+    "No numerical tolerance used; only the intentionally added "
+    "identity/status/diagnostic envelope and per-body retflags are excluded."
 )
