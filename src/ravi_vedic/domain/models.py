@@ -65,14 +65,22 @@ class BirthInput:
         timezone_id: str,
         latitude_deg: float,
         longitude_deg: float,
-        **kwargs: object,
+        elevation_m: float | None = None,
+        calendar: str = "gregorian",
+        time_uncertainty_seconds: int = 0,
+        fold: int | None = None,
+        source_note: str | None = None,
     ) -> BirthInput:
         return cls(
             local_datetime=datetime.fromisoformat(local_datetime),
             timezone_id=timezone_id,
             latitude_deg=latitude_deg,
             longitude_deg=longitude_deg,
-            **kwargs,
+            elevation_m=elevation_m,
+            calendar=calendar,
+            time_uncertainty_seconds=time_uncertainty_seconds,
+            fold=fold,
+            source_note=source_note,
         )
 
 
