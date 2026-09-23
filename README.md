@@ -110,6 +110,18 @@ RAVI currently supports **CPython 3.11, 3.12, 3.13 and 3.14**, expressed as
 canonical Swiss-file integration run across all four minors in CI. New Python minors are
 not implicitly supported until they enter those matrices and pass.
 
+## Python support contract
+
+The package supports CPython **3.11, 3.12, 3.13 and 3.14** and declares
+`requires-python = ">=3.11,<3.15"`. Both the normal quality lane and the strict
+canonical-Swiss lane run that exact four-minor matrix. Support is therefore based on
+executed RAVI tests, not on dependency metadata alone.
+
+The pinned `pyswisseph==2.10.3.2` publishes prebuilt wheels only through CPython 3.11,
+but RAVI CI also verifies successful source installation and canonical execution on
+3.12–3.14. Expansion to a future Python minor requires the same explicit green matrix
+change before package metadata is widened.
+
 ## Static typing contract
 
 The production package is checked with pinned **mypy 2.3.1** in strict mode. CI runs
