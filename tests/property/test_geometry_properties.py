@@ -39,6 +39,16 @@ def test_longitude_normalization_is_periodic_and_bounded(value: float, turns: in
 
 @PROPERTY_SETTINGS
 @given(
+    ticks=st.integers(min_value=-8_000_000, max_value=8_000_000),
+    turns=st.integers(min_value=-1_000, max_value=1_000),
+)
+def test_binary_exact_longitude_periodicity(ticks: int, turns: int) -> None:
+    value = ticks / 8.0
+    assert Longitude(value + 360.0 * turns).degrees == Longitude(value).degrees
+
+
+@PROPERTY_SETTINGS
+@given(
     longitude=FINITE_LONGITUDES,
     factor=st.integers(min_value=1, max_value=60),
 )
