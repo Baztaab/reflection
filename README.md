@@ -1,188 +1,36 @@
-# reflection
+# Reflection — RAVI Jyotish Laboratory
 
-`reflection` is the deterministic calculation engine behind RAVI VEDIC.
+The repository changed direction on 2026-09-24.
 
-The project is optimized for auditable Jyotish research rather than feature count.
-Astronomy, Jyotish policy, derived structure, evidence and interpretation are kept as
-separate concerns.
+The previous RAVI VEDIC foundation has been preserved **verbatim** under:
 
-Current milestone: **M2.6 Engine Foundation — COMPLETE**. All twelve M2.6.10
-architecture-acceptance gates are satisfied by executable code/tests/CI. M3 is not started.
+`archive/foundation-m2_6-2026-09-24/`
 
-## Current executable core
+That archive is the exact repository tree from commit `329d1db0bf136b0328e1638d6b6acd11ed02a0af`.
 
-The engine currently computes:
+## Active direction
 
-```text
-BirthInput
- -> pinned TimeContext
- -> SwissEphemerisAdapter
-    -> SwissSession (serialized native-state boundary)
- -> AstronomicalSnapshot
- -> policy-driven chart builders
- -> immutable ChartCollection (D1 / D9 / D10)
- -> CoreResult
- -> Core JSON v1 executable projection
-```
+The active project is now **J0 — Jyotish Computational Atlas**.
 
-Canonical choices currently implemented include True Pushya, True Rahu with derived
-opposite Ketu, Whole Sign houses, Parashari Navamsha and Parashari Dashamsha.
+We will first discover and prove the actual computational layers of Jyotish:
 
-## Explicit engine setup
+1. establish the traditional/manual rule;
+2. inspect existing implementations;
+3. identify the minimum real inputs and dependencies;
+4. build the smallest useful proof implementation when needed;
+5. cross-check results;
+6. record the accepted RAVI decision;
+7. map dependencies between techniques.
 
-Configure runtime once, then reuse the engine for sequential calculations:
+Architecture, public API, schemas, serialization, provenance machinery and heavy hardening
+will be synthesized only after enough of the Jyotish domain has been mapped.
 
-```python
-from ravi_vedic import BirthInput, RuntimeConfig, SourceProfile, create_engine
-from ravi_vedic.projection import to_core_dict
+## Archive rule
 
-engine = create_engine(RuntimeConfig(
-    source_profile=SourceProfile.CANONICAL,
-    ephemeris_path="/absolute/path/to/swiss-data",
-))
-birth = BirthInput.from_iso(
-    local_datetime="1997-06-07T20:28:36",
-    timezone_id="Asia/Tehran",
-    latitude_deg=36.15,
-    longitude_deg=51.6166666667,
-)
-payload = to_core_dict(engine.calculate(birth))
-```
+The frozen foundation is **reference material, not active code**.
 
-Canonical setup fails immediately for a missing/empty ephemeris directory, absent or empty
-planet/Moon file families at its top level, or unavailable/wrong-version tzdata.
-Files must remain unchanged while an engine is in use; directory
-presence does not guarantee coverage of every date. The adapter still checks actual
-Swiss-file source flags during calculations.
+Do not import from it, package it, run its tests or workflows, or treat its old STATUS,
+roadmaps, ADRs, schemas or AGENTS instructions as current project direction.
 
-For the reproducible 1800–2399 reference dataset used by canonical CI:
-
-```bash
-python scripts/fetch_canonical_ephemeris.py .runtime/swiss-ephe
-```
-
-The fetcher downloads only `sepl_18.se1` and `semo_18.se1` from a pinned official
-Swiss Ephemeris commit and verifies their byte counts, SHA-256 values and combined
-manifest before use. The binaries are not vendored in this repository; upstream Swiss
-Ephemeris licensing still applies to distribution and public-service deployment.
-
-For explicitly **non-canonical** development without `.se1` data:
-
-```python
-engine = create_engine(RuntimeConfig(source_profile=SourceProfile.DEVELOPMENT))
-```
-
-The development profile permits Moshier fallback; it is not a promise of a fixed Moshier
-dataset. The actual numerical source remains visible in result provenance.
-
-The supported package-level calculation entry points are `create_engine(...)` and
-`RaviEngine.calculate(...)`. `create_engine(...)` captures one immutable
-`RuntimeIdentity` snapshot at composition time: RAVI package version, Python runtime,
-pyswisseph/Swiss versions, ephemeris dataset identity, pinned timezone-data identity,
-source profile, stable platform identity and an exact hash of the installed RAVI Python
-sources. Absolute ephemeris paths are provenance only and are not part of that identity.
-
-Tests and trusted integrations may construct `RaviEngine` with fake ports, but must also
-supply an explicit fake `RuntimeIdentity`; there is no hidden runtime-identity discovery in
-the application/domain layers. The low-level
-`ravi_vedic.application.pipeline.calculate_core` function remains available only as an
-explicit integration seam and is intentionally not re-exported from the package root.
-Each completed `CoreResult` retains and serializes two distinct identities:
-
-- `input_sha256`: normalized effective birth input only, excluding display metadata;
-- `calculation_fingerprint`: a versioned SHA-256 over normalized input, Canon policy
-  identity, exact RAVI/runtime identity, resolved time facts and actual astronomy
-  provenance/source methods.
-
-Core JSON v1 also serializes `policy_manifest_sha256`, the immutable runtime identity,
-top-level `canonical | development | degraded` calculation status, typed diagnostics,
-and the tropical/sidereal Swiss return flags retained for each astronomical body.
-The executable schema rejects duplicate/missing Grahas and impossible D9/D10
-chart-factor-policy combinations. The obsolete mixed `deterministic_input_hash` and
-encoded string `warnings` fields were retired at the explicit M2.6.7.5 contract
-migration recorded by ADR-0011.
-
-## Python support contract
-
-RAVI supports **CPython 3.11, 3.12, 3.13 and 3.14**, expressed as
-`requires-python = ">=3.11,<3.15"`. Both the normal quality lane and the strict
-canonical-Swiss lane run that exact four-minor matrix. Support is therefore based on
-executed RAVI tests, not dependency metadata alone.
-
-The pinned `pyswisseph==2.10.3.2` publishes prebuilt wheels through CPython 3.11, while
-RAVI CI also verifies successful source installation and canonical execution on 3.12–3.14.
-A future Python minor is unsupported until package metadata and both CI matrices are
-expanded together and pass.
-
-## Static typing contract
-
-The production package is checked with pinned **mypy 2.3.1** in strict mode. CI runs
-`mypy src/ravi_vedic` before pytest. The only missing-import exception is scoped to the
-third-party `swisseph` module; RAVI production modules do not use a blanket ignore policy.
-
-## Property-testing contract
-
-RAVI pins **Hypothesis 6.168.1** and runs property tests as a distinct CI gate on every
-supported Python minor. Property tests stay on pure domain geometry rather than the
-process-global Swiss backend: longitude normalization, rational partition boundaries,
-whole-sign houses and D9/D10 projection invariants are exercised with generated inputs.
-
-The first property run exposed a real IEEE-754 edge case: an extremely small negative
-longitude could make Python's modulo round to exactly `360.0`, violating RAVI's
-half-open `[0, 360)` contract and producing sign index 12. The shared `Longitude`
-primitive now maps that overflow representative to the nearest valid float below 360,
-preserving Pisces ownership. A deterministic regression test locks the case in addition
-to the generated property coverage.
-
-## Error contract
-
-RAVI-owned semantic failures share one public root: `RaviVedicError`. Stable categories
-separate input/time, unsupported policy, runtime data, astronomy backend and invariant
-violations. Existing named errors such as `TimeResolutionError`,
-`EphemerisSourceError` and `SwissSessionError` remain available through their previous
-module paths and the package root.
-
-Plain `TypeError` is still used for Python API misuse such as omitting required injected
-ports; the RAVI hierarchy is not a replacement for Python's own programming errors.
-
-## Current machine contract
-
-There is exactly one executable JSON contract:
-
-- [Executable Core Schema](schemas/ravi_vedic_core_v1.schema.json)
-
-Future structures are specified in prose until their engine layer exists. The repository
-does not keep a speculative "full future schema" beside the executable contract.
-
-## Project documents
-
-- [MVP calculation specification](docs/spec/RAVI_VEDIC_MVP_v1.md)
-- [Completed M2.6 Engine Foundation roadmap](docs/roadmap/M2_6_ENGINE_FOUNDATION.md)
-- [Schema lifecycle notes](schemas/README.md)
-- [Architecture decisions](docs/adr/)
-- [Pinned Kerykeion / Immanuel review](docs/research/M2_6_1_REFERENCE_REVIEW.md)
-- [SwissSession source review](docs/research/M2_6_2_SWISS_SESSION_REVIEW.md)
-- [Canonical Swiss dataset review](docs/research/M2_6_3_CANONICAL_SWISS_DATA.md)
-- [Hierarchical Canon review](docs/research/M2_6_4_CANON_REVIEW.md)
-- [Angular/boundary kernel review](docs/research/M2_6_5_ANGLE_KERNEL_REVIEW.md)
-- [Generic chart collection review](docs/research/M2_6_6_CHART_COLLECTION_REVIEW.md)
-- [Frozen M2.6 baseline](docs/roadmap/M2_6_0_BASELINE.md)
-- [M2.6 architecture acceptance](docs/roadmap/M2_6_10_ACCEPTANCE.md)
-
-M2.6 Engine Foundation has passed its acceptance gates. M3 implementation has not started;
-the next bounded step is an M3.1 Nakshatra/Pada policy/contract audit and design before any
-new calculation code is added.
-
-## Development
-
-```bash
-python -m pip install -e ".[dev]"
-ruff check src tests scripts
-mypy src/ravi_vedic
-pytest --ignore=tests/property
-pytest tests/property
-```
-
-Before changing calculation code, read `AGENTS.md`, `STATUS.md`, and the roadmap or
-pre-implementation audit named there. Do not infer an active milestone from a completed
-roadmap.
+Useful pieces may later be recovered deliberately after the new computational map shows
+that they solve a real requirement.
