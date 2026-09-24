@@ -44,9 +44,15 @@ All twelve M2.6 acceptance gates pass. **M2.6 Engine Foundation is COMPLETE.**
 M3 may begin with Nakshatra/Pada only in a separate follow-up after this acceptance is
 merged. This acceptance does not itself add any M3 Jyotish technique.
 
-## Non-blocking repository governance note
+## Post-acceptance maintenance
 
-GitHub currently reports `main` as unprotected. Branch protection/rulesets are
-recommended repository-governance follow-up work, but they are not one of the twelve
-engine-architecture acceptance gates and do not change the accepted calculation
-foundation.
+The acceptance matrix above is historical evidence for the M2.6 decision. After acceptance,
+the pre-M2.6 cross-version parity verifier and baseline manifest were retired from regular
+CI because their migration responsibility was complete. Ongoing protection is owned by
+current golden/conformance tests, geometry and property invariants, runtime/schema
+contracts, immutable versioned reference fixtures and strict canonical-Swiss integration.
+
+Repository governance was also completed after acceptance. The default branch is protected
+by the active `Protect main — RAVI` ruleset with pull-request enforcement, linear history,
+squash-only merges, required quality/canonical checks, and force-push/deletion protection.
+These maintenance changes do not alter any M2.6 calculation policy or acceptance result.
