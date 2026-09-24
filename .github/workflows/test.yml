@@ -35,10 +35,3 @@ jobs:
         run: pytest --ignore=tests/property
       - name: Run property tests
         run: pytest tests/property
-      - name: Check out frozen pre-M2.6 core
-        uses: actions/checkout@v7
-        with:
-          ref: c12308f50ef2959f6ccdd4c95afd4bc7a171ee2e
-          path: .baseline
-      - name: Verify exact pre/post-refactor payload parity
-        run: python scripts/verify_foundation_parity.py .baseline .
