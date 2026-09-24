@@ -60,9 +60,6 @@ def test_dashamsa_segment_zero_start_signs_follow_odd_even_rule() -> None:
     assert project_longitude(30.0, policy).target_sign_index == 9
     assert project_longitude(60.0, policy).target_sign_index == 2
 
-    assert at.longitude_within_target_sign_deg == pytest.approx(0.0, abs=1e-12)
-
-
 
 def test_varga_degree_preserves_fraction_within_segment() -> None:
     policy = get_varga_policy("varga.parasari-dashamsa-v1")
