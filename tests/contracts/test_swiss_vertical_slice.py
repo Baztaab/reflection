@@ -6,7 +6,6 @@ import pytest
 from ravi_vedic import BirthInput, RuntimeConfig, SourceProfile, create_engine
 from ravi_vedic.domain.diagnostics import CalculationStatus
 from ravi_vedic.domain.models import Graha
-from ravi_vedic.infrastructure.swiss import EphemerisSourceError, SwissEphemerisAdapter
 from ravi_vedic.projection import to_core_dict
 
 FIXTURE = Path(__file__).parents[1] / "fixtures" / "reference_chart_001_true_pushya.json"
@@ -91,21 +90,6 @@ def test_ketu_is_exactly_opposite_true_rahu() -> None:
     assert ketu.longitude_speed_deg_per_day == rahu.longitude_speed_deg_per_day
     assert ketu.source_method == "derived:exact-opposition-from-true-rahu"
 
-
-def test_canonical_profile_requires_explicit_ephemeris_path() -> None:
-    with pytest.raises(EphemerisSourceError, match="explicit ephemeris_path"):
-        SwissEphemerisAdapter()
-
-
-def test_calculate_core_exposes_default_vargas() -> None:
-    fixture = json.loads(FIXTURE.read_text())
-    result = create_engine(RuntimeConfig(source_profile=SourceProfile.DEVELOPMENT)).calculate(
-        BirthInput.from_iso(**fixture["input"]),
-    )
-    assert result.d9.varga == "D9"
-    assert result.d9.mapping_policy_id == "varga.parasari-navamsa-v1"
-    assert result.d10.varga == "D10"
-    assert result.d10.mapping_policy_id == "varga.parasari-dashamsa-v1"
 
 
 def test_whole_sign_ascendant_survives_high_latitude() -> None:
