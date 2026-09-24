@@ -105,7 +105,7 @@ migration recorded by ADR-0011.
 ## Python support contract
 
 RAVI supports **CPython 3.11, 3.12, 3.13 and 3.14**, expressed as
-`requires-python = ">=3.11,<3.15"`. Both the normal quality/parity lane and the strict
+`requires-python = ">=3.11,<3.15"`. Both the normal quality lane and the strict
 canonical-Swiss lane run that exact four-minor matrix. Support is therefore based on
 executed RAVI tests, not dependency metadata alone.
 
