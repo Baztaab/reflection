@@ -7,25 +7,27 @@ The existing [quality workflow](https://github.com/Baztaab/reflection/actions/ru
 completed successfully on this exact baseline. All 44 downloaded source blobs were
 verified against their upstream Git blob identities before editing.
 
-The manifest in `tests/fixtures/m2_6_baseline_manifest.json` locks SHA-256 identities
-for both existing golden/conformance fixtures and the executable Core Schema.
-`tests/contracts/test_baseline_freeze.py` enforces those identities in the normal suite.
-Existing numerical assertions must remain intact when callers move to the engine API.
-The preserved pre-refactor worktree passed Ruff and 34 tests locally (33 original tests
-plus the hash gate). The refactor's CI also checks out this exact upstream commit and compares Core JSON
-payloads for five births in isolated Python processes using
-`scripts/verify_foundation_parity.py`.
+At the start of M2.6, a temporary baseline manifest and freeze test locked the existing
+golden/conformance fixtures and executable Core Schema, and the refactor CI compared the
+pre-refactor worktree against the evolving implementation for five births in isolated
+Python processes. The preserved baseline passed Ruff and 34 tests locally (33 original
+tests plus the temporary hash gate).
 
 Through M2.6.7.4 this was full-envelope equality. M2.6.7.5 explicitly migrated the
 calculation identity/status/diagnostic envelope. M2.6.8.4 additionally exposes per-body
 Swiss return flags that were retained internally but did not exist in the frozen baseline.
 
-The cross-version gate therefore still requires **exact zero-tolerance equality** for all
+During M2.6, the cross-version gate required **exact zero-tolerance equality** for all
 pre-existing input, TimeContext, astronomy values and source methods, astronomy
-provenance, canon id and D1/D9/D10 fields. It excludes only the intentionally migrated
-identity/status/diagnostic envelope and the newly exposed return-flag fields. Current
-schema/projection/canonical tests independently require those retflags and enforce their
-body/source semantics. ADR-0011 and ADR-0012 record these explicit contract migrations.
+provenance, canon id and D1/D9/D10 fields. It excluded only the intentionally migrated
+identity/status/diagnostic envelope and the newly exposed return-flag fields. ADR-0011
+and ADR-0012 record those explicit contract migrations.
+
+That migration gate completed its job when M2.6.10 was accepted. On 2026-09-24 the
+temporary baseline manifest, freeze test and cross-version verifier were retired from the
+active suite. Their successful 5/5 evidence remains in the M2.6.10 acceptance record and
+CI history. Current protection is owned by immutable versioned reference fixtures plus
+direct golden, conformance, geometry/property, runtime/schema and canonical-Swiss tests.
 
 Foundation changes must not alter astrological results. A deliberate calculation-policy
 change needs a separately reviewed decision, new policy identity where applicable,
