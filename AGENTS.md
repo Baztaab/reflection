@@ -8,6 +8,8 @@ Read in this order before changing calculation code:
 4. `docs/adr/`
 5. relevant tests
 
+When changing tests or CI, also read `docs/quality/TEST_SUITE_POLICY.md`.
+
 Non-negotiable rules:
 
 - Do not introduce a new Jyotish method because a library defaults to it.
@@ -20,6 +22,9 @@ Non-negotiable rules:
 - Do not add method booleans/integers that bypass a versioned `policy_id`.
 - Do not treat Yoga labels as independent evidence.
 - Do not weaken a boundary/golden/conformance test merely to make a changed calculation pass. A changed expected value needs an explicit policy/provenance reason.
+- Every permanent test must own a unique current behavior, invariant, architecture boundary or reproducibility contract; remove weaker duplicates when a stronger owner exists.
+- Acceptance/migration tests are temporary: record their retirement trigger, remove them from regular CI after acceptance, and preserve historical proof in acceptance docs rather than executable legacy checks.
+- Versioned reference fixtures are immutable regression assets; intentional semantic changes require a new fixture/version or an explicit contract migration.
 - `schemas/ravi_vedic_core_v1.schema.json` is the only current executable machine contract.
 - Future structures remain in the specification until their implementation and contract tests exist.
 - Never create placeholder timing/evidence/sensitivity fields to satisfy a future design.

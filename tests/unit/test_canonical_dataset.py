@@ -35,9 +35,17 @@ def test_reference_dataset_rejects_missing_files(tmp_path):
         verify_canonical_reference_dataset(tmp_path)
 
 
-def test_reference_dataset_rejects_wrong_file_bytes(tmp_path):
+def test_reference_dataset_rejects_wrong_file_sizes(tmp_path):
     for file in SWISS_REFERENCE_FILES:
         (tmp_path / file.name).write_bytes(b"not canonical")
 
     with pytest.raises(RuntimeDataError, match="size mismatch"):
+        verify_canonical_reference_dataset(tmp_path)
+
+
+def test_reference_dataset_rejects_same_size_wrong_hash(tmp_path):
+    for file in SWISS_REFERENCE_FILES:
+        (tmp_path / file.name).write_bytes(b"\0" * file.size_bytes)
+
+    with pytest.raises(RuntimeDataError, match="sha256 mismatch"):
         verify_canonical_reference_dataset(tmp_path)

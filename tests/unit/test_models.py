@@ -65,7 +65,7 @@ def test_snapshot_constructor_detaches_mutable_mapping():
         snapshot.bodies[Graha.MOON] = _body()
 
 
-def test_chart_constructors_detach_placements_and_enforce_policy_lineage():
+def test_chart_constructors_detach_placement_mappings():
     d1_placement = D1Placement(
         body=Graha.SUN,
         sidereal_longitude_deg=9.0,
@@ -114,16 +114,87 @@ def test_chart_constructors_detach_placements_and_enforce_policy_lineage():
     assert tuple(varga.placements) == (Graha.SUN,)
 
 
+def test_chart_constructors_reject_policy_lineage_mismatch():
+    d1_placement = D1Placement(
+        body=Graha.SUN,
+        sidereal_longitude_deg=9.0,
+        sign_index=0,
+        degree_in_sign=9.0,
+        house=1,
+        retrograde=False,
+        mapping_policy_id="wrong-policy",
+    )
+    with pytest.raises(InvariantViolationError, match="D1 placement policy"):
+        D1Chart(
+            ascendant_sidereal_longitude_deg=1.0,
+            ascendant_sign_index=0,
+            ascendant_degree_in_sign=1.0,
+            placements={Graha.SUN: d1_placement},
+            house_policy_id="houses.whole-sign-v1",
+            mapping_policy_id="varga.rasi-v1",
+        )
+
+    matching = VargaProjection(
+        source_longitude_deg=9.0,
+        segment_index=2,
+        target_sign_index=2,
+        longitude_within_target_sign_deg=21.0,
+        projected_longitude_deg=81.0,
+        mapping_policy_id="varga.parasari-navamsa-v1",
+    )
+    mismatched = VargaProjection(
+        source_longitude_deg=9.0,
+        segment_index=2,
+        target_sign_index=2,
+        longitude_within_target_sign_deg=21.0,
+        projected_longitude_deg=81.0,
+        mapping_policy_id="wrong-policy",
+    )
+
+    with pytest.raises(InvariantViolationError, match="Varga ascendant policy"):
+        VargaChart(
+            varga="D9",
+            factor=9,
+            ascendant=mismatched,
+            placements={},
+            mapping_policy_id="varga.parasari-navamsa-v1",
+        )
+
+    with pytest.raises(InvariantViolationError, match="Varga placement policy"):
+        VargaChart(
+            varga="D9",
+            factor=9,
+            ascendant=matching,
+            placements={
+                Graha.SUN: VargaPlacement(
+                    body=Graha.SUN,
+                    projection=mismatched,
+                    house=1,
+                    retrograde=False,
+                )
+            },
+            mapping_policy_id="varga.parasari-navamsa-v1",
+        )
+
+
 def test_provenance_detaches_sequence_inputs():
     sources = ["fake"]
-    diagnostics: list[Diagnostic] = []
+    diagnostic = Diagnostic(
+        code="TEST_DIAGNOSTIC",
+        severity="warning",
+        layer="astronomy",
+        affected_fields=("astronomy",),
+        canonicality_impact="none",
+        details={"reason": "test"},
+    )
+    diagnostics = [diagnostic]
     provenance = _provenance(sources, diagnostics)
 
     sources.append("mutated")
     diagnostics.clear()
 
     assert provenance.actual_sources == ("fake",)
-    assert provenance.diagnostics == ()
+    assert provenance.diagnostics == (diagnostic,)
 
 
 def test_core_result_requires_complete_calculation_identity():

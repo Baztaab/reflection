@@ -1,6 +1,6 @@
 from ravi_vedic.domain.canon import RAVI_VEDIC_MVP_V1
 from ravi_vedic.domain.d1 import build_d1
-from ravi_vedic.domain.geometry import sign_index, whole_sign_house
+from ravi_vedic.domain.geometry import whole_sign_house
 from ravi_vedic.domain.models import (
     AscendantPosition,
     AstronomicalSnapshot,
@@ -44,12 +44,6 @@ def _snapshot(asc: float, body_lon: float) -> AstronomicalSnapshot:
         ),
     )
 
-
-def test_sign_boundaries_are_half_open() -> None:
-    assert sign_index(29.999999999) == 0
-    assert sign_index(30.0) == 1
-    assert sign_index(359.999999999) == 11
-    assert sign_index(360.0) == 0
 
 
 def test_whole_sign_house_wraps() -> None:

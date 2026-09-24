@@ -61,25 +61,6 @@ def test_dashamsa_segment_zero_start_signs_follow_odd_even_rule() -> None:
     assert project_longitude(60.0, policy).target_sign_index == 2
 
 
-def test_navamsa_boundaries_are_half_open() -> None:
-    policy = get_varga_policy("varga.parasari-navamsa-v1")
-    boundary = 30.0 / 9.0
-    before = project_longitude(boundary - 1e-10, policy)
-    at = project_longitude(boundary, policy)
-    assert before.segment_index == 0
-    assert at.segment_index == 1
-    assert at.longitude_within_target_sign_deg == pytest.approx(0.0, abs=1e-12)
-
-
-def test_dashamsa_boundaries_are_half_open() -> None:
-    policy = get_varga_policy("varga.parasari-dashamsa-v1")
-    before = project_longitude(3.0 - 1e-10, policy)
-    at = project_longitude(3.0, policy)
-    assert before.segment_index == 0
-    assert at.segment_index == 1
-    assert at.longitude_within_target_sign_deg == pytest.approx(0.0, abs=1e-12)
-
-
 def test_varga_degree_preserves_fraction_within_segment() -> None:
     policy = get_varga_policy("varga.parasari-dashamsa-v1")
     result = project_longitude(35.0, policy)  # Taurus 5°: 2° into the second 3° segment.

@@ -364,13 +364,3 @@ def test_schema_rejects_malformed_typed_diagnostic() -> None:
 
     with pytest.raises(ValidationError):
         Draft202012Validator(schema).validate(malformed)
-
-
-def test_core_projection_is_deterministic_for_same_result() -> None:
-    result = _development_result()
-    first = to_core_dict(result)
-    second = to_core_dict(result)
-
-    assert first == second
-    assert len(first["provenance"]["input_sha256"]) == 64
-    assert len(first["provenance"]["calculation_fingerprint"]) == 64

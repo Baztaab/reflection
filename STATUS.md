@@ -56,7 +56,7 @@ Current policy source of truth is `CalculationCanon.astronomy` and
 
 ## What M2.6.0–1 established
 
-- Both original numerical fixtures and the Core Schema have frozen SHA-256 identities.
+- Versioned numerical reference fixtures have immutable SHA-256 identities; current Core Schema correctness is enforced by executable schema contract tests rather than a historical schema hash.
 - Application/domain code do not import concrete runtime infrastructure.
 - The pipeline runs with fake astronomy and time ports, with Swiss/tzdata imports blocked.
 - Runtime profile is explicit; canonical construction rejects missing/empty paths and
@@ -68,8 +68,9 @@ Current policy source of truth is `CalculationCanon.astronomy` and
 - A → B → A, DST failure recovery, unknown policy rejection, and unchanged JSON are tested.
 - All previous golden/contract assertions are retained; test setup uses explicit engines.
 
-Evidence: `docs/research/M2_6_1_REFERENCE_REVIEW.md`, ADR-0004,
-`docs/roadmap/M2_6_0_BASELINE.md`, and `scripts/verify_foundation_parity.py`.
+Historical acceptance evidence: `docs/research/M2_6_1_REFERENCE_REVIEW.md`, ADR-0004,
+and `docs/roadmap/M2_6_0_BASELINE.md`. The cross-version parity verifier was an
+acceptance-only migration gate and was retired after M2.6 acceptance.
 
 ## What M2.6.2 now enforces
 
@@ -466,8 +467,9 @@ Post-merge verification:
   pinned two-file Swiss dataset verified and strict canonical integration **1/1** per minor.
 
 No calculation policy, Jyotish technique or serialized payload was added in M2.6.10.
-GitHub currently reports `main` as unprotected; that is a separate non-blocking
-repository-governance follow-up, not an engine-architecture acceptance failure.
+Post-acceptance repository maintenance now protects the default branch with the active
+`Protect main — RAVI` ruleset: pull requests, linear history, squash-only merges, current
+quality/canonical status checks, and no force-push/deletion bypass.
 
 ## M3 handoff boundary
 
