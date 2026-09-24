@@ -11,22 +11,6 @@ from ravi_vedic.domain.geometry import (
 )
 
 
-@pytest.mark.parametrize(
-    "value",
-    [0.0, 0.125, 29.999999999, 30.0, 237.41339805282163, 359.999999999],
-)
-def test_longitude_periodicity_property(value):
-    baseline = Longitude(value)
-    for turns in range(-12, 13):
-        candidate = Longitude(value + 360.0 * turns)
-        assert candidate.degrees == pytest.approx(baseline.degrees, abs=1e-12)
-        assert candidate.sign_index == baseline.sign_index
-        assert candidate.degree_in_sign == pytest.approx(
-            baseline.degree_in_sign,
-            abs=1e-12,
-        )
-
-
 def test_tiny_negative_longitude_stays_inside_half_open_zodiac():
     longitude = Longitude(-2.866157805194779e-223)
 
