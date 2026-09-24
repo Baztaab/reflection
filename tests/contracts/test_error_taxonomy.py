@@ -19,11 +19,11 @@ from ravi_vedic import (
     UnsupportedPolicyError,
 )
 from ravi_vedic.infrastructure.swiss import (
-    EphemerisSourceError as HistoricalEphemerisSourceError,
+    EphemerisSourceError as ReexportedEphemerisSourceError,
 )
-from ravi_vedic.infrastructure.swiss import SwissSessionError as HistoricalSwissSessionError
+from ravi_vedic.infrastructure.swiss import SwissSessionError as ReexportedSwissSessionError
 from ravi_vedic.infrastructure.swiss.manifest import build_ephemeris_data_identity
-from ravi_vedic.infrastructure.timezone import TimeResolutionError as HistoricalTimeResolutionError
+from ravi_vedic.infrastructure.timezone import TimeResolutionError as ReexportedTimeResolutionError
 
 
 def test_public_error_hierarchy_has_stable_semantic_categories() -> None:
@@ -48,10 +48,10 @@ def test_public_error_hierarchy_has_stable_semantic_categories() -> None:
     assert issubclass(InvariantViolationError, RuntimeError)
 
 
-def test_historical_named_error_imports_are_identity_preserving() -> None:
-    assert HistoricalTimeResolutionError is TimeResolutionError
-    assert HistoricalEphemerisSourceError is EphemerisSourceError
-    assert HistoricalSwissSessionError is SwissSessionError
+def test_supported_error_reexports_preserve_identity() -> None:
+    assert ReexportedTimeResolutionError is TimeResolutionError
+    assert ReexportedEphemerisSourceError is EphemerisSourceError
+    assert ReexportedSwissSessionError is SwissSessionError
 
 
 def test_invalid_birth_input_raises_typed_input_error() -> None:
