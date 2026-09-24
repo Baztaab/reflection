@@ -72,6 +72,21 @@ supported. If a compatibility shim is deprecated, its test must carry the same r
 milestone as the shim. Do not preserve an accidental historical import path forever just
 because a test exists for it.
 
+## Known lifecycle-bound contracts
+
+The following tests are intentionally retained even though their lifetime is not infinite:
+
+- error re-export identity tests stay only while those re-export paths remain part of the
+  supported package surface; remove the shim and its test in the same reviewed API change;
+- Core-v1 schema tests stay while Core-v1 is executable/supported; a future schema version
+  must explicitly decide whether v1 remains a compatibility contract or is retired;
+- Python-support matrix tests change only with package metadata and both CI matrices in the
+  same reviewed change;
+- versioned reference-fixture integrity tests stay while that fixture version is a supported
+  regression reference; never mutate a version in place to follow a new policy.
+
+Do not create a placeholder test for a future contract before that contract exists.
+
 ## CI/meta tests
 
 A test may inspect CI or project configuration when the configuration itself is a
