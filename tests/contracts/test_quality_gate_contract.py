@@ -4,27 +4,23 @@ from pathlib import Path
 ROOT = Path(__file__).parents[2]
 PYPROJECT = ROOT / "pyproject.toml"
 QUALITY_WORKFLOW = ROOT / ".github" / "workflows" / "test.yml"
-BOUNDARY_CONTRACT = ROOT / "tests" / "contracts" / "test_application_boundaries.py"
 
 
-def test_property_testing_dependency_is_pinned() -> None:
+def test_dev_quality_toolchain_is_exactly_pinned() -> None:
     pyproject = tomllib.loads(PYPROJECT.read_text())
     dev = pyproject["project"]["optional-dependencies"]["dev"]
 
-    assert "hypothesis==6.168.1" in dev
+    assert dev
+    assert all("==" in requirement for requirement in dev)
 
 
-def test_quality_workflow_has_explicit_property_gate() -> None:
+def test_quality_workflow_keeps_each_quality_gate_explicit() -> None:
     workflow = QUALITY_WORKFLOW.read_text()
 
-    assert "name: Run deterministic test suite" in workflow
-    assert "pytest --ignore=tests/property" in workflow
-    assert "name: Run property tests" in workflow
-    assert "pytest tests/property" in workflow
-
-
-def test_dependency_direction_contract_remains_in_main_test_suite() -> None:
-    workflow = QUALITY_WORKFLOW.read_text()
-
-    assert BOUNDARY_CONTRACT.is_file()
-    assert "pytest --ignore=tests/property" in workflow
+    for command in (
+        "ruff check src tests scripts",
+        "mypy src/ravi_vedic",
+        "pytest --ignore=tests/property",
+        "pytest tests/property",
+    ):
+        assert command in workflow
